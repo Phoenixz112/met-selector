@@ -665,14 +665,15 @@ function onCode() {
 function onDoor() {
   const rows = fRows();
   const gates = uniq(rows, r=>r.gate);
+  const gSel = document.getElementById('m-gate');
   if (gates.length > 1) {
-    opt(document.getElementById('m-gate'), gates, g=>`${g} Gate${g>1?'s':''}`);
+    opt(gSel, gates, g=>`${g} Gate${g>1?'s':''}`);
+    ['m-ent','m-car','m-cwt','m-spd'].forEach(id=>document.getElementById(id).innerHTML='<option value="">— Select —</option>');
   } else {
-    // Auto-select if only 1 gate option
-    const g = document.getElementById('m-gate');
-    g.innerHTML = `<option value="${gates[0]}">${gates[0]} Gate</option>`;
+    // Auto-select + auto-trigger onGate
+    gSel.innerHTML = `<option value="${gates[0]}">${gates[0]} Gate</option>`;
+    onGate(); // trigger next dropdown automatically
   }
-  ['m-ent','m-car','m-cwt','m-spd'].forEach(id=>document.getElementById(id).innerHTML='<option value="">— Select —</option>');
 }
 function onGate() {
   const rows = fRows();
