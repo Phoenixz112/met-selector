@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>MET Selector</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap');
+:root{
+  --red:#C8102E;--red-dark:#9e0c23;--red-light:#fdf1f3;
+  --navy:#1a2744;--navy-mid:#243157;
+  --mist:#f0f4f8;--white:#fff;
+  --border:#d1dce8;--text:#1a2744;--text-soft:#64748b;
+  --green:#0f7556;--amber:#b45309;
+  --radius:10px;--shadow:0 2px 12px rgba(26,39,68,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--mist);color:var(--text);min-height:100vh;font-size:15px}
+/* HEADER */
+.app-header{background:var(--navy);color:#fff;padding:0 18px;display:flex;align-items:center;height:54px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.25);gap:12px}
+.header-title{font-size:17px;font-weight:700;letter-spacing:.5px}
+.header-sub{font-size:10px;color:rgba(255,255,255,.5);font-weight:400;text-transform:uppercase;letter-spacing:.5px}
+/* TABS */
+.main-tabs{background:#fff;display:flex;border-bottom:2px solid var(--border);position:sticky;top:54px;z-index:90}
+.tab-btn{flex:1;padding:13px 8px;background:none;border:none;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:var(--text-soft);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s}
+.tab-btn.active{color:var(--red);border-bottom-color:var(--red)}
+.tab-btn svg{width:17px;height:17px}
+/* PAGE */
+.page{display:none;padding:14px;max-width:620px;margin:0 auto}
+.page.active{display:block}
+/* LOADING */
+.loading-wrap{text-align:center;padding:48px 16px;color:var(--text-soft)}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--red);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* MODE */
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.mode-card{background:#fff;border:2px solid var(--border);border-radius:12px;padding:20px 12px;cursor:pointer;text-align:center;transition:all .2s;box-shadow:var(--shadow)}
+.mode-card:hover{border-color:var(--red);transform:translateY(-1px)}
+.mode-icon{font-size:30px;margin-bottom:8px;display:block}
+.mode-label{font-size:14px;font-weight:700;color:var(--text);display:block}
+.mode-desc{font-size:11px;color:var(--text-soft);display:block;margin-top:4px;line-height:1.45}
+/* STEPS */
+.steps-bar{display:flex;align-items:center;margin-bottom:14px;background:#fff;border-radius:99px;padding:6px 10px;box-shadow:var(--shadow);border:1.5px solid var(--border)}
+.step-pill{flex:1;text-align:center;font-size:11px;font-weight:500;color:var(--text-soft);padding:5px 4px;border-radius:99px;transition:all .2s;white-space:nowrap}
+.step-pill.active{background:var(--red);color:#fff;font-weight:700}
+.step-pill.done{color:var(--green);font-weight:600}
+/* SECTION */
+.section-title{font-size:11px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px}
+.section-title:first-child{margin-top:4px}
+/* CARD */
+.card{background:#fff;border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow);border:1.5px solid var(--border)}
+/* FORM */
+.form-row{margin-bottom:14px}
+.form-label{font-size:11px;font-weight:700;color:var(--text-soft);margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:.5px}
+.form-select,.form-input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;color:var(--text);background:#fff;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;transition:border-color .2s}
+.form-select:focus,.form-input:focus{outline:none;border-color:var(--red)}
+.form-input{background-image:none}
+.input-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* BUTTONS */
+.btn-primary{width:100%;padding:15px;background:var(--red);color:#fff;border:none;border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:14px;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-primary:hover{background:var(--red-dark)}
+.btn-primary:disabled{background:#ccc;cursor:not-allowed}
+.btn-secondary{width:100%;padding:12px;background:none;color:var(--text-soft);border:1.5px solid var(--border);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:14px;font-weight:500;cursor:pointer;margin-top:8px;transition:all .2s}
+.btn-secondary:hover{border-color:var(--navy);color:var(--navy)}
+.btn-export{width:100%;padding:14px;background:var(--navy);color:#fff;border:none;border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-export:hover{background:#111d38}
+.btn-reset{width:100%;padding:12px;background:none;color:var(--red);border:1.5px solid var(--red);border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:14px;font-weight:500;cursor:pointer;margin-top:8px;transition:all .2s}
+.btn-reset:hover{background:var(--red-light)}
+/* FACTORY CARDS */
+.factory-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.factory-card{background:#fff;border:2px solid var(--border);border-radius:var(--radius);padding:14px 16px;cursor:pointer;transition:all .2s;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
+.factory-card:hover{border-color:var(--red)}
+.factory-card.selected{border-color:var(--red);background:var(--red-light)}
+.factory-icon{font-size:26px;flex-shrink:0}
+.factory-info{flex:1}
+.factory-name{font-size:14px;font-weight:700;color:var(--navy)}
+.factory-desc{font-size:12px;color:var(--text-soft);margin-top:2px}
+.factory-check{width:20px;height:20px;background:var(--red);border-radius:50%;display:none;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:12px;font-weight:700}
+.factory-card.selected .factory-check{display:flex}
+/* MODEL ROWS */
+.model-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.model-row{background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:12px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:all .2s;box-shadow:var(--shadow)}
+.model-row:hover{border-color:var(--red)}
+.model-row.selected{border-color:var(--red);background:var(--red-light)}
+.model-code{font-size:13px;font-weight:700;color:var(--navy);font-family:'Roboto Mono',monospace}
+.model-cap{font-size:12px;color:var(--text-soft)}
+.model-check{width:18px;height:18px;background:var(--red);border-radius:50%;display:none;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;margin-left:8px;flex-shrink:0}
+.model-row.selected .model-check{display:flex}
+/* RESULT */
+.result-header{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 100%);border-radius:var(--radius);padding:18px 16px;color:#fff;margin-bottom:12px;box-shadow:0 8px 24px rgba(26,39,68,.18)}
+.result-model{font-size:20px;font-weight:700;letter-spacing:.5px;font-family:'Roboto Mono',monospace}
+.result-sub{font-size:12px;color:rgba(255,255,255,.6);margin-top:4px}
+.result-badge{display:inline-block;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;margin-top:8px;text-transform:uppercase;letter-spacing:.5px}
+/* DIM TABLE */
+.dim-table{width:100%;border-collapse:collapse}
+.dim-table tr{border-bottom:1px solid var(--border)}
+.dim-table tr:last-child{border-bottom:none}
+.dim-table td{padding:9px 0;font-size:13px}
+.dim-table td:first-child{color:var(--text-soft);font-weight:500;width:55%}
+.dim-table td:last-child{font-family:'Roboto Mono',monospace;font-weight:600;color:var(--navy);text-align:right;font-size:14px}
+.dim-unit{font-size:10px;color:var(--text-soft);font-weight:400}
+/* MATCH CARDS */
+.match-card{background:#fff;border:1.5px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);margin-bottom:10px}
+.match-card.best{border-color:var(--green);background:#f0fdf8}
+.match-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.match-code{font-size:15px;font-weight:700;color:var(--navy);font-family:'Roboto Mono',monospace}
+.match-tag{font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;text-transform:uppercase}
+.tag-best{background:#dcfce7;color:var(--green)}
+.tag-fit{background:#e0f2fe;color:#0369a1}
+.match-dims{font-size:12px;color:var(--text-soft);line-height:1.8}
+.match-dims span{font-family:'Roboto Mono',monospace;color:var(--navy);font-weight:600}
+/* DRAWING */
+.drawing-container{background:#fff;border-radius:var(--radius);padding:14px;margin-bottom:12px;box-shadow:var(--shadow);border:1.5px solid var(--border)}
+.drawing-tabs{display:flex;gap:6px;margin-bottom:12px}
+.drawing-tab{padding:6px 14px;border:1.5px solid var(--border);border-radius:99px;background:none;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;cursor:pointer;color:var(--text-soft);transition:all .2s}
+.drawing-tab.active{background:var(--navy);border-color:var(--navy);color:#fff}
+.dview{display:none}
+.dview.active{display:block}
+.svg-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:8px;background:#f8fafc}
+/* ALERTS */
+.alert-info{background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;font-size:12px;color:#1e40af;margin-bottom:12px}
+.alert-warn{background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:10px 14px;font-size:12px;color:#92400e;margin-bottom:12px}
+.alert-err{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:12px;color:#991b1b;margin-bottom:12px}
+.no-result{text-align:center;padding:32px 16px;color:var(--text-soft)}
+.no-result-icon{font-size:40px;margin-bottom:12px}
+.no-result-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px}
+/* ESC */
+.esc-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.esc-card{background:#fff;border:2px solid var(--border);border-radius:var(--radius);padding:14px 16px;cursor:pointer;transition:all .2s;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
+.esc-card:hover{border-color:var(--red)}
+.esc-card.selected{border-color:var(--red);background:var(--red-light)}
+.esc-icon{font-size:28px;flex-shrink:0}
+.esc-info{flex:1}
+.esc-name{font-size:14px;font-weight:700;color:var(--navy)}
+.esc-desc{font-size:12px;color:var(--text-soft);margin-top:2px}
+.esc-check{width:20px;height:20px;background:var(--red);border-radius:50%;display:none;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:12px;font-weight:700}
+.esc-card.selected .esc-check{display:flex}
+@media print{
+  .app-header,.main-tabs,.btn-primary,.btn-secondary,.btn-export,.btn-reset,.no-print{display:none!important}
+  body{background:#fff}
+  .page{display:block!important;padding:0}
+  .card,.result-header,.drawing-container{box-shadow:none;break-inside:avoid}
+}
+@media(max-width:400px){.mode-grid{gap:8px}.input-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="app-header">
+  <div>
+    <div class="header-title">MET Selector</div>
+    <div class="header-sub">Mitsubishi Elevator · Escalator</div>
+  </div>
+</header>
+<div class="main-tabs">
+  <button class="tab-btn active" onclick="switchTab('elev')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 7l3-3 3 3M9 17l3 3 3-3"/></svg>
+    Elevator
+  </button>
+  <button class="tab-btn" onclick="switchTab('esc')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20L20 4M4 20h6M20 4h-6"/><circle cx="7" cy="17" r="1.5" fill="currentColor"/><circle cx="17" cy="7" r="1.5" fill="currentColor"/></svg>
+    Escalator
+  </button>
+</div>
+
+<!-- ===== ELEVATOR ===== -->
+<div id="main-elev" class="page active">
+  <!-- LOADING -->
+  <div id="elev-loading">
+    <div class="loading-wrap">
+      <div class="spinner"></div>
+      <div>Loading catalog data...</div>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div id="elev-home" style="display:none">
+    <div class="section-title">Select Query Mode</div>
+    <div class="mode-grid">
+      <div class="mode-card" onclick="startMode('shaft')">
+        <span class="mode-icon">📐</span>
+        <span class="mode-label">By Shaft Size</span>
+        <span class="mode-desc">Enter shaft dimensions — find all models that fit</span>
+      </div>
+      <div class="mode-card" onclick="startMode('model')">
+        <span class="mode-icon">📋</span>
+        <span class="mode-label">By Model</span>
+        <span class="mode-desc">Choose factory & model — view full specifications</span>
+      </div>
+    </div>
+    <div class="alert-info" id="db-status"></div>
+  </div>
+
+  <!-- BY SHAFT -->
+  <div id="elev-shaft" style="display:none">
+    <div class="steps-bar">
+      <div class="step-pill active">1 · Shaft Input</div>
+      <div class="step-pill">2 · Results</div>
+    </div>
+    <div class="card">
+      <div class="section-title" style="margin-top:0">Hoistway Clear Dimensions</div>
+      <div class="input-row">
+        <div class="form-row">
+          <label class="form-label">Width — AH (mm)</label>
+          <input class="form-input" type="number" id="sh-ah" placeholder="e.g. 2100">
+        </div>
+        <div class="form-row">
+          <label class="form-label">Depth — BH (mm)</label>
+          <input class="form-input" type="number" id="sh-bh" placeholder="e.g. 2200">
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Travel Height — TR (m)</label>
+        <input class="form-input" type="number" id="sh-tr" placeholder="e.g. 45">
+      </div>
+      <div class="section-title">Filters (optional)</div>
+      <div class="form-row">
+        <label class="form-label">Factory</label>
+        <select class="form-select" id="sh-factory">
+          <option value="">Any Factory</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Min. Capacity (kg)</label>
+        <select class="form-select" id="sh-cap">
+          <option value="0">Any capacity</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Door Type</label>
+        <select class="form-select" id="sh-door">
+          <option value="">Any</option>
+          <option value="CO">CO (Centre Opening)</option>
+          <option value="2S">2S (Side Opening)</option>
+        </select>
+      </div>
+      <div class="form-row" style="margin-bottom:0">
+        <label class="form-label">Counterweight Position</label>
+        <select class="form-select" id="sh-cwt">
+          <option value="">Any</option>
+          <option value="Rear">Rear</option>
+          <option value="Side">Side</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="searchShaft()">
+      Search Matching Models
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    </button>
+    <button class="btn-secondary no-print" onclick="goHome()">← Back</button>
+    <div id="shaft-results" style="display:none;margin-top:4px">
+      <div class="steps-bar">
+        <div class="step-pill done">1 · Shaft Input</div>
+        <div class="step-pill active">2 · Results</div>
+      </div>
+      <div id="shaft-body"></div>
+      <button class="btn-export no-print" onclick="window.print()">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print / Export PDF
+      </button>
+      <button class="btn-secondary no-print" onclick="document.getElementById('shaft-results').style.display='none'">← Edit Search</button>
+    </div>
+  </div>
+
+  <!-- BY MODEL -->
+  <div id="elev-model" style="display:none">
+    <!-- Step 1: Factory -->
+    <div id="em1">
+      <div class="steps-bar">
+        <div class="step-pill active">1 · Factory</div>
+        <div class="step-pill">2 · Series</div>
+        <div class="step-pill">3 · Specs</div>
+        <div class="step-pill">4 · Result</div>
+      </div>
+      <div class="section-title">Select Factory</div>
+      <div class="factory-grid" id="factory-list"></div>
+      <button class="btn-primary" onclick="goMS(2)" id="btn-f" disabled>
+        Next <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+      <button class="btn-secondary" onclick="goHome()">← Back</button>
+    </div>
+    <!-- Step 2: Series -->
+    <div id="em2" style="display:none">
+      <div class="steps-bar">
+        <div class="step-pill done">1 · Factory</div>
+        <div class="step-pill active">2 · Series</div>
+        <div class="step-pill">3 · Specs</div>
+        <div class="step-pill">4 · Result</div>
+      </div>
+      <div class="section-title">Select Series</div>
+      <div class="model-list" id="series-list"></div>
+      <button class="btn-primary" onclick="goMS(3)" id="btn-s" disabled>
+        Next <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+      <button class="btn-secondary" onclick="goMS(1)">← Back</button>
+    </div>
+    <!-- Step 3: Specs -->
+    <div id="em3" style="display:none">
+      <div class="steps-bar">
+        <div class="step-pill done">1 · Factory</div>
+        <div class="step-pill done">2 · Series</div>
+        <div class="step-pill active">3 · Specs</div>
+        <div class="step-pill">4 · Result</div>
+      </div>
+      <div class="card">
+        <div class="form-row">
+          <label class="form-label">Code / Capacity</label>
+          <select class="form-select" id="m-code" onchange="onCode()"></select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Door Type</label>
+          <select class="form-select" id="m-door" onchange="onDoor()"></select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Gate</label>
+          <select class="form-select" id="m-gate" onchange="onGate()"></select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Entrance Width (mm)</label>
+          <select class="form-select" id="m-ent" onchange="onEnt()"></select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Car Size AA × BB (mm)</label>
+          <select class="form-select" id="m-car" onchange="onCar()"></select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Counterweight Position</label>
+          <select class="form-select" id="m-cwt" onchange="onCwt()"></select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Rated Speed (m/s)</label>
+          <select class="form-select" id="m-spd"></select>
+        </div>
+        <div class="form-row" style="margin-bottom:0">
+          <label class="form-label">Travel Height — TR (m)</label>
+          <input class="form-input" type="number" id="m-tr" placeholder="e.g. 45">
+        </div>
+      </div>
+      <button class="btn-primary" onclick="showResult()">
+        View Result <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+      <button class="btn-secondary" onclick="goMS(2)">← Back</button>
+    </div>
+    <!-- Step 4: Result -->
+    <div id="em4" style="display:none">
+      <div class="result-header">
+        <div class="result-model" id="r-title">NEXIEZ-MR · P10</div>
+        <div class="result-sub" id="r-sub">AMEC · CO · Gate 1 · 1.0 m/s</div>
+        <div class="result-badge">Passenger Elevator</div>
+      </div>
+      <div class="section-title">Hoistway (Min. Dimensions)</div>
+      <div class="card"><table class="dim-table" id="r-shaft"></table></div>
+      <div class="section-title">Machine Room (Min. Dimensions)</div>
+      <div class="card"><table class="dim-table" id="r-mr"></table></div>
+      <div class="section-title">Car & Vertical</div>
+      <div class="card"><table class="dim-table" id="r-car"></table></div>
+      <div class="section-title">Layout Drawing</div>
+      <div class="drawing-container">
+        <div class="drawing-tabs">
+          <button class="drawing-tab active" onclick="switchDraw('top')">Top View</button>
+          <button class="drawing-tab" onclick="switchDraw('side')">Side View</button>
+        </div>
+        <div class="dview active" id="draw-top"><div class="svg-wrap" id="svg-top"></div></div>
+        <div class="dview" id="draw-side"><div class="svg-wrap" id="svg-side"></div></div>
+      </div>
+      <div class="alert-info">All dimensions in mm · Source: Mitsubishi Electric Catalog</div>
+      <button class="btn-export no-print" onclick="window.print()">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print / Export PDF
+      </button>
+      <button class="btn-reset" onclick="goMS(3)">← Change Specs</button>
+      <button class="btn-secondary" onclick="goHome()">New Query</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ESCALATOR ===== -->
+<div id="main-esc" class="page">
+  <div id="esc-loading">
+    <div class="loading-wrap">
+      <div class="spinner"></div>
+      <div>Loading catalog data...</div>
+    </div>
+  </div>
+  <div id="esc-home" style="display:none">
+    <div class="section-title">Select Series</div>
+    <div class="esc-grid" id="esc-series-list"></div>
+    <button class="btn-primary" onclick="showEsc()" id="btn-esc" disabled>
+      View Specifications <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+    <div class="alert-warn" style="margin-top:12px">⚠ No escalator data loaded yet. Add data to ESCALATOR sheet to enable this section.</div>
+  </div>
+  <div id="esc-result" style="display:none">
+    <div class="result-header">
+      <div class="result-model" id="esc-title">Smart K-II</div>
+      <div class="result-sub" id="esc-sub">SMEC · Escalator</div>
+      <div class="result-badge">Escalator</div>
+    </div>
+    <div class="card">
+      <div class="form-row">
+        <label class="form-label">Incline Angle</label>
+        <select class="form-select" id="esc-ang" onchange="updEsc()"></select>
+      </div>
+      <div class="form-row" style="margin-bottom:0">
+        <label class="form-label">Step Width</label>
+        <select class="form-select" id="esc-wid" onchange="updEsc()"></select>
+      </div>
+    </div>
+    <div class="section-title">Key Dimensions</div>
+    <div class="card"><table class="dim-table" id="esc-dims"></table></div>
+    <div class="alert-warn">⚠ Rise (H) and run (L) vary by site. Verify with Mitsubishi technical drawings.</div>
+    <button class="btn-export no-print" onclick="window.print()">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Print / Export PDF
+    </button>
+    <button class="btn-reset" onclick="resetEsc()">← Back</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// CONFIG — Google Sheets ID
+// ============================================================
+const SHEET_ID = '1OjCye8QlxaNXojs6fckuyjIK9wQ3F-L5QIfwHemvQps';
+const SHEETS_URL = (sheet) =>
+  `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheet)}`;
+
+// ============================================================
+// GLOBAL DATA STORE
+// ============================================================
+let DB = [];       // ELEVATOR rows
+let VT = [];       // VERTICAL rows
+let ESC_DB = [];   // ESCALATOR rows
+let ST = { factory: null, series: null, escSeries: null };
+
+// ============================================================
+// FETCH SHEETS DATA
+// ============================================================
+async function fetchSheet(sheetName) {
+  const res = await fetch(SHEETS_URL(sheetName));
+  const text = await res.text();
+  // Strip Google's JSONP wrapper
+  const json = JSON.parse(text.replace(/^[^\(]+\(/, '').replace(/\);?\s*$/, ''));
+  const cols = json.table.cols.map(c => c.label.trim());
+  return (json.table.rows || [])
+    .filter(r => r && r.c && r.c.some(c => c && c.v !== null && c.v !== ''))
+    .map(r => {
+      const obj = {};
+      cols.forEach((col, i) => {
+        const cell = r.c[i];
+        obj[col] = cell ? (cell.v !== null ? cell.v : '') : '';
+      });
+      return obj;
+    });
+}
+
+async function loadAllData() {
+  try {
+    [DB, VT, ESC_DB] = await Promise.all([
+      fetchSheet('ELEVATOR'),
+      fetchSheet('VERTICAL'),
+      fetchSheet('ESCALATOR'),
+    ]);
+    // Normalize number fields
+    DB = DB.map(r => ({
+      ...r,
+      persons:  +r.persons,
+      capacity: +r.capacity,
+      gate:     +r.gate,
+      entrance: +r.entrance,
+      aa: +r.aa, bb: +r.bb,
+      speed: +r.speed,
+      ah: +r.ah, bh: +r.bh,
+      am: r.am ? +r.am : null,
+      bm: r.bm ? +r.bm : null,
+    }));
+    VT = VT.map(r => ({
+      ...r,
+      speed:   +r.speed,
+      min_cap: +r.min_cap,
+      max_cap: +r.max_cap,
+      tr_min:  +r.tr_min,
+      tr_max:  +r.tr_max,
+      oh:  +r.oh,
+      pit: +r.pit,
+      hm:  r.hm ? +r.hm : null,
+    }));
+    ESC_DB = ESC_DB.map(r => ({
+      ...r,
+      angle:      +r.angle,
+      step_width: +r.step_width,
+      W1: +r.W1, W2: +r.W2, W3: +r.W3,
+      upper_ext: +r.upper_ext,
+      lower_ext: +r.lower_ext,
+      speed: +r.speed,
+    }));
+
+    initApp();
+  } catch(e) {
+    document.getElementById('elev-loading').innerHTML =
+      `<div class="alert-err">❌ Failed to load data: ${e.message}<br>Check that the Google Sheet is shared publicly.</div>`;
+    document.getElementById('esc-loading').innerHTML =
+      `<div class="alert-err">❌ Failed to load data.</div>`;
+  }
+}
+
+function initApp() {
+  // Hide loaders, show home
+  document.getElementById('elev-loading').style.display = 'none';
+  document.getElementById('elev-home').style.display = '';
+  document.getElementById('esc-loading').style.display = 'none';
+  document.getElementById('esc-home').style.display = '';
+
+  // Status
+  document.getElementById('db-status').textContent =
+    `✅ Loaded ${DB.length} elevator configurations · ${VT.length} vertical records · ${ESC_DB.length} escalator records`;
+
+  // Populate shaft filter dropdowns
+  const factories = [...new Set(DB.map(r => r.factory))].sort();
+  const fSel = document.getElementById('sh-factory');
+  factories.forEach(f => { const o=document.createElement('option');o.value=f;o.textContent=f;fSel.appendChild(o); });
+
+  const caps = [...new Set(DB.map(r => r.capacity))].sort((a,b)=>a-b);
+  const cSel = document.getElementById('sh-cap');
+  caps.forEach(c => { const o=document.createElement('option');o.value=c;o.textContent=`≥ ${c} kg`;cSel.appendChild(o); });
+
+  // Build factory cards for By Model
+  buildFactoryCards();
+
+  // Build escalator series
+  buildEscSeries();
+}
+
+// ============================================================
+// NAV
+// ============================================================
+function switchTab(t) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (i===0&&t==='elev')||(i===1&&t==='esc')));
+  document.getElementById('main-elev').classList.toggle('active', t==='elev');
+  document.getElementById('main-esc').classList.toggle('active', t==='esc');
+}
+function goHome() {
+  document.getElementById('elev-home').style.display = '';
+  document.getElementById('elev-shaft').style.display = 'none';
+  document.getElementById('elev-model').style.display = 'none';
+}
+function startMode(m) {
+  document.getElementById('elev-home').style.display = 'none';
+  if (m === 'shaft') {
+    document.getElementById('elev-shaft').style.display = '';
+    document.getElementById('shaft-results').style.display = 'none';
+  } else {
+    document.getElementById('elev-model').style.display = '';
+    goMS(1);
+  }
+}
+function goMS(n) {
+  for(let i=1;i<=4;i++) document.getElementById('em'+i).style.display = (i===n?'':'none');
+  if(n===3) initSpecs();
+}
+
+// ============================================================
+// FACTORY CARDS (dynamic from DB)
+// ============================================================
+function buildFactoryCards() {
+  const factories = [...new Set(DB.map(r => r.factory))].sort();
+  const icons = { AMEC:'🏭', MESE:'🏗️', MHE:'🔧' };
+  const list = document.getElementById('factory-list');
+  list.innerHTML = '';
+  factories.forEach(f => {
+    const series = [...new Set(DB.filter(r=>r.factory===f).map(r=>r.series))];
+    const div = document.createElement('div');
+    div.className = 'factory-card';
+    div.id = 'fac-'+f;
+    div.innerHTML = `
+      <span class="factory-icon">${icons[f]||'🏢'}</span>
+      <div class="factory-info">
+        <div class="factory-name">${f}</div>
+        <div class="factory-desc">${series.join(' · ')}</div>
+      </div>
+      <div class="factory-check">✓</div>`;
+    div.onclick = () => {
+      ST.factory = f;
+      document.querySelectorAll('.factory-card').forEach(c=>c.classList.remove('selected'));
+      div.classList.add('selected');
+      document.getElementById('btn-f').disabled = false;
+      buildSeriesList(f);
+    };
+    list.appendChild(div);
+  });
+}
+
+function buildSeriesList(factory) {
+  const series = [...new Set(DB.filter(r=>r.factory===factory).map(r=>r.series))].sort();
+  const list = document.getElementById('series-list');
+  list.innerHTML = '';
+  ST.series = null;
+  document.getElementById('btn-s').disabled = true;
+  series.forEach(s => {
+    const rows = DB.filter(r=>r.factory===factory&&r.series===s);
+    const caps = [...new Set(rows.map(r=>r.capacity))].sort((a,b)=>a-b);
+    const speeds = [...new Set(rows.map(r=>r.speed))].sort((a,b)=>a-b);
+    const div = document.createElement('div');
+    div.className = 'model-row';
+    div.id = 'ser-'+s.replace(/[^a-zA-Z0-9]/g,'-');
+    div.innerHTML = `
+      <div>
+        <div class="model-code">${s}</div>
+        <div class="model-cap">${caps[0]}–${caps[caps.length-1]} kg · ${speeds[0]}–${speeds[speeds.length-1]} m/s</div>
+      </div>
+      <div style="display:flex;align-items:center">
+        <div class="model-check">✓</div>
+      </div>`;
+    div.onclick = () => {
+      ST.series = s;
+      document.querySelectorAll('#series-list .model-row').forEach(c=>c.classList.remove('selected'));
+      div.classList.add('selected');
+      document.getElementById('btn-s').disabled = false;
+    };
+    list.appendChild(div);
+  });
+}
+
+// ============================================================
+// CASCADING DROPDOWNS (By Model)
+// ============================================================
+function uniq(arr, fn) { return [...new Set(arr.map(fn))].sort((a,b) => typeof a==='number'?a-b:String(a).localeCompare(String(b))); }
+function opt(sel, vals, fn) {
+  sel.innerHTML = '<option value="">— Select —</option>';
+  vals.forEach(v => { const o=document.createElement('option');o.value=v;o.textContent=fn(v);sel.appendChild(o); });
+}
+
+function initSpecs() {
+  const rows = DB.filter(r => r.factory===ST.factory && r.series===ST.series);
+  opt(document.getElementById('m-code'), uniq(rows, r=>r.code), c => {
+    const r = rows.find(x=>x.code===c);
+    return `${c} — ${r.capacity} kg (${r.persons}P)`;
+  });
+  ['m-door','m-gate','m-ent','m-car','m-cwt','m-spd'].forEach(id =>
+    document.getElementById(id).innerHTML = '<option value="">— Select code first —</option>');
+}
+
+function fRows() {
+  let r = DB.filter(x => x.factory===ST.factory && x.series===ST.series);
+  const code = document.getElementById('m-code').value;
+  const door = document.getElementById('m-door').value;
+  const gate = document.getElementById('m-gate').value;
+  const ent  = parseInt(document.getElementById('m-ent').value)||0;
+  const car  = document.getElementById('m-car').value;
+  const cwt  = document.getElementById('m-cwt').value;
+  if(code) r=r.filter(x=>x.code===code);
+  if(door) r=r.filter(x=>x.door===door);
+  if(gate) r=r.filter(x=>x.gate===parseInt(gate));
+  if(ent)  r=r.filter(x=>x.entrance===ent);
+  if(car){const[a,b]=car.split('x').map(Number);r=r.filter(x=>x.aa===a&&x.bb===b);}
+  if(cwt)  r=r.filter(x=>x.cwt===cwt);
+  return r;
+}
+
+function onCode() {
+  const code = document.getElementById('m-code').value;
+  const rows = DB.filter(r=>r.factory===ST.factory&&r.series===ST.series&&r.code===code);
+  opt(document.getElementById('m-door'), uniq(rows,r=>r.door), d=>d==='CO'?'CO (Centre Opening)':'2S (Side Opening)');
+  ['m-gate','m-ent','m-car','m-cwt','m-spd'].forEach(id=>document.getElementById(id).innerHTML='<option value="">— Select —</option>');
+}
+function onDoor() {
+  const rows = fRows();
+  const gates = uniq(rows, r=>r.gate);
+  if (gates.length > 1) {
+    opt(document.getElementById('m-gate'), gates, g=>`${g} Gate${g>1?'s':''}`);
+  } else {
+    // Auto-select if only 1 gate option
+    const g = document.getElementById('m-gate');
+    g.innerHTML = `<option value="${gates[0]}">${gates[0]} Gate</option>`;
+  }
+  ['m-ent','m-car','m-cwt','m-spd'].forEach(id=>document.getElementById(id).innerHTML='<option value="">— Select —</option>');
+}
+function onGate() {
+  const rows = fRows();
+  opt(document.getElementById('m-ent'), uniq(rows,r=>r.entrance), e=>{
+    const types = [...new Set(rows.filter(x=>x.entrance===e).map(x=>x.entrance_type))];
+    return `${e} mm (${types.join('/')})`;
+  });
+  ['m-car','m-cwt','m-spd'].forEach(id=>document.getElementById(id).innerHTML='<option value="">— Select —</option>');
+}
+function onEnt() {
+  const rows = fRows();
+  opt(document.getElementById('m-car'), uniq(rows,r=>r.aa+'x'+r.bb), s=>{const[a,b]=s.split('x');return `${a} × ${b} mm`;});
+  ['m-cwt','m-spd'].forEach(id=>document.getElementById(id).innerHTML='<option value="">— Select —</option>');
+}
+function onCar() {
+  const rows = fRows();
+  opt(document.getElementById('m-cwt'), uniq(rows,r=>r.cwt), c=>'CWT '+c);
+  document.getElementById('m-spd').innerHTML='<option value="">— Select —</option>';
+}
+function onCwt() {
+  const rows = fRows();
+  opt(document.getElementById('m-spd'), uniq(rows,r=>r.speed), s=>s+' m/s');
+}
+
+// ============================================================
+// SHOW RESULT (By Model)
+// ============================================================
+function showResult() {
+  const code  = document.getElementById('m-code').value;
+  const door  = document.getElementById('m-door').value;
+  const gate  = parseInt(document.getElementById('m-gate').value);
+  const ent   = parseInt(document.getElementById('m-ent').value);
+  const car   = document.getElementById('m-car').value;
+  const cwt   = document.getElementById('m-cwt').value;
+  const spd   = parseFloat(document.getElementById('m-spd').value);
+  const tr    = parseFloat(document.getElementById('m-tr').value);
+
+  if(!code||!door||!gate||!ent||!car||!cwt||!spd) { alert('Please complete all selections.'); return; }
+  if(!tr) { alert('Please enter Travel Height (TR).'); return; }
+
+  const [aa,bb] = car.split('x').map(Number);
+  const row = DB.find(r =>
+    r.factory===ST.factory && r.series===ST.series &&
+    r.code===code && r.door===door && r.gate===gate &&
+    r.entrance===ent && r.aa===aa && r.bb===bb &&
+    r.cwt===cwt && r.speed===spd
+  );
+  if(!row) { alert('No exact match found. Try adjusting selections.'); return; }
+
+  // Match vertical
+  const vt = VT.find(v =>
+    v.factory===ST.factory && v.series===ST.series &&
+    v.speed===spd &&
+    row.capacity >= v.min_cap && row.capacity <= v.max_cap &&
+    tr > v.tr_min && tr <= v.tr_max
+  );
+
+  document.getElementById('r-title').textContent = `${ST.series} · ${code}`;
+  document.getElementById('r-sub').textContent =
+    `${ST.factory} · ${door} Door · Gate ${gate} · CWT ${cwt} · ${spd} m/s · TR ${tr}m`;
+
+  tbl('r-shaft', [
+    ['Min. Hoistway Width (AH)', row.ah, 'mm'],
+    ['Min. Hoistway Depth (BH)', row.bh, 'mm'],
+    ['Car Size (AA × BB)', `${row.aa} × ${row.bb}`, 'mm'],
+    ['Entrance Width', row.entrance, 'mm'],
+    ['Entrance Type', row.entrance_type, ''],
+    ['Door Type', row.door==='CO'?'CO (Centre Opening)':'2S (Side Opening)', ''],
+    ['Gate', `${row.gate} Gate`, ''],
+    ['Counterweight Position', row.cwt, ''],
+  ]);
+
+  tbl('r-mr', [
+    ['Machine Room Width (AM)', row.am || '-', row.am ? 'mm' : '(MRL — no machine room)'],
+    ['Machine Room Depth (BM)', row.bm || '-', row.bm ? 'mm' : ''],
+    ['Machine Room Clear Height (HM)', vt ? (vt.hm || 'N/A') : '—', vt?.hm ? 'mm' : ''],
+  ]);
+
+  tbl('r-car', [
+    ['Code / Capacity', `${row.code} — ${row.capacity} kg`, ''],
+    ['Number of Persons', row.persons, 'persons'],
+    ['Rated Speed', spd, 'm/s'],
+    ['Travel Height (TR)', tr, 'm'],
+    ['Min. Overhead (OH)', vt ? vt.oh : '— Check TR range', vt ? 'mm' : ''],
+    ['Min. Pit Depth (PD)', vt ? vt.pit : '— Check TR range', vt ? 'mm' : ''],
+  ]);
+
+  if(!vt) {
+    document.getElementById('r-car').insertAdjacentHTML('afterend',
+      '<div class="alert-warn">⚠ No vertical dimension found for TR='+tr+'m at '+spd+' m/s. Check VERTICAL sheet.</div>');
+  }
+
+  document.getElementById('svg-top').innerHTML = svgTop(row);
+  document.getElementById('svg-side').innerHTML = vt ? svgSide(row, vt, spd) : '<p style="padding:16px;color:#64748b">Side view requires vertical data.</p>';
+
+  goMS(4);
+}
+
+// ============================================================
+// BY SHAFT SEARCH
+// ============================================================
+function searchShaft() {
+  const ah    = parseInt(document.getElementById('sh-ah').value);
+  const bh    = parseInt(document.getElementById('sh-bh').value);
+  const tr    = parseFloat(document.getElementById('sh-tr').value);
+  const minC  = parseInt(document.getElementById('sh-cap').value)||0;
+  const door  = document.getElementById('sh-door').value;
+  const cwt   = document.getElementById('sh-cwt').value;
+  const fac   = document.getElementById('sh-factory').value;
+
+  if(!ah||!bh) { alert('Please enter AH and BH.'); return; }
+  if(!tr)      { alert('Please enter Travel Height (TR).'); return; }
+
+  // Filter by shaft + basic filters
+  let matches = DB.filter(r =>
+    r.ah <= ah && r.bh <= bh &&
+    r.capacity >= minC &&
+    (!door || r.door===door) &&
+    (!cwt  || r.cwt===cwt)  &&
+    (!fac  || r.factory===fac)
+  );
+
+  // Deduplicate — keep unique factory+series+code+door+gate+cwt (best speed per group)
+  const seen = new Set();
+  matches = matches.filter(r => {
+    const key = `${r.factory}|${r.series}|${r.code}|${r.door}|${r.gate}|${r.entrance}|${r.aa}x${r.bb}|${r.cwt}`;
+    if(seen.has(key)) return false;
+    seen.add(key); return true;
+  });
+
+  // Check OH/PD available for TR
+  matches = matches.map(r => {
+    const vt = VT.find(v =>
+      v.factory===r.factory && v.series===r.series &&
+      r.capacity >= v.min_cap && r.capacity <= v.max_cap &&
+      tr > v.tr_min && tr <= v.tr_max
+    );
+    return { ...r, _vt: vt, _trOk: !!vt };
+  });
+
+  // Warn if TR too large for some speeds
+  matches.sort((a,b) => b.capacity - a.capacity || (b.aa*b.bb)-(a.aa*a.bb));
+
+  const body = document.getElementById('shaft-body');
+  if(!matches.length) {
+    body.innerHTML = `<div class="no-result">
+      <div class="no-result-icon">🔍</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:6px">No matching models</div>
+      <div style="font-size:13px">Shaft AH ${ah} × BH ${bh} mm is too small for the selected filters.</div>
+    </div>`;
+  } else {
+    body.innerHTML = `<div class="alert-info">Found <strong>${matches.length}</strong> configuration${matches.length>1?'s':''} for Shaft ${ah} × ${bh} mm · TR ${tr}m</div>`
+    + matches.map((r,i) => `
+      <div class="match-card ${i===0?'best':''}">
+        <div class="match-header">
+          <div class="match-code">${r.factory} · ${r.series} · ${r.code}</div>
+          <span class="match-tag ${i===0?'tag-best':'tag-fit'}">${i===0?'Best Fit':'Fits'}</span>
+        </div>
+        <div class="match-dims">
+          Capacity: <span>${r.capacity} kg (${r.persons}P)</span> &nbsp;·&nbsp;
+          Door: <span>${r.door}</span> &nbsp;·&nbsp;
+          Gate: <span>${r.gate}</span> &nbsp;·&nbsp;
+          CWT: <span>${r.cwt}</span><br>
+          Car: <span>${r.aa} × ${r.bb}</span> mm &nbsp;·&nbsp;
+          Entrance: <span>${r.entrance}</span> mm (${r.entrance_type})<br>
+          Min. Shaft: <span>${r.ah} × ${r.bh}</span> mm
+          ${r.am ? `&nbsp;·&nbsp; Machine Room: <span>${r.am} × ${r.bm}</span> mm` : '&nbsp;·&nbsp; <span>MRL</span>'}
+          ${r._vt ? `<br>OH: <span>${r._vt.oh}</span> mm &nbsp;·&nbsp; PD: <span>${r._vt.pit}</span> mm (for TR ${tr}m)` : '<br><span style="color:#b45309">⚠ No vertical data for TR '+tr+'m — check VERTICAL sheet</span>'}
+        </div>
+      </div>`).join('');
+  }
+
+  document.getElementById('shaft-results').style.display = '';
+  document.getElementById('shaft-results').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ============================================================
+// TABLE HELPER
+// ============================================================
+function tbl(id, rows) {
+  const t = document.getElementById(id); t.innerHTML = '';
+  rows.forEach(([l,v,u]) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${l}</td><td>${typeof v==='number'?v.toLocaleString():v} <span class="dim-unit">${u}</span></td>`;
+    t.appendChild(tr);
+  });
+}
+
+// ============================================================
+// DRAWINGS
+// ============================================================
+function mkArrow(id, color) {
+  return `<marker id="${id}" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0L5,2.5L0,5Z" fill="${color}"/></marker>
+          <marker id="${id}l" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto-start-reverse"><path d="M0,0L5,2.5L0,5Z" fill="${color}"/></marker>`;
+}
+
+function svgTop(row) {
+  const S=0.18,P=56,R='#C8102E',N='#1a2744';
+  const sW=row.ah*S, sD=row.bh*S;
+  const cW=row.aa*S, cD=row.bb*S;
+  const W=sW+P*2+40, H=sD+P*2+30;
+  const ox=P, oy=P;
+  const carX=ox+(sW-cW)/2, carY=oy+18*S;
+  const cwW=88*S, cwH=66*S;
+  let cwX, cwY;
+  if(row.cwt==='Rear'){cwX=ox+(sW-cwW)/2;cwY=oy+sD-cwH-4;}
+  else{cwX=ox+sW-cwW-4;cwY=oy+(sD-cwH)/2;}
+  const opW=row.entrance*S, dX=ox+(sW-opW)/2;
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="min-width:${Math.max(280,W)}px">
+  <defs>${mkArrow('ra',R)}${mkArrow('na',N)}</defs>
+  <rect x="${ox}" y="${oy}" width="${sW}" height="${sD}" fill="#f0f4f8" stroke="${N}" stroke-width="2"/>
+  <rect x="${carX}" y="${carY}" width="${cW}" height="${cD}" fill="#b3c6e0" stroke="${N}" stroke-width="1.5" rx="2"/>
+  <line x1="${carX}" y1="${carY}" x2="${carX+cW}" y2="${carY+cD}" stroke="#6b8aad" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="${carX+cW}" y1="${carY}" x2="${carX}" y2="${carY+cD}" stroke="#6b8aad" stroke-width="1" stroke-dasharray="4,3"/>
+  <rect x="${cwX}" y="${cwY}" width="${cwW}" height="${cwH}" fill="${R}" fill-opacity=".7" stroke="#9e0c23" stroke-width="1.5" rx="2"/>
+  <text x="${cwX+cwW/2}" y="${cwY+cwH/2+4}" text-anchor="middle" font-size="7" fill="white" font-weight="bold" font-family="Inter,sans-serif">CWT</text>
+  <rect x="${dX}" y="${oy-5}" width="${opW}" height="9" fill="${R}" fill-opacity=".5" stroke="${R}" stroke-width="1"/>
+  <line x1="${ox}" y1="${oy+sD+18}" x2="${ox+sW}" y2="${oy+sD+18}" stroke="${R}" stroke-width="1" marker-start="url(#ral)" marker-end="url(#ra)"/>
+  <text x="${ox+sW/2}" y="${oy+sD+14}" text-anchor="middle" font-size="8" fill="${R}" font-family="Roboto Mono,monospace" font-weight="600">AH: ${row.ah}</text>
+  <line x1="${ox-22}" y1="${oy}" x2="${ox-22}" y2="${oy+sD}" stroke="${R}" stroke-width="1" marker-start="url(#ral)" marker-end="url(#ra)"/>
+  <text x="${ox-24}" y="${oy+sD/2+4}" text-anchor="middle" font-size="8" fill="${R}" font-family="Roboto Mono,monospace" font-weight="600" transform="rotate(-90,${ox-24},${oy+sD/2+4})">BH: ${row.bh}</text>
+  <text x="${carX+cW/2}" y="${carY+cD/2+4}" text-anchor="middle" font-size="9" fill="${N}" font-weight="700" font-family="Inter,sans-serif">CAR</text>
+  <text x="${dX+opW/2}" y="${oy-9}" text-anchor="middle" font-size="7" fill="${R}" font-family="Roboto Mono,monospace">Entrance: ${row.entrance}</text>
+  <text x="${ox+sW+8}" y="${oy+10}" font-size="8" fill="#64748b" font-family="Inter,sans-serif">▲ FRONT</text>
+  <text x="${ox+sW/2}" y="${H-2}" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="Inter,sans-serif">Top View · mm</text>
+  </svg>`;
+}
+
+function svgSide(row, vt, spd) {
+  const S=0.12,P=56,R='#C8102E',N='#1a2744';
+  const sD=row.bh*S, oh=vt.oh*S, pit=vt.pit*S, trav=80*S;
+  const W=sD+P*2+60, H=oh+trav+pit+P*2+50;
+  const ox=P, oy=P+20, flY=oy+oh;
+  const cH=2200*S, cW=(row.bb+60)*S, carX=ox+10, carY=flY-cH;
+  const hasMR = row.am && row.bm;
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="min-width:${Math.max(260,W)}px">
+  <defs>${mkArrow('sa',R)}</defs>
+  <rect x="${ox}" y="${oy}" width="${sD}" height="${oh+trav+pit}" fill="#f0f4f8" stroke="${N}" stroke-width="2"/>
+  <rect x="${ox}" y="${oy+oh+trav}" width="${sD}" height="${pit}" fill="#e2e8f0" stroke="${N}" stroke-width="1.5"/>
+  ${hasMR ? `<rect x="${ox}" y="${oy-28}" width="${sD}" height="26" fill="#fef3c7" stroke="#d97706" stroke-width="1.5" rx="2"/>
+  <text x="${ox+sD/2}" y="${oy-12}" text-anchor="middle" font-size="7" fill="#92400e" font-weight="700" font-family="Inter,sans-serif">MACHINE ROOM${vt.hm?` (HM ≥ ${vt.hm})`:''}` : ''}
+  <rect x="${carX}" y="${carY}" width="${cW}" height="${cH}" fill="#b3c6e0" stroke="${N}" stroke-width="1.5" rx="2"/>
+  <text x="${carX+cW/2}" y="${carY+cH/2+4}" text-anchor="middle" font-size="8" fill="${N}" font-weight="700" font-family="Inter,sans-serif">CAR</text>
+  <path d="M${ox+8} ${flY+16} Q${ox+sD*.3} ${flY+28} ${ox+sD*.5} ${flY+16} Q${ox+sD*.7} ${flY+4} ${ox+sD-8} ${flY+16}" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="${ox+sD+16}" y1="${oy}" x2="${ox+sD+16}" y2="${flY}" stroke="${R}" stroke-width="1" marker-start="url(#sal)" marker-end="url(#sa)"/>
+  <text x="${ox+sD+20}" y="${oy+oh/2+4}" font-size="7" fill="${R}" font-family="Roboto Mono,monospace" font-weight="600">OH: ${vt.oh}</text>
+  <line x1="${ox+sD+16}" y1="${oy+oh+trav}" x2="${ox+sD+16}" y2="${oy+oh+trav+pit}" stroke="${R}" stroke-width="1" marker-start="url(#sal)" marker-end="url(#sa)"/>
+  <text x="${ox+sD+20}" y="${oy+oh+trav+pit/2+4}" font-size="7" fill="${R}" font-family="Roboto Mono,monospace" font-weight="600">PD: ${vt.pit}</text>
+  <line x1="${ox-10}" y1="${flY}" x2="${ox+sD+10}" y2="${flY}" stroke="${N}" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="${ox-12}" y="${flY+4}" font-size="7" fill="${N}" font-family="Inter,sans-serif">FFL</text>
+  <text x="${ox+sD/2}" y="${H-2}" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="Inter,sans-serif">Side View · ${spd} m/s · mm</text>
+  </svg>`;
+}
+
+function switchDraw(v) {
+  document.querySelectorAll('.drawing-tab').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase().includes(v)));
+  document.querySelectorAll('.dview').forEach(d=>d.classList.toggle('active',d.id==='draw-'+v));
+}
+
+// ============================================================
+// ESCALATOR (from Sheets)
+// ============================================================
+function buildEscSeries() {
+  const series = [...new Set(ESC_DB.map(r=>`${r.factory}|${r.series}`))];
+  const list = document.getElementById('esc-series-list');
+  list.innerHTML = '';
+  if(series.length === 0) return;
+  // Hide the "no data" warning
+  document.querySelector('#esc-home .alert-warn').style.display = 'none';
+  series.forEach(s => {
+    const [fac, ser] = s.split('|');
+    const div = document.createElement('div');
+    div.className = 'esc-card';
+    div.id = 'esc-'+ser.replace(/[^a-zA-Z0-9]/g,'-');
+    div.innerHTML = `
+      <span class="esc-icon">🏪</span>
+      <div class="esc-info"><div class="esc-name">${ser}</div><div class="esc-desc">${fac}</div></div>
+      <div class="esc-check">✓</div>`;
+    div.onclick = () => {
+      ST.escSeries = { fac, ser };
+      document.querySelectorAll('.esc-card').forEach(c=>c.classList.remove('selected'));
+      div.classList.add('selected');
+      document.getElementById('btn-esc').disabled = false;
+    };
+    list.appendChild(div);
+  });
+}
+
+function showEsc() {
+  if(!ST.escSeries) return;
+  const { fac, ser } = ST.escSeries;
+  const rows = ESC_DB.filter(r=>r.factory===fac&&r.series===ser);
+  document.getElementById('esc-title').textContent = ser;
+  document.getElementById('esc-sub').textContent = `${fac} · Escalator`;
+  const aS=document.getElementById('esc-ang'); aS.innerHTML='';
+  [...new Set(rows.map(r=>r.angle))].sort((a,b)=>a-b).forEach(a=>{const o=document.createElement('option');o.value=a;o.textContent=a+'°';aS.appendChild(o);});
+  const wS=document.getElementById('esc-wid'); wS.innerHTML='';
+  [...new Set(rows.map(r=>r.step_width))].sort((a,b)=>a-b).forEach(w=>{const o=document.createElement('option');o.value=w;o.textContent=w+' mm';wS.appendChild(o);});
+  document.getElementById('esc-home').style.display = 'none';
+  document.getElementById('esc-result').style.display = '';
+  updEsc();
+}
+
+function updEsc() {
+  if(!ST.escSeries) return;
+  const { fac, ser } = ST.escSeries;
+  const a = parseInt(document.getElementById('esc-ang').value);
+  const w = parseInt(document.getElementById('esc-wid').value);
+  const d = ESC_DB.find(r=>r.factory===fac&&r.series===ser&&r.angle===a&&r.step_width===w);
+  if(!d){document.getElementById('esc-dims').innerHTML='<tr><td colspan="2">No data for this combination.</td></tr>';return;}
+  tbl('esc-dims',[
+    ['Step Width',w,'mm'],['Truss Width (W1)',d.W1,'mm'],['Balustrade Width (W2)',d.W2,'mm'],
+    ['Overall Width (W3)',d.W3,'mm'],['Upper Landing Extension',d.upper_ext,'mm'],
+    ['Lower Landing Extension',d.lower_ext,'mm'],['Rated Speed',d.speed,'m/s'],['Incline Angle',a,'°'],
+  ]);
+}
+
+function resetEsc() {
+  ST.escSeries = null;
+  document.querySelectorAll('.esc-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('btn-esc').disabled = true;
+  document.getElementById('esc-home').style.display = '';
+  document.getElementById('esc-result').style.display = 'none';
+}
+
+// ============================================================
+// START
+// ============================================================
+loadAllData();
+</script>
+</body>
+</html>
