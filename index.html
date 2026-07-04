@@ -487,12 +487,76 @@ body{font-family:'Inter',sans-serif;background:var(--mist);color:var(--text);min
 <div id="main-home-elev" class="page">
   <div id="he-loading"><div class="loading-wrap"><div class="spinner"></div><div>Loading...</div></div></div>
   <div id="he-home" style="display:none">
+    <div class="section-title">Select Query Mode</div>
+    <div class="mode-grid" style="margin-bottom:16px">
+      <div class="mode-card" onclick="startHeMode('shaft')">
+        <span class="mode-icon">📐</span>
+        <span class="mode-label">By Shaft Size</span>
+        <span class="mode-desc">Enter shaft dimensions — find matching models</span>
+      </div>
+      <div class="mode-card" onclick="startHeMode('model')">
+        <span class="mode-icon">📋</span>
+        <span class="mode-label">By Model</span>
+        <span class="mode-desc">Select series — view specifications</span>
+      </div>
+    </div>
+    <button class="btn-secondary no-print" onclick="showPage('home')">← Back to Menu</button>
+  </div>
+
+  <!-- HE By Shaft -->
+  <div id="he-shaft" style="display:none">
+    <div class="steps-bar">
+      <div class="step-pill active">1 · Input</div>
+      <div class="step-pill">2 · Results</div>
+    </div>
+    <div class="card">
+      <div class="section-title" style="margin-top:0">Hoistway Dimensions (Available)</div>
+      <div class="input-row">
+        <div class="form-row">
+          <label class="form-label">Width — AH (mm)</label>
+          <input class="form-input" type="number" id="he-sh-ah" placeholder="e.g. 1750">
+        </div>
+        <div class="form-row">
+          <label class="form-label">Depth — BH (mm)</label>
+          <input class="form-input" type="number" id="he-sh-bh" placeholder="e.g. 1350">
+        </div>
+      </div>
+      <div class="form-row" style="margin-bottom:0">
+        <label class="form-label">Gate</label>
+        <select class="form-select" id="he-sh-gate">
+          <option value="">Any</option>
+          <option value="1">1 Gate</option>
+          <option value="2">2 Gate</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="searchHeShaft()">
+      Search
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    </button>
+    <button class="btn-secondary no-print" onclick="backHeHome()">← Back</button>
+    <div id="he-shaft-results" style="display:none;margin-top:4px">
+      <div class="steps-bar">
+        <div class="step-pill done">1 · Input</div>
+        <div class="step-pill active">2 · Results</div>
+      </div>
+      <div id="he-shaft-body"></div>
+      <button class="btn-export no-print" onclick="window.print()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print / Export PDF
+      </button>
+      <button class="btn-secondary no-print" onclick="document.getElementById('he-shaft-results').style.display='none'">← Edit Search</button>
+    </div>
+  </div>
+
+  <!-- HE By Model (Series list) -->
+  <div id="he-model" style="display:none">
     <div class="section-title">Select Series</div>
     <div class="model-list" id="he-series-list"></div>
     <button class="btn-primary" onclick="showHeForm()" id="btn-he" disabled>
       Next <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
     </button>
-    <button class="btn-secondary no-print" onclick="showPage('home')">← Back to Menu</button>
+    <button class="btn-secondary no-print" onclick="backHeHome()">← Back</button>
   </div>
   <div id="he-form" style="display:none">
     <div class="card">
@@ -675,13 +739,8 @@ function initApp(){
   document.getElementById('db-status').textContent =
     `✅ Loaded: ${PH.length} horiz · ${PV.length} vert · ${FR.length} freight · ${ESC.length} escalator`;
 
-  // Shaft filter dropdowns
-  const origins=[...new Set(PH.map(r=>r.origin))].sort();
-  const oSel=document.getElementById('sh-origin');
-  origins.forEach(o=>{const el=document.createElement('option');el.value=o;el.textContent=o;oSel.appendChild(el);});
-  const caps=[...new Set(PH.map(r=>r.capacity))].sort((a,b)=>a-b);
-  const cSel=document.getElementById('sh-cap');
-  caps.forEach(c=>{const el=document.createElement('option');el.value=c;el.textContent=`≥ ${c} kg`;cSel.appendChild(el);});
+  // Shaft filter dropdowns — populated dynamically when type selected
+  buildShaftFilters();
 
   // Freight series list
   buildFreightList();
@@ -717,7 +776,15 @@ function showPage(p){
 function switchTab(t){ showPage(t); }
 
 function goCategory(cat){
-  if(cat==='home') { showPage('home-elev'); return; }
+  if(cat==='home'){
+    showPage('home-elev');
+    ['he-shaft','he-model','he-form'].forEach(id=>{
+      const el=document.getElementById(id);if(el)el.style.display='none';
+    });
+    document.getElementById('he-home').style.display='';
+    if(HE.length) buildHeSeriesList();
+    return;
+  }
   showPage(cat);
   if(cat==='passenger'){
     // reset to pass-home
@@ -750,6 +817,7 @@ function startMode(m){
   if(m==='shaft'){
     document.getElementById('pass-shaft').style.display='';
     document.getElementById('shaft-results').style.display='none';
+    buildShaftFilters(); // rebuild filters for current passType
   } else {
     document.getElementById('pass-model').style.display='';
     goMS(1);
@@ -764,8 +832,8 @@ function goMS(n){
 // ============================================================
 // SERIES LIST (By Model)
 // ============================================================
-function seriesForType(){
-  const t=ST.passType;
+function seriesForType(t){
+  t=t||ST.passType;
   const seriesMap={
     home:  ['SHA','SVC'],
     mrl:   ['NEXIEZ-MRL II','NEXIEZ-FIT','NEXIEZ-S'],
@@ -773,6 +841,11 @@ function seriesForType(){
     bed:   ['NEXIEZ-MR BED'],
   };
   return seriesMap[t]||[];
+}
+function phForType(){
+  // Filter PH rows to only those matching current passType
+  const allowed=seriesForType();
+  return allowed.length ? PH.filter(r=>allowed.includes(r.series)) : PH;
 }
 function buildSeriesList(){
   const allowed=seriesForType();
@@ -1093,7 +1166,8 @@ function searchShaft(){
   if(!tr){alert('Please enter Travel Height (TR).');return;}
 
   const seen=new Set();
-  let matches=PH.filter(r=>{
+  const phRows=phForType(); // only search within current passType
+  let matches=phRows.filter(r=>{
     // Get correct AH/BH based on gate and fp filter
     const fpCheck=fp||r.fireproof;
     const gateVal=r.gate;
@@ -1112,12 +1186,15 @@ function searchShaft(){
 
     // Check vertical exists for this TR
     const vt=PV.find(v=>v.series===r.series&&r.capacity>=v.min_cap&&r.capacity<=v.max_cap&&tr>v.tr_min&&tr<=v.tr_max);
+    const vtOH=vt?(r.standard==='EN81'?vt.oh_en:vt.oh_mit):null;
+    const vtPIT=vt?vt.pit:null;
 
     const key=`${r.origin}|${r.series}|${r.code}|${r.door}|${r.gate}|${r.entrance}|${r.car_aa}x${r.car_bb}|${r.cwt||''}|${r.fireproof}`;
     if(seen.has(key)) return false;
     seen.add(key);
 
-    r._ah=rAH; r._bh=rBH; r._vt=vt;
+    const vtOH2=vt?(r.standard==='EN81'?vt.oh_en:vt.oh_mit):null;
+    r._ah=rAH; r._bh=rBH; r._vt=vt; r._vtOH=vtOH2; r._vtPIT=vt?vt.pit:null;
     return true;
   });
 
@@ -1457,15 +1534,92 @@ function sendLog(data){
 // ============================================================
 let HE_series = null;
 
-function initHE(){
-  const heLoad=document.getElementById('he-loading');
-  if(heLoad) heLoad.style.display='none';
-  const heHome=document.getElementById('he-home');
-  if(heHome) heHome.style.display='';
+function backHeHome(){
+  ['he-shaft','he-model','he-form'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display='none';
+  });
+  document.getElementById('he-home').style.display='';
+}
+
+function startHeMode(m){
+  document.getElementById('he-home').style.display='none';
+  if(m==='shaft'){
+    document.getElementById('he-shaft').style.display='';
+    document.getElementById('he-shaft-results').style.display='none';
+  } else {
+    document.getElementById('he-model').style.display='';
+    buildHeSeriesList();
+  }
+}
+
+function searchHeShaft(){
+  const ah=parseInt(document.getElementById('he-sh-ah').value);
+  const bh=parseInt(document.getElementById('he-sh-bh').value);
+  const gate=document.getElementById('he-sh-gate').value;
+  if(!ah||!bh){alert('Please enter AH and BH.');return;}
+
+  let matches=HE.filter(r=>{
+    if(r.ah>ah||r.bh>bh) return false;
+    if(gate&&r.gate!==parseInt(gate)) return false;
+    return true;
+  });
+  matches.sort((a,b)=>b.capacity-a.capacity);
+
+  const body=document.getElementById('he-shaft-body');
+  if(!matches.length){
+    body.innerHTML=`<div class="no-result"><div style="font-size:36px;margin-bottom:12px">🔍</div><div style="font-size:15px;font-weight:700;margin-bottom:6px">No matching models</div><div style="font-size:13px">AH ${ah} × BH ${bh} mm is too small.</div></div>`;
+  } else {
+    const best=matches[0];
+    let html2=`<div class="alert-info">Found <strong>${matches.length}</strong> model${matches.length>1?'s':''} fitting AH ${ah} × BH ${bh} mm</div>`;
+    html2+=`<div class="match-best">
+      <div class="match-header">
+        <div class="match-code">${best.series} · ${best.code}</div>
+        <span class="tag-best">Best Fit</span>
+      </div>
+      <div class="match-dims">
+        Capacity: <span>${best.capacity} kg (${best.persons}P)</span> &nbsp;·&nbsp;
+        Door: <span>${best.door}</span> &nbsp;·&nbsp;
+        Gate: <span>${best.gate}</span><br>
+        Car: <span>${best.car_aa}×${best.car_bb}</span> mm &nbsp;·&nbsp;
+        Entrance: <span>${best.entrance}</span> mm<br>
+        Min. Shaft: <span>${best.ah}×${best.bh}</span> mm &nbsp;·&nbsp;
+        OH: <span>${best.oh_std}</span> mm &nbsp;·&nbsp;
+        Pit: <span>${best.pit_std}</span> mm
+        ${best.note?`<br><span style="color:#b45309">ℹ ${best.note}</span>`:''}
+      </div>
+    </div>`;
+    if(matches.length>1){
+      html2+=`<div style="font-size:11px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin:12px 0 8px">Other ${matches.length-1} match${matches.length>2?'es':''}</div>`;
+      matches.slice(1).forEach(r=>{
+        html2+=`<div class="accordion-header" onclick="toggleAcc(this)">
+          <span>${r.series} · ${r.code} — ${r.capacity}kg · ${r.door} · Gate ${r.gate}</span>
+          <span style="font-size:18px;color:var(--text-soft)">＋</span>
+        </div>
+        <div class="accordion-body">
+          <div class="match-dims">
+            Car: <span>${r.car_aa}×${r.car_bb}</span> mm &nbsp;·&nbsp; Entrance: <span>${r.entrance}</span> mm<br>
+            Min. Shaft: <span>${r.ah}×${r.bh}</span> mm &nbsp;·&nbsp;
+            OH: <span>${r.oh_std}</span> mm &nbsp;·&nbsp; Pit: <span>${r.pit_std}</span> mm
+            ${r.note?`<br><span style="color:#b45309">ℹ ${r.note}</span>`:''}
+          </div>
+        </div>`;
+      });
+    }
+    body.innerHTML=html2;
+  }
+  document.getElementById('he-shaft-results').style.display='';
+  document.getElementById('he-shaft-results').scrollIntoView({behavior:'smooth'});
+}
+
+function buildHeSeriesList(){
+  if(!HE||!HE.length) return;
   const series=[...new Set(HE.map(r=>r.series))].sort();
   const list=document.getElementById('he-series-list');
   if(!list) return;
   list.innerHTML='';
+  HE_series=null;
+  document.getElementById('btn-he').disabled=true;
   const icons={SHA:'🏠',SVC:'🛗'};
   series.forEach(s=>{
     const rows=HE.filter(r=>r.series===s);
@@ -1475,6 +1629,14 @@ function initHE(){
     div.onclick=()=>{HE_series=s;document.querySelectorAll('#he-series-list .model-row').forEach(c=>c.classList.remove('selected'));div.classList.add('selected');document.getElementById('btn-he').disabled=false;};
     list.appendChild(div);
   });
+}
+
+function initHE(){
+  const heLoad=document.getElementById('he-loading');
+  if(heLoad) heLoad.style.display='none';
+  const heHome=document.getElementById('he-home');
+  if(heHome) heHome.style.display='';
+  buildHeSeriesList();
 }
 
 function showHeForm(){
