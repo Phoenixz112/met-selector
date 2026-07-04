@@ -780,25 +780,27 @@ function onDoor(){
 }
 function onGate(){
   const rows=fRows();
+  ['m-ent','m-fp','m-cwt','m-spd'].forEach(id=>
+    document.getElementById(id).innerHTML='<option value="">— Select —</option>');
   opt(document.getElementById('m-ent'),uniq(rows,r=>r.entrance),e=>{
     const types=[...new Set(rows.filter(x=>x.entrance===e).map(x=>x.entrance_type))];
     return `${e} mm${types.length?` (${types.join('/')})` :''}`;
   });
-  ['m-fp','m-cwt','m-spd'].forEach(id=>
-    document.getElementById(id).innerHTML='<option value="">— Select —</option>');
 }
 function onEnt(){
   const rows=fRows();
+  // Clear downstream first
+  ['m-fp','m-cwt','m-spd'].forEach(id=>
+    document.getElementById(id).innerHTML='<option value="">— Select —</option>');
   const fps=uniq(rows,r=>r.fireproof);
   const fpLabels={no:'Without fireproof',yes:'With fireproof'};
   if(fps.length>1){
     opt(document.getElementById('m-fp'),fps,f=>fpLabels[f]||f);
   } else {
+    // Auto-select single fp option then cascade
     document.getElementById('m-fp').innerHTML=`<option value="${fps[0]}">${fpLabels[fps[0]]||fps[0]}</option>`;
     onFp();
   }
-  ['m-cwt','m-spd'].forEach(id=>
-    document.getElementById(id).innerHTML='<option value="">— Select —</option>');
 }
 function onFp(){
   const rows=fRows();
@@ -822,24 +824,23 @@ function onCwt(){
 function fillSpeeds(rows){
   if(!rows.length) return;
   const cap=rows[0].capacity;
-  // Get speed ranges from PH (spd_min/spd_max columns)
-  const spdRanges=[...new Map(rows.map(r=>[`${r.spd_min}-${r.spd_max}`,{min:+r.spd_min,max:+r.spd_max}])).values()];
-  // Get all speeds from PV for this series+capacity
+  const spdMin=rows[0].spd_min||0;
+  const spdMax=rows[0].spd_max||99;
+  // Get speeds from PV that match series + capacity range + within PH speed range
   const vtSpeeds=PV
-    .filter(v=>v.series===ST.series&&cap>=v.min_cap&&cap<=v.max_cap)
+    .filter(v=>v.series===ST.series && cap>=v.min_cap && cap<=v.max_cap
+              && v.speed>=spdMin && v.speed<=spdMax)
     .map(v=>v.speed);
-  // Only show speeds that fall within the PH speed ranges AND exist in PV
-  const validSpeeds=[...new Set(
-    vtSpeeds.filter(s=>spdRanges.some(r=>s>=r.min&&s<=r.max))
-  )].sort((a,b)=>a-b);
-  // Fallback if PV empty: show unique speeds from spdRanges
-  const fallback=[...new Set(spdRanges.flatMap(r=>{
-    const pts=[];
-    for(let s=r.min;s<=r.max+0.01;s=Math.round((s+0.25)*100)/100) pts.push(s);
-    return pts;
-  }))].sort((a,b)=>a-b);
-  const speeds=validSpeeds.length>0?validSpeeds:fallback;
-  opt(document.getElementById('m-spd'),speeds,s=>s+' m/s');
+  const speeds=[...new Set(vtSpeeds)].sort((a,b)=>a-b);
+  if(speeds.length){
+    opt(document.getElementById('m-spd'),speeds,s=>s+' m/s');
+  } else {
+    // Fallback: all speeds in PV for this series+cap regardless of range
+    const allSpeeds=[...new Set(
+      PV.filter(v=>v.series===ST.series&&cap>=v.min_cap&&cap<=v.max_cap).map(v=>v.speed)
+    )].sort((a,b)=>a-b);
+    opt(document.getElementById('m-spd'),allSpeeds,s=>s+' m/s');
+  }
 }
 
 // ============================================================
