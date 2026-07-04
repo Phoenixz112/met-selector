@@ -201,6 +201,14 @@ body{font-family:'Inter',sans-serif;background:var(--mist);color:var(--text);min
       </div>
       <svg style="margin-left:auto;flex-shrink:0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
     </div>
+    <div class="type-card" onclick="goCategory('home')" style="display:flex;align-items:center;text-align:left;padding:18px 20px;gap:16px">
+      <span class="type-icon" style="font-size:32px;margin:0;flex-shrink:0">🏠</span>
+      <div>
+        <span class="type-label" style="font-size:15px">Home Elevator</span>
+        <span class="type-sub" style="display:block;margin-top:3px">SHA · SVC</span>
+      </div>
+      <svg style="margin-left:auto;flex-shrink:0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </div>
     <div class="type-card" onclick="goCategory('freight')" style="display:flex;align-items:center;text-align:left;padding:18px 20px;gap:16px">
       <span class="type-icon" style="font-size:32px;margin:0;flex-shrink:0">🏭</span>
       <div>
@@ -475,6 +483,46 @@ body{font-family:'Inter',sans-serif;background:var(--mist);color:var(--text);min
   </div>
 </div>
 
+<!-- HOME ELEVATOR -->
+<div id="main-home-elev" class="page">
+  <div id="he-loading"><div class="loading-wrap"><div class="spinner"></div><div>Loading...</div></div></div>
+  <div id="he-home" style="display:none">
+    <div class="section-title">Select Series</div>
+    <div class="model-list" id="he-series-list"></div>
+    <button class="btn-primary" onclick="showHeForm()" id="btn-he" disabled>
+      Next <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+    <button class="btn-secondary no-print" onclick="showPage('home')">← Back to Menu</button>
+  </div>
+  <div id="he-form" style="display:none">
+    <div class="card">
+      <div class="form-row"><label class="form-label">Code / Capacity</label><select class="form-select" id="he-code" onchange="onHeCode()"></select></div>
+      <div class="form-row"><label class="form-label">Door Type</label><select class="form-select" id="he-door" onchange="onHeDoor()"></select></div>
+      <div class="form-row" style="margin-bottom:0"><label class="form-label">Gate</label><select class="form-select" id="he-gate"></select></div>
+    </div>
+    <button class="btn-primary" onclick="showHeResult()">
+      View Result <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+    <button class="btn-secondary" onclick="resetHe()">← Back</button>
+    <div id="he-result" style="display:none">
+      <div class="result-header" style="margin-top:12px">
+        <div class="result-model" id="he-r-title">—</div>
+        <div class="result-sub" id="he-r-sub">—</div>
+        <div class="result-badge">Home Elevator</div>
+      </div>
+      <div class="section-title">Hoistway Dimensions</div>
+      <div class="card"><table class="dim-table" id="he-r-shaft"></table></div>
+      <div class="alert-info">All dimensions in mm · Source: Mitsubishi Electric Catalog (MHE)</div>
+      <button class="btn-export no-print" onclick="window.print()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print / Export PDF
+      </button>
+      <button class="btn-reset" onclick="document.getElementById('he-result').style.display='none'">← Edit</button>
+      <button class="btn-secondary" onclick="showPage('home')">New Query</button>
+    </div>
+  </div>
+</div>
+
 <!-- ESCALATOR -->
 <div id="main-escalator" class="page">
   <div id="esc-loading"><div class="loading-wrap"><div class="spinner"></div><div>Loading...</div></div></div>
@@ -517,7 +565,7 @@ const sheetURL = s => `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/t
 // ============================================================
 // DATA STORE
 // ============================================================
-let PH=[], PV=[], FR=[], ESC=[];
+let PH=[], PV=[], FR=[], ESC=[], HE=[];
 let PROFILE={ company:'', type:'' };
 let ST={ passType:null, series:null, escSeries:null, frSeries:null };
 
@@ -540,11 +588,12 @@ async function fetchSheet(name){
 
 async function loadAll(){
   try {
-    [PH,PV,FR,ESC] = await Promise.all([
+    [PH,PV,FR,ESC,HE] = await Promise.all([
       fetchSheet('PASSENGER_HORIZONTAL'),
       fetchSheet('PASSENGER_VERTICAL'),
       fetchSheet('FREIGHT'),
       fetchSheet('ESCALATOR'),
+      fetchSheet('HOME_ELEVATOR'),
     ]);
     // Normalize numbers
     PH = PH.map(r=>({...r,
@@ -578,9 +627,15 @@ async function loadAll(){
       W1:+r.W1, W2:+r.W2, W3:+r.W3,
       upper_ext:+r.upper_ext, lower_ext:+r.lower_ext, speed:+r.speed,
     }));
+    HE = HE.map(r=>({...r,
+      persons:+r.persons, capacity:+r.capacity,
+      gate:+r.gate, entrance:+r.entrance,
+      car_aa:+r.car_aa, car_bb:+r.car_bb,
+      ah:+r.ah, bh:+r.bh,
+    }));
     initApp();
   } catch(e) {
-    ['pass-loading','fr-loading','esc-loading'].forEach(id=>{
+    ['pass-loading','fr-loading','esc-loading','he-loading'].forEach(id=>{
       const el=document.getElementById(id);
       if(el) el.innerHTML=`<div class="alert-err">❌ Failed to load: ${e.message}<br>Check Sheet is shared publicly.</div>`;
     });
@@ -613,6 +668,7 @@ function initApp(){
   // Freight series list
   buildFreightList();
   buildEscList();
+  initHE();
 }
 
 // ============================================================
@@ -635,7 +691,7 @@ function saveProfile(){
 // NAV
 // ============================================================
 function showPage(p){
-  ['profile','home','passenger','freight','escalator'].forEach(id=>{
+  ['profile','home','passenger','home-elev','freight','escalator'].forEach(id=>{
     document.getElementById('main-'+id).classList.toggle('active',id===p);
   });
 }
@@ -643,6 +699,7 @@ function showPage(p){
 function switchTab(t){ showPage(t); }
 
 function goCategory(cat){
+  if(cat==='home') { showPage('home-elev'); return; }
   showPage(cat);
   if(cat==='passenger'){
     // reset to pass-home
@@ -1350,6 +1407,107 @@ function switchDraw(v){
 function sendLog(data){
   const payload={...data,company:PROFILE.company,company_type:PROFILE.type};
   fetch(LOG_URL,{method:'POST',body:JSON.stringify(payload)}).catch(()=>{});
+}
+
+// ============================================================
+// HOME ELEVATOR
+// ============================================================
+let HE_series = null;
+
+function initHE(){
+  const heLoad=document.getElementById('he-loading');
+  if(heLoad) heLoad.style.display='none';
+  const heHome=document.getElementById('he-home');
+  if(heHome) heHome.style.display='';
+  const series=[...new Set(HE.map(r=>r.series))].sort();
+  const list=document.getElementById('he-series-list');
+  if(!list) return;
+  list.innerHTML='';
+  const icons={SHA:'🏠',SVC:'🛗'};
+  series.forEach(s=>{
+    const rows=HE.filter(r=>r.series===s);
+    const caps=[...new Set(rows.map(r=>r.capacity))].sort((a,b)=>a-b);
+    const div=document.createElement('div');div.className='model-row';
+    div.innerHTML=`<div><div class="model-code">${icons[s]||'🏠'} ${s}</div><div class="model-cap">${caps[0]}–${caps[caps.length-1]} kg · MHE</div></div><div style="display:flex;align-items:center"><div class="model-check">✓</div></div>`;
+    div.onclick=()=>{HE_series=s;document.querySelectorAll('#he-series-list .model-row').forEach(c=>c.classList.remove('selected'));div.classList.add('selected');document.getElementById('btn-he').disabled=false;};
+    list.appendChild(div);
+  });
+}
+
+function showHeForm(){
+  if(!HE_series) return;
+  const rows=HE.filter(r=>r.series===HE_series);
+  document.getElementById('he-home').style.display='none';
+  document.getElementById('he-form').style.display='';
+  document.getElementById('he-result').style.display='none';
+  // Populate code
+  const codes=[...new Set(rows.map(r=>r.code))].sort();
+  const cSel=document.getElementById('he-code');
+  cSel.innerHTML='<option value="">— Select —</option>';
+  codes.forEach(c=>{
+    const r=rows.find(x=>x.code===c);
+    const o=document.createElement('option');o.value=c;o.textContent=`${c} — ${r.capacity} kg (${r.persons}P)`;cSel.appendChild(o);
+  });
+  onHeCode();
+}
+
+function onHeCode(){
+  const code=document.getElementById('he-code').value;
+  const rows=HE.filter(r=>r.series===HE_series&&r.code===code);
+  const dSel=document.getElementById('he-door');
+  dSel.innerHTML='<option value="">— Select —</option>';
+  [...new Set(rows.map(r=>r.door))].forEach(d=>{
+    const o=document.createElement('option');o.value=d;o.textContent=d;dSel.appendChild(o);
+  });
+  document.getElementById('he-gate').innerHTML='<option value="">— Select —</option>';
+  onHeDoor();
+}
+
+function onHeDoor(){
+  const code=document.getElementById('he-code').value;
+  const door=document.getElementById('he-door').value;
+  const rows=HE.filter(r=>r.series===HE_series&&r.code===code&&(!door||r.door===door));
+  const gates=[...new Set(rows.map(r=>r.gate))].sort();
+  const gSel=document.getElementById('he-gate');
+  if(gates.length>1){
+    gSel.innerHTML='<option value="">— Select —</option>';
+    gates.forEach(g=>{const o=document.createElement('option');o.value=g;o.textContent=g+' Gate';gSel.appendChild(o);});
+  } else {
+    gSel.innerHTML=`<option value="${gates[0]}">${gates[0]} Gate</option>`;
+  }
+}
+
+function showHeResult(){
+  const code=document.getElementById('he-code').value;
+  const door=document.getElementById('he-door').value;
+  const gate=parseInt(document.getElementById('he-gate').value);
+  if(!code||!door||!gate){alert('Please complete all selections.');return;}
+  const row=HE.find(r=>r.series===HE_series&&r.code===code&&r.door===door&&r.gate===gate);
+  if(!row){alert('No matching record found.');return;}
+  document.getElementById('he-r-title').textContent=`${HE_series} · ${code}`;
+  document.getElementById('he-r-sub').textContent=`MHE · ${door} Door · ${gate} Gate · ${row.capacity} kg (${row.persons}P)`;
+  tbl('he-r-shaft',[
+    ['Min. Hoistway Width (AH)',row.ah,'mm'],
+    ['Min. Hoistway Depth (BH)',row.bh,'mm'],
+    ['Car Size (AA × BB)',`${row.car_aa} × ${row.car_bb}`,'mm'],
+    ['Entrance Width',row.entrance,'mm'],
+    ['Door Type',row.door,''],
+    ['Gate',row.gate+' Gate',''],
+    ['Capacity',row.capacity,'kg'],
+    ['Persons',row.persons,'persons'],
+    row.note?['Note',row.note,'']:null,
+  ].filter(Boolean));
+  document.getElementById('he-result').style.display='';
+  document.getElementById('he-result').scrollIntoView({behavior:'smooth'});
+  sendLog({mode:'Home Elevator',series:HE_series,code,capacity:row.capacity,door,gate});
+}
+
+function resetHe(){
+  HE_series=null;
+  document.querySelectorAll('#he-series-list .model-row').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('btn-he').disabled=true;
+  document.getElementById('he-home').style.display='';
+  document.getElementById('he-form').style.display='none';
 }
 
 // ============================================================
