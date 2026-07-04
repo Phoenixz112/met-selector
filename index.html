@@ -948,21 +948,39 @@ function getTolerance(tr, gate){
 }
 function renderTolBox(ah, bh, tr, gate){
   const{ahTol,bhTol,side}=getTolerance(tr,gate);
-  const trLabel=parseFloat(tr)<=60?`TR ≤ 60m → +${side}mm each side`:`TR > 60m → +${side}mm each side`;
-  const bhNote=parseInt(gate)===2?'(rear side only)':`(${side}+${side})`;
+  const trF=parseFloat(tr);
+  const g=parseInt(gate);
+  const bhNote=g===2?' (rear side only)':'';
   return `<div class="tol-box">
-    <div class="tol-title">▶ SHAFT TOLERANCE — ${trLabel}</div>
-    <div class="tol-row"><span class="tol-label">Required AH (catalog)</span><span class="tol-val">${ah.toLocaleString()} mm</span></div>
-    <div class="tol-row"><span class="tol-label">Required BH (catalog)</span><span class="tol-val">${bh.toLocaleString()} mm</span></div>
-    <div class="tol-row"><span class="tol-label">Tolerance AH (each side)</span><span class="tol-val">+${side} mm</span></div>
-    <div class="tol-row"><span class="tol-label">Tolerance BH ${bhNote}</span><span class="tol-val">+${parseInt(gate)===2?50:side} mm</span></div>
-    <div class="tol-row" style="border-top:2px solid #fde68a;margin-top:4px;padding-top:8px">
-      <span class="tol-label" style="font-weight:700;color:var(--navy)">✅ Effective AH (with tolerance)</span>
-      <span class="tol-val green" style="font-size:14px">${(ah+ahTol).toLocaleString()} mm</span>
+    <div class="tol-title" style="font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">
+      ▷ SHAFT TOLERANCE — TR = ${trF}m
     </div>
     <div class="tol-row">
-      <span class="tol-label" style="font-weight:700;color:var(--navy)">✅ Effective BH (with tolerance)</span>
-      <span class="tol-val green" style="font-size:14px">${(bh+bhTol).toLocaleString()} mm</span>
+      <span class="tol-label">Required AH (catalog)</span>
+      <span class="tol-val" style="font-weight:700">${ah.toLocaleString()} mm</span>
+    </div>
+    <div class="tol-row">
+      <span class="tol-label">Required BH (catalog)</span>
+      <span class="tol-val" style="font-weight:700">${bh.toLocaleString()} mm</span>
+    </div>
+    <div class="tol-row">
+      <span class="tol-label">Tolerance (each side)${bhNote?'<br><span style="font-size:10px;color:#b45309">BH: '+bhNote+'</span>':''}</span>
+      <span class="tol-val">± ${side} mm</span>
+    </div>
+    <div style="border-top:1.5px solid #fde68a;margin:6px 0"></div>
+    <div class="tol-row" style="padding:3px 0">
+      <span class="tol-label" style="display:flex;align-items:center;gap:6px">
+        <span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;background:#0f7556;border-radius:3px;color:#fff;font-size:10px;flex-shrink:0;font-weight:700">✓</span>
+        Effective AH (with tolerance)
+      </span>
+      <span class="tol-val">${(ah+ahTol).toLocaleString()} mm</span>
+    </div>
+    <div class="tol-row" style="padding:3px 0">
+      <span class="tol-label" style="display:flex;align-items:center;gap:6px">
+        <span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;background:#0f7556;border-radius:3px;color:#fff;font-size:10px;flex-shrink:0;font-weight:700">✓</span>
+        <strong>Effective BH (with tolerance)</strong>
+      </span>
+      <span class="tol-val" style="font-weight:700;font-size:14px">${(bh+bhTol).toLocaleString()} mm</span>
     </div>
   </div>`;
 }
