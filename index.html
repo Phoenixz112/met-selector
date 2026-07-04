@@ -210,7 +210,7 @@ body{font-family:'Inter',sans-serif;background:var(--mist);color:var(--text);min
       <svg style="margin-left:auto;flex-shrink:0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
     </div>
     <div class="type-card" onclick="goCategory('freight')" style="display:flex;align-items:center;text-align:left;padding:18px 20px;gap:16px">
-      <span class="type-icon" style="font-size:32px;margin:0;flex-shrink:0">🏭</span>
+      <img src="https://phoenixz112.github.io/met-selector/freight.png" style="width:36px;height:36px;object-fit:contain;flex-shrink:0">
       <div>
         <span class="type-label" style="font-size:15px">Freight Elevator</span>
         <span class="type-sub" style="display:block;margin-top:3px">GFM-T · GFCL2 · GFCL3 · LEHY</span>
@@ -218,7 +218,7 @@ body{font-family:'Inter',sans-serif;background:var(--mist);color:var(--text);min
       <svg style="margin-left:auto;flex-shrink:0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
     </div>
     <div class="type-card" onclick="goCategory('escalator')" style="display:flex;align-items:center;text-align:left;padding:18px 20px;gap:16px">
-      <span class="type-icon" style="font-size:32px;margin:0;flex-shrink:0">🪜</span>
+      <img src="https://phoenixz112.github.io/met-selector/escalator.png" style="width:36px;height:36px;object-fit:contain;flex-shrink:0">
       <div>
         <span class="type-label" style="font-size:15px">Escalator</span>
         <span class="type-sub" style="display:block;margin-top:3px">Smart K-II</span>
@@ -497,6 +497,7 @@ body{font-family:'Inter',sans-serif;background:var(--mist);color:var(--text);min
   <div id="he-form" style="display:none">
     <div class="card">
       <div class="form-row"><label class="form-label">Code / Capacity</label><select class="form-select" id="he-code" onchange="onHeCode()"></select></div>
+      <div class="form-row"><label class="form-label">Car Ceiling Height</label><select class="form-select" id="he-ceiling"></select></div>
       <div class="form-row"><label class="form-label">Door Type</label><select class="form-select" id="he-door" onchange="onHeDoor()"></select></div>
       <div class="form-row" style="margin-bottom:0"><label class="form-label">Gate</label><select class="form-select" id="he-gate"></select></div>
     </div>
@@ -510,9 +511,21 @@ body{font-family:'Inter',sans-serif;background:var(--mist);color:var(--text);min
         <div class="result-sub" id="he-r-sub">—</div>
         <div class="result-badge">Home Elevator</div>
       </div>
-      <div class="section-title">Hoistway Dimensions</div>
+      <div class="section-title">Shaft Plan</div>
       <div class="card"><table class="dim-table" id="he-r-shaft"></table></div>
-      <div class="alert-info">All dimensions in mm · Source: Mitsubishi Electric Catalog (MHE)</div>
+      <div class="section-title">Elevation Plan</div>
+      <div class="card"><table class="dim-table" id="he-r-elev"></table></div>
+      <div class="alert-warn" id="he-note" style="display:none"></div>
+      <div class="section-title">Layout Drawing</div>
+      <div class="drawing-container">
+        <div class="drawing-tabs">
+          <button class="drawing-tab active" onclick="switchHeDraw('top')">Shaft Plan</button>
+          <button class="drawing-tab" onclick="switchHeDraw('side')">Elevation Plan</button>
+        </div>
+        <div class="dview active" id="he-draw-top"><div class="svg-wrap" id="he-svg-top"></div></div>
+        <div class="dview" id="he-draw-side"><div class="svg-wrap" id="he-svg-side"></div></div>
+      </div>
+      <div class="alert-info">All dimensions in mm · Source: Mitsubishi Electric Catalog (MHE)<br>*¹ When 100mm Higher Car Ceiling Height & Entrance Height (Optional) is applied<br>*² When Double Isolation Unit for Absorbing Vibration and Sound (Optional) is applied</div>
       <button class="btn-export no-print" onclick="window.print()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
         Print / Export PDF
@@ -632,6 +645,11 @@ async function loadAll(){
       gate:+r.gate, entrance:+r.entrance,
       car_aa:+r.car_aa, car_bb:+r.car_bb,
       ah:+r.ah, bh:+r.bh,
+      ceiling_std:n(r.ceiling_std), ceiling_opt:n(r.ceiling_opt),
+      oh_std:n(r.oh_std), oh_opt:n(r.oh_opt),
+      pit_std:n(r.pit_std), pit_opt:n(r.pit_opt),
+      ent_h_std:n(r.ent_h_std), ent_h_opt:n(r.ent_h_opt),
+      max_travel:n(r.max_travel),
     }));
     initApp();
   } catch(e) {
@@ -1396,6 +1414,13 @@ function svgSide({bh,oh,pit,hasMR,hm},spd){
   <text x="${ox+sD/2}" y="${H-2}" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="Inter,sans-serif">Side View · ${spd}m/s · mm</text>
   </svg>`;
 }
+function switchHeDraw(v){
+  ['he-draw-top','he-draw-side'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.classList.toggle('active',id==='he-draw-'+v);
+  });
+  document.querySelectorAll('#he-draw-top').length; // reflow
+}
 function switchDraw(v){
   document.querySelectorAll('.drawing-tab').forEach(b=>b.classList.toggle('active',b.textContent.toLowerCase().includes(v)));
   document.querySelectorAll('.dview').forEach(d=>d.classList.toggle('active',d.id==='draw-'+v));
@@ -1440,7 +1465,6 @@ function showHeForm(){
   document.getElementById('he-home').style.display='none';
   document.getElementById('he-form').style.display='';
   document.getElementById('he-result').style.display='none';
-  // Populate code
   const codes=[...new Set(rows.map(r=>r.code))].sort();
   const cSel=document.getElementById('he-code');
   cSel.innerHTML='<option value="">— Select —</option>';
@@ -1448,12 +1472,25 @@ function showHeForm(){
     const r=rows.find(x=>x.code===c);
     const o=document.createElement('option');o.value=c;o.textContent=`${c} — ${r.capacity} kg (${r.persons}P)`;cSel.appendChild(o);
   });
+  // Add ceiling height selector
+  const ceilSel=document.getElementById('he-ceiling');
+  if(ceilSel){ ceilSel.innerHTML='<option value="">— Select code first —</option>'; }
   onHeCode();
 }
 
 function onHeCode(){
   const code=document.getElementById('he-code').value;
   const rows=HE.filter(r=>r.series===HE_series&&r.code===code);
+  // Ceiling height options
+  const ceilSel=document.getElementById('he-ceiling');
+  if(ceilSel&&rows.length){
+    const r=rows[0];
+    ceilSel.innerHTML='';
+    const o1=document.createElement('option');o1.value='std';o1.textContent=`Standard — ${r.ceiling_std} mm`;ceilSel.appendChild(o1);
+    if(r.ceiling_opt){
+      const o2=document.createElement('option');o2.value='opt';o2.textContent=`Optional (+100mm) — ${r.ceiling_opt} mm`;ceilSel.appendChild(o2);
+    }
+  }
   const dSel=document.getElementById('he-door');
   dSel.innerHTML='<option value="">— Select —</option>';
   [...new Set(rows.map(r=>r.door))].forEach(d=>{
@@ -1481,25 +1518,135 @@ function showHeResult(){
   const code=document.getElementById('he-code').value;
   const door=document.getElementById('he-door').value;
   const gate=parseInt(document.getElementById('he-gate').value);
+  const ceilOpt=document.getElementById('he-ceiling')?.value||'std';
   if(!code||!door||!gate){alert('Please complete all selections.');return;}
   const row=HE.find(r=>r.series===HE_series&&r.code===code&&r.door===door&&r.gate===gate);
   if(!row){alert('No matching record found.');return;}
+
+  const isOpt=ceilOpt==='opt';
+  const ceiling = isOpt&&row.ceiling_opt ? row.ceiling_opt : row.ceiling_std;
+  const oh      = isOpt&&row.oh_opt     ? row.oh_opt     : row.oh_std;
+  const pit     = row.pit_std;
+  const pitOpt  = row.pit_opt;
+  const entH    = isOpt&&row.ent_h_opt  ? row.ent_h_opt  : row.ent_h_std;
+
   document.getElementById('he-r-title').textContent=`${HE_series} · ${code}`;
-  document.getElementById('he-r-sub').textContent=`MHE · ${door} Door · ${gate} Gate · ${row.capacity} kg (${row.persons}P)`;
+  document.getElementById('he-r-sub').textContent=`MHE · ${door} Door · ${gate} Gate · ${ceiling}mm Ceiling · ${row.capacity} kg (${row.persons}P)`;
+
+  // Shaft plan
   tbl('he-r-shaft',[
     ['Min. Hoistway Width (AH)',row.ah,'mm'],
     ['Min. Hoistway Depth (BH)',row.bh,'mm'],
-    ['Car Size (AA × BB)',`${row.car_aa} × ${row.car_bb}`,'mm'],
-    ['Entrance Width',row.entrance,'mm'],
-    ['Door Type',row.door,''],
-    ['Gate',row.gate+' Gate',''],
-    ['Capacity',row.capacity,'kg'],
-    ['Persons',row.persons,'persons'],
-    row.note?['Note',row.note,'']:null,
+    ['Car Width (AA)',row.car_aa,'mm'],
+    ['Car Depth (BB)',row.car_bb,'mm'],
+    ['Entrance Width (JJ)',row.entrance,'mm'],
+  ]);
+
+  // Elevation
+  tbl('he-r-elev',[
+    ['(A) Car Ceiling Height',ceiling, isOpt?'mm (Optional)':'mm (Standard)'],
+    ['(B) Entrance Height',entH,'mm'],
+    ['(C) Min. Overhead',oh,'mm'],
+    ['(D) Max. Travel',row.max_travel?.toLocaleString(),'mm'],
+    ['(E) Min. Pit (Standard)',pit,'mm'],
+    pitOpt?['(E) Min. Pit (With Isolation Unit)',pitOpt,'mm']:null,
   ].filter(Boolean));
+
+  // Drawings
+  document.getElementById('he-svg-top').innerHTML=svgHeTop(row);
+  document.getElementById('he-svg-side').innerHTML=svgHeSide(row,oh,pit,ceiling,entH,row.max_travel);
+
+  if(row.note){
+    document.getElementById('he-note').textContent='ℹ '+row.note;
+    document.getElementById('he-note').style.display='';
+  } else {
+    document.getElementById('he-note').style.display='none';
+  }
+
   document.getElementById('he-result').style.display='';
   document.getElementById('he-result').scrollIntoView({behavior:'smooth'});
   sendLog({mode:'Home Elevator',series:HE_series,code,capacity:row.capacity,door,gate});
+}
+
+function svgHeTop(row){
+  const S=0.22,P=50,R='#C8102E',N='#1a2744';
+  const sW=row.ah*S,sD=row.bh*S,cW=row.car_aa*S,cD=row.car_bb*S;
+  const W=sW+P*2+40,H=sD+P*2+30,ox=P,oy=P;
+  const carX=ox+(sW-cW)/2,carY=oy+(sD-cD)/2;
+  const opW=row.entrance*S,dX=ox+(sW-opW)/2;
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="min-width:${Math.max(240,W)}px">
+  <defs>
+    <marker id="ha" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto"><path d="M0,0L5,2.5L0,5Z" fill="${R}"/></marker>
+    <marker id="hal" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto-start-reverse"><path d="M0,0L5,2.5L0,5Z" fill="${R}"/></marker>
+  </defs>
+  <rect x="${ox}" y="${oy}" width="${sW}" height="${sD}" fill="#f0f4f8" stroke="${N}" stroke-width="2"/>
+  <rect x="${carX}" y="${carY}" width="${cW}" height="${cD}" fill="#b3c6e0" stroke="${N}" stroke-width="1.5" rx="2"/>
+  <line x1="${carX}" y1="${carY}" x2="${carX+cW}" y2="${carY+cD}" stroke="#6b8aad" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="${carX+cW}" y1="${carY}" x2="${carX}" y2="${carY+cD}" stroke="#6b8aad" stroke-width="1" stroke-dasharray="4,3"/>
+  <rect x="${dX}" y="${oy-5}" width="${opW}" height="9" fill="${R}" fill-opacity=".5" stroke="${R}" stroke-width="1"/>
+  <!-- Dim AH -->
+  <line x1="${ox}" y1="${oy+sD+18}" x2="${ox+sW}" y2="${oy+sD+18}" stroke="${R}" stroke-width="1" marker-start="url(#hal)" marker-end="url(#ha)"/>
+  <text x="${ox+sW/2}" y="${oy+sD+14}" text-anchor="middle" font-size="8" fill="${R}" font-family="Roboto Mono,monospace" font-weight="600">AH: ${row.ah}</text>
+  <!-- Dim BH -->
+  <line x1="${ox-22}" y1="${oy}" x2="${ox-22}" y2="${oy+sD}" stroke="${R}" stroke-width="1" marker-start="url(#hal)" marker-end="url(#ha)"/>
+  <text x="${ox-24}" y="${oy+sD/2+4}" text-anchor="middle" font-size="8" fill="${R}" font-family="Roboto Mono,monospace" font-weight="600" transform="rotate(-90,${ox-24},${oy+sD/2+4})">BH: ${row.bh}</text>
+  <!-- Car dims -->
+  <text x="${carX+cW/2}" y="${carY+cD/2}" text-anchor="middle" font-size="8" fill="${N}" font-weight="700" font-family="Inter,sans-serif">CAR</text>
+  <text x="${carX+cW/2}" y="${carY+cD/2+12}" text-anchor="middle" font-size="7" fill="${N}" font-family="Roboto Mono,monospace">${row.car_aa}×${row.car_bb}</text>
+  <!-- Entrance -->
+  <text x="${dX+opW/2}" y="${oy-9}" text-anchor="middle" font-size="7" fill="${R}" font-family="Roboto Mono,monospace">JJ: ${row.entrance}</text>
+  <text x="${ox+sW+8}" y="${oy+10}" font-size="8" fill="#64748b" font-family="Inter,sans-serif">▲ FRONT</text>
+  <text x="${ox+sW/2}" y="${H-2}" text-anchor="middle" font-size="8" fill="#94a3b8" font-family="Inter,sans-serif">Shaft Plan · mm</text>
+  </svg>`;
+}
+
+function svgHeSide(row,oh,pit,ceiling,entH,maxTravel){
+  const S=0.06,P=50,R='#C8102E',N='#1a2744';
+  const ohS=oh*S,pitS=pit*S,travS=Math.min(maxTravel,8000)*S;
+  const ceilS=ceiling*S,entHs=entH*S;
+  const W=200,H=ohS+travS+pitS+P*2+30;
+  const ox=40,oy=P;
+  const shW=row.bh*S;
+  const flY=oy+ohS;
+  const carBottom=flY,carTop=carBottom-ceilS;
+  const entTop=flY-entHs;
+
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="min-width:${W}px">
+  <defs>
+    <marker id="sea" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto"><path d="M0,0L4,2L0,4Z" fill="${R}"/></marker>
+    <marker id="seal" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto-start-reverse"><path d="M0,0L4,2L0,4Z" fill="${R}"/></marker>
+    <marker id="sea2" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto"><path d="M0,0L4,2L0,4Z" fill="${N}"/></marker>
+    <marker id="sea2l" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto-start-reverse"><path d="M0,0L4,2L0,4Z" fill="${N}"/></marker>
+  </defs>
+  <!-- Shaft walls -->
+  <rect x="${ox}" y="${oy}" width="${shW}" height="${ohS+travS+pitS}" fill="#f0f4f8" stroke="${N}" stroke-width="2"/>
+  <!-- Pit zone -->
+  <rect x="${ox}" y="${flY+travS}" width="${shW}" height="${pitS}" fill="#e2e8f0" stroke="${N}" stroke-width="1.5"/>
+  <!-- Car body -->
+  <rect x="${ox+8}" y="${carTop}" width="${shW-16}" height="${ceilS}" fill="#b3c6e0" stroke="${N}" stroke-width="1.5" rx="2"/>
+  <!-- Entrance opening on car -->
+  <rect x="${ox+shW-4}" y="${entTop}" width="6" height="${entHs}" fill="${R}" fill-opacity=".6" stroke="${R}" stroke-width="1"/>
+  <!-- Floor line -->
+  <line x1="${ox-8}" y1="${flY}" x2="${ox+shW+8}" y2="${flY}" stroke="${N}" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="${ox-10}" y="${flY+4}" font-size="6" fill="${N}" font-family="Inter,sans-serif" text-anchor="end">FFL</text>
+  <!-- Travel wavy -->
+  <path d="M${ox+8} ${flY+travS*0.3} Q${ox+shW/2} ${flY+travS*0.5} ${ox+shW-8} ${flY+travS*0.7}" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <!-- Dim labels right side -->
+  <line x1="${ox+shW+14}" y1="${oy}" x2="${ox+shW+14}" y2="${flY}" stroke="${R}" stroke-width="1" marker-start="url(#seal)" marker-end="url(#sea)"/>
+  <text x="${ox+shW+17}" y="${oy+ohS/2+3}" font-size="6.5" fill="${R}" font-family="Roboto Mono,monospace" font-weight="600">© OH: ${oh}</text>
+  <line x1="${ox+shW+14}" y1="${flY+travS}" x2="${ox+shW+14}" y2="${flY+travS+pitS}" stroke="${R}" stroke-width="1" marker-start="url(#seal)" marker-end="url(#sea)"/>
+  <text x="${ox+shW+17}" y="${flY+travS+pitS/2+3}" font-size="6.5" fill="${R}" font-family="Roboto Mono,monospace" font-weight="600">⑤ PIT: ${pit}</text>
+  <!-- Dim labels left side (car) -->
+  <line x1="${ox-14}" y1="${carTop}" x2="${ox-14}" y2="${carBottom}" stroke="${N}" stroke-width="1" marker-start="url(#sea2l)" marker-end="url(#sea2)"/>
+  <text x="${ox-16}" y="${carTop+ceilS/2+3}" font-size="6" fill="${N}" font-family="Roboto Mono,monospace" text-anchor="end">Ⓐ ${ceiling}</text>
+  <!-- Entrance height -->
+  <line x1="${ox+shW+30}" y1="${entTop}" x2="${ox+shW+30}" y2="${flY}" stroke="${N}" stroke-width="1" marker-start="url(#sea2l)" marker-end="url(#sea2)"/>
+  <text x="${ox+shW+33}" y="${entTop+entHs/2+3}" font-size="6" fill="${N}" font-family="Roboto Mono,monospace" font-weight="600">Ⓑ ${entH}</text>
+  <!-- Travel label -->
+  <text x="${ox+shW/2}" y="${flY+travS*0.55}" text-anchor="middle" font-size="6.5" fill="#94a3b8" font-family="Inter,sans-serif">Ⓓ Max.Travel</text>
+  <text x="${ox+shW/2}" y="${flY+travS*0.65}" text-anchor="middle" font-size="6.5" fill="#94a3b8" font-family="Roboto Mono,monospace">${(maxTravel||0).toLocaleString()} mm</text>
+  <text x="${ox+shW/2}" y="${H-2}" text-anchor="middle" font-size="7" fill="#94a3b8" font-family="Inter,sans-serif">Elevation Plan · mm</text>
+  </svg>`;
 }
 
 function resetHe(){
