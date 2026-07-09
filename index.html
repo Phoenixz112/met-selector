@@ -1667,7 +1667,15 @@ function toggleAcc(el){
 // ============================================================
 function buildFreightList(){
   if(!FR||!FR.length){ console.warn('FR empty'); return; }
-  const series=[...new Set(FR.map(r=>`${r.origin}||${r.series}`))].sort();
+  const ORDER=['GFM-T','GFCL2','GFCL3','LEHY-G','LEHY-L-G'];
+  const series=[...new Set(FR.map(r=>`${r.origin}||${r.series}`))].sort((a,b)=>{
+    const sa=a.split('||')[1], sb=b.split('||')[1];
+    const ia=ORDER.indexOf(sa), ib=ORDER.indexOf(sb);
+    if(ia===-1&&ib===-1) return sa.localeCompare(sb);
+    if(ia===-1) return 1;
+    if(ib===-1) return -1;
+    return ia-ib;
+  });
   const list=document.getElementById('fr-series-list');
   if(!list) return;
   list.innerHTML='';
