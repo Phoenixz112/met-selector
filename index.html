@@ -1671,13 +1671,13 @@ function buildFreightList(){
   const list=document.getElementById('fr-series-list');
   if(!list) return;
   list.innerHTML='';
-  const icons={Melina:'🇹🇭',TMEC:'🏗️',SMEC:'🇨🇳'};
+  const icons={Melina:'',TMEC:'',SMEC:''};
   series.forEach(s=>{
     const[org,ser]=s.split('||');
     const rows=FR.filter(r=>r.origin===org&&r.series===ser);
     const caps=[...new Set(rows.map(r=>r.capacity))].sort((a,b)=>a-b);
     const div=document.createElement('div');div.className='model-row';
-    div.innerHTML=`<div><div class="model-code">${icons[org]||'🏭'} ${ser}</div><div class="model-cap">${org} · ${caps[0].toLocaleString()}–${caps[caps.length-1].toLocaleString()} kg</div></div><div style="display:flex;align-items:center"><div class="model-check">✓</div></div>`;
+    div.innerHTML=`<div><div class="model-code">${ser}</div><div class="model-cap">${org} · ${caps[0].toLocaleString()}–${caps[caps.length-1].toLocaleString()} kg</div></div><div style="display:flex;align-items:center"><div class="model-check">✓</div></div>`;
     div.onclick=()=>{
       ST.frSeries={org,ser};
       document.querySelectorAll('#fr-series-list .model-row').forEach(c=>c.classList.remove('selected'));
