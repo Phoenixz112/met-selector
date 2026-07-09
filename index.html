@@ -1668,12 +1668,13 @@ function toggleAcc(el){
 function buildFreightList(){
   if(!FR||!FR.length){ console.warn('FR empty'); return; }
   const FR_INFO={
-    'GFM-T':   'Melina · Mitsubishi Elevator — Japan',
-    'GFCL2':   'TMEC · Mitsubishi Elevator — Taiwan',
-    'GFCL3':   'TMEC · Mitsubishi Elevator — Taiwan',
-    'LEHY-G':  'SMEC · Shanghai Mitsubishi Elevator — China',
-    'LEHY-L-G':'SMEC · Shanghai Mitsubishi Elevator — China',
+    'GFM-T':   'Mitsubishi Elevator — Japan',
+    'GFCL2':   'Mitsubishi Elevator — Taiwan',
+    'GFCL3':   'Mitsubishi Elevator — Taiwan',
+    'LEHY-G':  'Shanghai Mitsubishi Elevator — China',
+    'LEHY-L-G':'Shanghai Mitsubishi Elevator — China',
   };
+  const ORDER=['GFM-T','GFCL2','GFCL3','LEHY-G','LEHY-L-G'];
   const series=[...new Set(FR.map(r=>`${r.origin}||${r.series}`))].sort((a,b)=>{
     const sa=a.split('||')[1], sb=b.split('||')[1];
     const ia=ORDER.indexOf(sa), ib=ORDER.indexOf(sb);
