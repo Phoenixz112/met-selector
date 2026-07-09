@@ -1237,7 +1237,7 @@ function seriesForType(t){
   const seriesMap={
     home:  ['SHA','SVC'],
     mrl:   ['NEXIEZ-MRL II','NEXIEZ-FIT','NEXIEZ-S'],
-    mr:    ['NEXIEZ-MR','NEXWAY-S-AP II','NEXWAY Package R'],
+    mr:    ['NEXIEZ-MR','NEXWAY-S-AP II','NEXWAY-S-Package R'],
     bed:   ['NEXIEZ-MR BED'],
   };
   return seriesMap[t]||[];
@@ -1297,7 +1297,7 @@ function initSpecs(){
   ['m-std','m-door','m-gate','m-ent','m-fp','m-cwt','m-spd'].forEach(id=>
     document.getElementById(id).innerHTML='<option value="">— Select code first —</option>');
   // Show/hide CWT row based on series
-  const hasCWT=['NEXIEZ-MR','NEXWAY-S-AP II','NEXWAY Package R','NEXIEZ-MR BED'].includes(ST.series);
+  const hasCWT=['NEXIEZ-MR','NEXWAY-S-AP II','NEXWAY-S-Package R','NEXIEZ-MR BED'].includes(ST.series);
   document.getElementById('cwt-row').style.display=hasCWT?'':'none';
 }
 function onCode(){
@@ -1352,7 +1352,7 @@ function onEnt(){
 }
 function onFp(){
   const rows=fRows();
-  const hasCWT=['NEXIEZ-MR','NEXWAY-S-AP II','NEXWAY Package R','NEXIEZ-MR BED'].includes(ST.series);
+  const hasCWT=['NEXIEZ-MR','NEXWAY-S-AP II','NEXWAY-S-Package R','NEXIEZ-MR BED'].includes(ST.series);
   if(hasCWT){
     const cwts=uniq(rows,r=>r.cwt);
     if(cwts.length>1){
