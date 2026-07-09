@@ -1667,7 +1667,13 @@ function toggleAcc(el){
 // ============================================================
 function buildFreightList(){
   if(!FR||!FR.length){ console.warn('FR empty'); return; }
-  const ORDER=['GFM-T','GFCL2','GFCL3','LEHY-G','LEHY-L-G'];
+  const FR_INFO={
+    'GFM-T':   'Melina · Mitsubishi Elevator — Japan',
+    'GFCL2':   'TMEC · Mitsubishi Elevator — Taiwan',
+    'GFCL3':   'TMEC · Mitsubishi Elevator — Taiwan',
+    'LEHY-G':  'SMEC · Shanghai Mitsubishi Elevator — China',
+    'LEHY-L-G':'SMEC · Shanghai Mitsubishi Elevator — China',
+  };
   const series=[...new Set(FR.map(r=>`${r.origin}||${r.series}`))].sort((a,b)=>{
     const sa=a.split('||')[1], sb=b.split('||')[1];
     const ia=ORDER.indexOf(sa), ib=ORDER.indexOf(sb);
@@ -1685,7 +1691,7 @@ function buildFreightList(){
     const rows=FR.filter(r=>r.origin===org&&r.series===ser);
     const caps=[...new Set(rows.map(r=>r.capacity))].sort((a,b)=>a-b);
     const div=document.createElement('div');div.className='model-row';
-    div.innerHTML=`<div><div class="model-code">${ser}</div><div class="model-cap">${org} · ${caps[0].toLocaleString()}–${caps[caps.length-1].toLocaleString()} kg</div></div><div style="display:flex;align-items:center"><div class="model-check">✓</div></div>`;
+    div.innerHTML=`<div><div class="model-code">${ser}</div><div class="model-cap">${FR_INFO[ser]||org} · ${caps[0].toLocaleString()}–${caps[caps.length-1].toLocaleString()} kg</div></div><div style="display:flex;align-items:center"><div class="model-check">✓</div></div>`;
     div.onclick=()=>{
       ST.frSeries={org,ser};
       document.querySelectorAll('#fr-series-list .model-row').forEach(c=>c.classList.remove('selected'));
