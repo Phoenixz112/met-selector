@@ -571,6 +571,7 @@ body{
       </div>
     </div>
     <button class="btn-secondary" onclick="goPassHome()">← Back</button>
+    <button class="btn-secondary no-print" onclick="showPage('home')">← Back to Menu</button>
   </div>
 
   <!-- BY SHAFT -->
@@ -654,6 +655,7 @@ body{
         Print / Export PDF
       </button>
       <button class="btn-secondary no-print" onclick="document.getElementById('shaft-results').style.display='none'">← Edit Search</button>
+      <button class="btn-secondary no-print" onclick="showPage('home')">← Back to Menu</button>
     </div>
   </div>
 
@@ -725,7 +727,7 @@ body{
         Print / Export PDF
       </button>
       <button class="btn-reset" onclick="goMS(2)">← Change Specs</button>
-      <button class="btn-secondary" onclick="showPage('home')">New Query</button>
+      <button class="btn-secondary" onclick="showPage('home')">← Back to Menu</button>
     </div>
   </div>
 </div>
@@ -772,6 +774,7 @@ body{
         Print / Export PDF
       </button>
       <button class="btn-reset" onclick="document.getElementById('fr-result').style.display='none'">← Edit</button>
+      <button class="btn-secondary no-print" onclick="showPage('home')">← Back to Menu</button>
     </div>
   </div>
 </div>
@@ -862,6 +865,7 @@ body{
       View Result <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
     </button>
     <button class="btn-secondary" onclick="resetHe()">← Back</button>
+    <button class="btn-secondary no-print" onclick="showPage('home')">← Back to Menu</button>
     <div id="he-result" style="display:none">
       <div class="result-header" style="margin-top:12px">
         <div class="result-model" id="he-r-title">—</div>
@@ -888,7 +892,7 @@ body{
         Print / Export PDF
       </button>
       <button class="btn-reset" onclick="document.getElementById('he-result').style.display='none'">← Edit</button>
-      <button class="btn-secondary" onclick="showPage('home')">New Query</button>
+      <button class="btn-secondary" onclick="showPage('home')">← Back to Menu</button>
     </div>
   </div>
 </div>
