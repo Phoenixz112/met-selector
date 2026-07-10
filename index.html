@@ -630,12 +630,29 @@ body{
           <option value="yes">With fireproof</option>
         </select>
       </div>
-      <div class="form-row" style="margin-bottom:0">
+      <div class="form-row">
         <label class="form-label">Counterweight Position</label>
         <select class="form-select" id="sh-cwt">
           <option value="">Any</option>
           <option value="Rear">Rear</option>
           <option value="Side">Side</option>
+        </select>
+      </div>
+      <div class="form-row" style="margin-bottom:0">
+        <label class="form-label">Rated Speed (m/s) <span style="color:var(--red)">*</span></label>
+        <select class="form-select" id="sh-spd">
+          <option value="">— Select —</option>
+          <option value="0.5">0.50 m/s</option>
+          <option value="0.75">0.75 m/s</option>
+          <option value="1.0">1.00 m/s</option>
+          <option value="1.5">1.50 m/s</option>
+          <option value="1.6">1.60 m/s</option>
+          <option value="1.75">1.75 m/s</option>
+          <option value="2.0">2.00 m/s</option>
+          <option value="2.5">2.50 m/s</option>
+          <option value="3.0">3.00 m/s</option>
+          <option value="3.5">3.50 m/s</option>
+          <option value="4.0">4.00 m/s</option>
         </select>
       </div>
     </div>
@@ -1562,6 +1579,7 @@ function searchShaft(){
   const ah=parseInt(document.getElementById('sh-ah').value);
   const bh=parseInt(document.getElementById('sh-bh').value);
   const tr=parseFloat(document.getElementById('sh-tr').value);
+  const spd=parseFloat(document.getElementById('sh-spd').value);
   const minC=parseInt(document.getElementById('sh-cap').value)||0;
   const door=document.getElementById('sh-door').value;
   const cwt=document.getElementById('sh-cwt').value;
@@ -1571,6 +1589,7 @@ function searchShaft(){
 
   if(!ah||!bh){alert('Please enter AH and BH.');return;}
   if(!tr){alert('Please enter Travel Height (TR).');return;}
+  if(!spd){alert('Please select Rated Speed.');return;}
 
   const seen=new Set();
   const phRows=phForType(); // only search within current passType
@@ -1590,9 +1609,11 @@ function searchShaft(){
     if(origin&&r.origin!==origin) return false;
     if(std&&r.standard!==std) return false;
     if(fp&&r.fireproof!==fp) return false;
+    // Filter by speed — must be within spd_min/spd_max range of this row
+    if(spd&&r.spd_min&&r.spd_max&&(spd<r.spd_min||spd>r.spd_max)) return false;
 
-    // Check vertical exists for this TR
-    const vt=PV.find(v=>v.series===r.series&&r.capacity>=v.min_cap&&r.capacity<=v.max_cap&&tr>v.tr_min&&tr<=v.tr_max);
+    // Check vertical exists for this TR and speed
+    const vt=PV.find(v=>v.series===r.series&&r.capacity>=v.min_cap&&r.capacity<=v.max_cap&&tr>v.tr_min&&tr<=v.tr_max&&(!spd||v.speed===spd));
     const vtOH=vt?(r.standard==='EN81'?vt.oh_en:vt.oh_mit):null;
     const vtPIT=vt?vt.pit:null;
 
