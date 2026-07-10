@@ -2092,7 +2092,9 @@ function initHE(){
 function showHeForm(){
   if(!HE_series) return;
   const rows=HE.filter(r=>r.series===HE_series);
-  document.getElementById('he-home').style.display='none';
+  ['he-home','he-model','he-shaft'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.style.display='none';
+  });
   document.getElementById('he-form').style.display='';
   document.getElementById('he-result').style.display='none';
   const codes=[...new Set(rows.map(r=>r.code))].sort();
@@ -2133,9 +2135,17 @@ function onHeCode(){
 function onHeDoor(){
   const code=document.getElementById('he-code').value;
   const door=document.getElementById('he-door').value;
-  const rows=HE.filter(r=>r.series===HE_series&&r.code===code&&(!door||r.door===door));
-  const gates=[...new Set(rows.map(r=>r.gate))].sort();
+  if(!code||!door){
+    document.getElementById('he-gate').innerHTML='<option value="">— Select —</option>';
+    return;
+  }
+  const rows=HE.filter(r=>r.series===HE_series&&r.code===code&&r.door===door);
+  const gates=[...new Set(rows.map(r=>+r.gate))].filter(g=>!isNaN(g)).sort((a,b)=>a-b);
   const gSel=document.getElementById('he-gate');
+  if(!gates.length){
+    gSel.innerHTML='<option value="">— No data —</option>';
+    return;
+  }
   if(gates.length>1){
     gSel.innerHTML='<option value="">— Select —</option>';
     gates.forEach(g=>{const o=document.createElement('option');o.value=g;o.textContent=g+' Gate';gSel.appendChild(o);});
