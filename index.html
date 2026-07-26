@@ -1256,9 +1256,6 @@ function startMode(m){
       const cSel=document.getElementById('sh-cap');
       if(cSel){
         cSel.innerHTML='<option value="0">Any capacity</option>';
-        [...new Set(rows.map(r=>r.capacity))].sort((a,b)=>a-b).forEach(c=>{
-          const el=document.createElement('option');el.value=c;el.textContent=`≥ ${c} kg`;cSel.appendChild(el);
-        });
       }
     }, 50);
   } else {
