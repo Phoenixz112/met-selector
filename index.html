@@ -1579,6 +1579,12 @@ function showModelResult(){
 // ============================================================
 // BY SHAFT SEARCH
 // ============================================================
+function getOHDisplay(r){
+  const oh = r.oh || (r._vt&&(r._vt.oh||r._vt.oh_mit));
+  const pd = r.pd || (r._vt&&(r._vt.pit||r._vt.pd));
+  if(oh) return `OH: <span>${oh}</span> mm &nbsp;·&nbsp; PD: <span>${pd||'—'}</span> mm`;
+  return '<span style="color:#b45309">⚠ No OH/PD data for this TR</span>';
+}
 function searchShaft(){
   const ah=parseInt(document.getElementById('sh-ah').value);
   const bh=parseInt(document.getElementById('sh-bh').value);
@@ -1626,7 +1632,13 @@ function searchShaft(){
     return true;
   });
 
-  matches.sort((a,b)=>b.capacity-a.capacity||(b.car_aa*b.car_bb)-(a.car_aa*a.car_bb));
+  // Best Fit = largest capacity that fits within shaft
+  // Among same capacity = smallest shaft (tightest fit)
+  matches.sort((a,b)=>{
+    if(b.capacity!==a.capacity) return b.capacity-a.capacity;
+    // Same capacity → prefer smaller shaft (tighter fit)
+    return (a._ah+a._bh)-(b._ah+b._bh);
+  });
 
   const body=document.getElementById('shaft-body');
   if(!matches.length){
@@ -1652,7 +1664,7 @@ function searchShaft(){
         Entrance: <span>${best.entrance}</span> mm (${best.entrance_type})<br>
         Min. Shaft: <span>${best._ah}×${best._bh}</span> mm
         ${best.am?` &nbsp;·&nbsp; M/R: <span>${best.am}×${best.bm}</span> mm`:''}<br>
-        ${best._vt&&(best._vt.oh||best._vt.oh_mit)?`OH: <span>${best._vt.oh??best._vt.oh_mit}</span> mm &nbsp;·&nbsp; PD: <span>${best._vt.pit??best._vt.pd}</span> mm`:'<span style="color:#b45309">⚠ No OH/PD data for this TR</span>'}
+        ${getOHDisplay(best)}
       </div>
       ${renderTolBox(best._ah,best._bh,tr,best.gate)}
     </div>`;
