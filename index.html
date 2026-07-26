@@ -1243,6 +1243,24 @@ function startMode(m){
   if(m==='shaft'){
     document.getElementById('pass-shaft').style.display='';
     document.getElementById('shaft-results').style.display='none';
+    // Populate origin + capacity from current passType rows
+    setTimeout(()=>{
+      const rows=phForType();
+      const oSel=document.getElementById('sh-origin');
+      if(oSel){
+        oSel.innerHTML='<option value="">Any</option>';
+        [...new Set(rows.map(r=>r.origin))].sort().forEach(o=>{
+          const el=document.createElement('option');el.value=o;el.textContent=o;oSel.appendChild(el);
+        });
+      }
+      const cSel=document.getElementById('sh-cap');
+      if(cSel){
+        cSel.innerHTML='<option value="0">Any capacity</option>';
+        [...new Set(rows.map(r=>r.capacity))].sort((a,b)=>a-b).forEach(c=>{
+          const el=document.createElement('option');el.value=c;el.textContent=`≥ ${c} kg`;cSel.appendChild(el);
+        });
+      }
+    }, 50);
   } else {
     document.getElementById('pass-model').style.display='';
     goMS(1);
