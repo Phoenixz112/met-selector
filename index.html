@@ -1229,7 +1229,7 @@ function startMode(m){
   } else {
     document.getElementById('pass-model').style.display='';
     goMS(1);
-    buildSeriesList();
+    setTimeout(()=>buildSeriesList(), 50);
   }
 }
 function goMS(n){
