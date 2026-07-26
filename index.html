@@ -56,7 +56,7 @@ body{
 }
 
 /* ── PAGE ────────────────────────────────────────────────── */
-.page{display:none;padding:16px;max-width:600px;margin:0 auto;padding-bottom:32px}
+.page{display:none;padding:20px;max-width:880px;margin:0 auto;padding-bottom:40px}
 .page.active{display:block;animation:fadeUp .25s var(--transition)}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
@@ -428,6 +428,23 @@ body{
 }
 
 /* ── RESPONSIVE ──────────────────────────────────────────── */
+/* Desktop layout */
+@media(min-width:700px){
+  .mode-grid{grid-template-columns:1fr 1fr}
+  .type-grid{grid-template-columns:1fr 1fr}
+  .input-row{grid-template-columns:1fr 1fr}
+  .match-best,.match-other{padding:20px}
+  .card{padding:22px}
+  .profile-hero{padding:36px 28px}
+  .profile-hero-title{font-size:30px}
+  .result-model{font-size:24px}
+  .dim-table td{padding:11px 0;font-size:14px}
+  .tol-box{padding:20px}
+  .steps-bar{max-width:500px}
+}
+@media(min-width:900px){
+  .page{padding:24px 32px}
+}
 @media(max-width:480px){
   .page{padding:12px}
   .mode-grid{gap:10px}
