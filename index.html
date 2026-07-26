@@ -1065,11 +1065,11 @@ async function loadAll(){
       persons:n(r.persons)||0, capacity:n(r.capacity)||0,
       gate:n(r.gate)||1, entrance:n(r.entrance)||0,
       car_aa:n(r.car_aa), car_bb:n(r.car_bb),
-      // New MASTER format
-      ah:n(r.ah), bh:n(r.bh),
-      oh:n(r.oh), oh_sets:n(r.oh_sets),
-      pd:n(r.pd), pd_sets:n(r.pd_sets),
-      hm:n(r.hm),
+      // New MASTER format (handle both uppercase from Sheets and lowercase)
+      ah:n(r.ah||r.AH), bh:n(r.bh||r.BH),
+      oh:n(r.oh||r.OH), oh_sets:n(r.oh_sets||r.OH_sets),
+      pd:n(r.pd||r.PD), pd_sets:n(r.pd_sets||r.PD_sets),
+      hm:n(r.hm||r.HM),
       tr_min:n(r.tr_min), tr_max:n(r.tr_max),
       spd_min:n(r.spd_min)??n(r.speed_ms), spd_max:n(r.spd_max)??n(r.speed_ms),
       am:n(r.am), bm:n(r.bm),
