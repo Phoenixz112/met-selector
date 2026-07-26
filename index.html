@@ -1385,24 +1385,29 @@ function onCwt(){
 }
 function fillSpeeds(rows){
   if(!rows.length) return;
-  const cap=rows[0].capacity;
-  const spdMin=rows[0].spd_min||0;
-  const spdMax=rows[0].spd_max||99;
-  // Get speeds from PV that match series + capacity range + within PH speed range
-  const vtSpeeds=PV
-    .filter(v=>v.series===ST.series && cap>=v.min_cap && cap<=v.max_cap
-              && v.speed>=spdMin && v.speed<=spdMax)
-    .map(v=>v.speed);
-  const speeds=[...new Set(vtSpeeds)].sort((a,b)=>a-b);
-  if(speeds.length){
-    opt(document.getElementById('m-spd'),speeds,s=>s+' m/s');
-  } else {
-    // Fallback: all speeds in PV for this series+cap regardless of range
-    const allSpeeds=[...new Set(
-      PV.filter(v=>v.series===ST.series&&cap>=v.min_cap&&cap<=v.max_cap).map(v=>v.speed)
-    )].sort((a,b)=>a-b);
-    opt(document.getElementById('m-spd'),allSpeeds,s=>s+' m/s');
-  }
+  const code=document.getElementById('m-code').value;
+  const std=document.getElementById('m-std').value;
+  const door=document.getElementById('m-door').value;
+  const gate=document.getElementById('m-gate').value;
+  const ent=document.getElementById('m-ent').value;
+  const fp=document.getElementById('m-fp').value;
+  const cwt=document.getElementById('m-cwt').value;
+
+  // Filter PH rows matching current selections
+  let filtered=PH.filter(r=>r.series===ST.series&&r.code===code);
+  if(std)  filtered=filtered.filter(r=>r.standard===std);
+  if(door) filtered=filtered.filter(r=>r.door===door);
+  if(gate) filtered=filtered.filter(r=>+r.gate===+gate);
+  if(ent)  filtered=filtered.filter(r=>r.entrance===ent||+r.entrance===+ent);
+  if(fp)   filtered=filtered.filter(r=>r.fireproof===fp);
+  if(cwt)  filtered=filtered.filter(r=>r.cwt===cwt);
+
+  // Get unique speeds from filtered rows (spd_min or speed_ms)
+  const speeds=[...new Set(
+    filtered.map(r=>+(r.spd_min||r.speed_ms||0)).filter(s=>s>0)
+  )].sort((a,b)=>a-b);
+
+  opt(document.getElementById('m-spd'), speeds, s=>s+' m/s');
 }
 
 // ============================================================
