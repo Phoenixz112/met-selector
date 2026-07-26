@@ -1470,14 +1470,14 @@ function renderTolBox(ah, bh, tr, gate){
     <div class="tol-row" style="padding:3px 0">
       <span class="tol-label" style="display:flex;align-items:center;gap:6px">
         <span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;background:#0f7556;border-radius:3px;color:#fff;font-size:10px;flex-shrink:0;font-weight:700">✓</span>
-        Effective AH (with tolerance)
+        Recommended AH
       </span>
       <span class="tol-val">${(ah+ahTol).toLocaleString()} mm</span>
     </div>
     <div class="tol-row" style="padding:3px 0">
       <span class="tol-label" style="display:flex;align-items:center;gap:6px">
         <span style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;background:#0f7556;border-radius:3px;color:#fff;font-size:10px;flex-shrink:0;font-weight:700">✓</span>
-        <strong>Effective BH (with tolerance)</strong>
+        <strong>Recommended BH</strong>
       </span>
       <span class="tol-val" style="font-weight:700;font-size:14px">${(bh+bhTol).toLocaleString()} mm</span>
     </div>
@@ -1511,7 +1511,7 @@ function showModelResult(){
   const spd=document.getElementById('m-spd').value;
   const tr=document.getElementById('m-tr').value;
 
-  if(!code||!std||!door||!ent||!spd){alert('Please complete all selections.');return;}
+  if(!code||!std||!door||!ent){alert('Please complete all selections (Code, Standard, Door, Entrance).');return;}
   if(!tr){alert('Please enter Travel Height (TR).');return;}
 
   const row=PH.find(r=>
