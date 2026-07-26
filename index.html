@@ -1033,7 +1033,7 @@ const sheetURL = s => `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/t
 // ============================================================
 // DATA STORE
 // ============================================================
-let PH=[], PV=[], FR=[], ESC=[], HE=[];
+let PH=[], PV=[], FR=[], ESC=[], HE=[]; // PV kept for compatibility but unused
 let PROFILE={ company:'', type:'' };
 let ST={ passType:null, series:null, escSeries:null, frSeries:null };
 
@@ -1063,7 +1063,7 @@ async function loadAll(){
   try {
     var [phRaw,pvRaw,frRaw,escRaw,heRaw,escSetsRaw,escRangesRaw] = await Promise.all([
       safeSheet('PASSENGER'),
-      safeSheet('PASSENGER_VERTICAL'), // legacy
+      Promise.resolve([]), // PASSENGER_VERTICAL removed
       safeSheet('FREIGHT'),
       safeSheet('ESCALATOR'),
       safeSheet('HOME_ELEVATOR'),
@@ -1096,14 +1096,7 @@ async function loadAll(){
       g2_ah_nofp:n(r.g2_ah_nofp)??n(r.ah), g2_bh_nofp:n(r.g2_bh_nofp)??n(r.bh),
       g2_ah_fp:n(r.g2_ah_fp)??n(r.ah),     g2_bh_fp:n(r.g2_bh_fp)??n(r.bh),
     }));
-    PV = PV.map(r=>({...r,
-      speed:+r.speed, min_cap:+r.min_cap, max_cap:+r.max_cap,
-      tr_min:+r.tr_min, tr_max:+r.tr_max,
-      oh_mit:n(r.oh_mit), oh_en:n(r.oh_en),
-      oh_mit_sets:n(r.oh_mit_sets), oh_en_sets:n(r.oh_en_sets),
-      pit:n(r.pit), pit_sets:n(r.pit_sets),
-      hm:n(r.hm), max_floors:n(r.max_floors),
-    }));
+    // PASSENGER_VERTICAL removed - data now in PASSENGER sheet
     FR = FR.map(r=>({...r,
       capacity:+r.capacity, speed:+r.speed,
       jj:n(r.jj), hh:n(r.hh), hl:n(r.hl),
@@ -1146,11 +1139,11 @@ function initApp(){
   document.getElementById('esc-loading').style.display='none';
   document.getElementById('esc-home').style.display='';
 
-  const total = PH.length+PV.length+FR.length+ESC.length;
-  const statusMsg=`✅ Loaded: ${PH.length} horiz · ${PV.length} vert · ${FR.length} freight · ${ESC.length} escalator`;
+  const total = PH.length+FR.length+ESC.length;
+  const statusMsg=`✅ Loaded: ${PH.length} passenger · ${FR.length} freight · ${ESC.length} escalator`;
   const s2=document.getElementById('db-load-status');if(s2){s2.textContent=statusMsg;s2.style.display='';}
   document.getElementById('db-status').textContent =
-    `✅ Loaded: ${PH.length} horiz · ${PV.length} vert · ${FR.length} freight · ${ESC.length} escalator`;
+    `✅ Loaded: ${PH.length} passenger · ${FR.length} freight · ${ESC.length} escalator`;
 
   // Shaft filter dropdowns — populated dynamically when type selected
 
@@ -1503,23 +1496,14 @@ function fillSpeeds(rows){
 // ============================================================
 function lookupVT(series, capacity, speed, tr, std, phRow){
   const sp=parseFloat(speed), trF=parseFloat(tr);
-  // New MASTER: OH/PD in PH, find matching row by speed+TR
-  if(phRow&&phRow.ah!=null){
-    const m=PH.find(r=>
-      r.series===series && r.capacity===capacity &&
-      (r.spd_min==null||sp>=r.spd_min) && (r.spd_max==null||sp<=r.spd_max) &&
-      (r.tr_min==null||trF>r.tr_min) && (r.tr_max==null||trF<=r.tr_max)
-    );
-    if(m&&m.oh!=null) return {oh:m.oh, pit:m.pd, hm:m.hm, max_floors:null};
-  }
-  // Legacy PV
-  const row=PV.find(v=>
-    v.series===series &&
-    capacity>=v.min_cap && capacity<=v.max_cap &&
-    sp===v.speed && trF>v.tr_min && trF<=v.tr_max
+  // Find matching PH row by series+capacity+speed+TR
+  const m=PH.find(r=>
+    r.series===series && r.capacity===capacity &&
+    (r.spd_min==null||sp>=r.spd_min) && (r.spd_max==null||sp<=r.spd_max) &&
+    (r.tr_min==null||trF>r.tr_min) && (r.tr_max==null||trF<=r.tr_max)
   );
-  if(!row) return null;
-  return {oh:std==='EN81'?row.oh_en:row.oh_mit, pit:row.pit, hm:row.hm, max_floors:row.max_floors};
+  if(m&&m.oh!=null) return {oh:m.oh, pit:m.pd, hm:m.hm, max_floors:null};
+  return null;
 }
 
 // ============================================================
@@ -1729,7 +1713,7 @@ function searchShaft(){
     // OH/PD: MASTER has it in PH row directly
     let vt=null;
     if(r.oh!=null){ vt=r; }
-    else { vt=PV.find(v=>v.series===r.series&&r.capacity>=v.min_cap&&r.capacity<=v.max_cap&&tr>v.tr_min&&tr<=v.tr_max); }
+    // No PV fallback - data in PH only
     r._ah=rAH; r._bh=rBH; r._vt=vt;
     r._vtOH=r.oh||(vt?(r.standard==='EN81'?vt.oh_en:vt.oh_mit):null);
     r._vtPIT=r.pd||(vt?vt.pit:null);
