@@ -1028,8 +1028,8 @@ async function safeSheet(name){
 async function loadAll(){
   try {
     var [phRaw,pvRaw,frRaw,escRaw,heRaw,escSetsRaw,escRangesRaw] = await Promise.all([
-      safeSheet('PASSENGER_HORIZONTAL'),
-      safeSheet('PASSENGER_VERTICAL'),
+      safeSheet('PASSENGER'),
+      safeSheet('PASSENGER_VERTICAL') // legacy - can be removed,
       safeSheet('FREIGHT'),
       safeSheet('ESCALATOR'),
       safeSheet('HOME_ELEVATOR'),
