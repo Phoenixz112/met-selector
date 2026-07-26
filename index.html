@@ -1243,9 +1243,10 @@ function startMode(m){
   if(m==='shaft'){
     document.getElementById('pass-shaft').style.display='';
     document.getElementById('shaft-results').style.display='none';
-    // Populate origin + capacity from current passType rows
     setTimeout(()=>{
       const rows=phForType();
+
+      // Origin
       const oSel=document.getElementById('sh-origin');
       if(oSel){
         oSel.innerHTML='<option value="">Any</option>';
@@ -1253,9 +1254,47 @@ function startMode(m){
           const el=document.createElement('option');el.value=o;el.textContent=o;oSel.appendChild(el);
         });
       }
+
+      // Capacity - keep Any only
       const cSel=document.getElementById('sh-cap');
-      if(cSel){
-        cSel.innerHTML='<option value="0">Any capacity</option>';
+      if(cSel) cSel.innerHTML='<option value="0">Any capacity</option>';
+
+      // Door Type - from actual data
+      const dSel=document.getElementById('sh-door');
+      if(dSel){
+        const doorLabels={'CO':'CO (Centre Opening)','2S':'2S (Side Opening)','2CO':'2CO (Double Centre Opening)','2U':'2U','3S':'3S','3U':'3U'};
+        dSel.innerHTML='<option value="">Any</option>';
+        [...new Set(rows.map(r=>r.door).filter(Boolean))].sort().forEach(d=>{
+          const el=document.createElement('option');el.value=d;el.textContent=doorLabels[d]||d;dSel.appendChild(el);
+        });
+      }
+
+      // Speed - from actual data
+      const sSel=document.getElementById('sh-spd');
+      if(sSel){
+        sSel.innerHTML='<option value="">Any</option>';
+        [...new Set(rows.map(r=>+(r.spd_min||r.speed_ms||0)).filter(s=>s>0))].sort((a,b)=>a-b).forEach(s=>{
+          const el=document.createElement('option');el.value=s;el.textContent=s.toFixed(2)+' m/s';sSel.appendChild(el);
+        });
+      }
+
+      // Standard - from actual data
+      const stdSel=document.getElementById('sh-std');
+      if(stdSel){
+        const stdLabels={'MIT':'Mitsubishi Std','EN81':'EN 81'};
+        stdSel.innerHTML='<option value="">Any</option>';
+        [...new Set(rows.map(r=>r.standard).filter(Boolean))].sort().forEach(s=>{
+          const el=document.createElement('option');el.value=s;el.textContent=stdLabels[s]||s;stdSel.appendChild(el);
+        });
+      }
+
+      // CWT - from actual data
+      const cwtSel=document.getElementById('sh-cwt');
+      if(cwtSel){
+        cwtSel.innerHTML='<option value="">Any</option>';
+        [...new Set(rows.map(r=>r.cwt).filter(Boolean))].sort().forEach(c=>{
+          const el=document.createElement('option');el.value=c;el.textContent=c;cwtSel.appendChild(el);
+        });
       }
     }, 50);
   } else {
