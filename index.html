@@ -1298,7 +1298,13 @@ function fRows(){
 }
 function initSpecs(){
   const rows=PH.filter(r=>r.series===ST.series);
-  opt(document.getElementById('m-code'),uniq(rows,r=>r.code),c=>{
+  // Sort codes by capacity (ascending)
+  const codes=[...new Set(rows.map(r=>r.code))].sort((a,b)=>{
+    const ca=rows.find(r=>r.code===a)?.capacity||0;
+    const cb=rows.find(r=>r.code===b)?.capacity||0;
+    return ca-cb;
+  });
+  opt(document.getElementById('m-code'),codes,c=>{
     const r=rows.find(x=>x.code===c);
     return `${c} — ${r.capacity} kg (${r.persons}P)`;
   });
@@ -2091,7 +2097,11 @@ function showHeForm(){
   document.getElementById('he-home').style.display='none';
   document.getElementById('he-form').style.display='';
   document.getElementById('he-result').style.display='none';
-  const codes=[...new Set(rows.map(r=>r.code))].sort();
+  const codes=[...new Set(rows.map(r=>r.code))].sort((a,b)=>{
+    const ca=rows.find(r=>r.code===a)?.capacity||0;
+    const cb=rows.find(r=>r.code===b)?.capacity||0;
+    return ca-cb;
+  });
   const cSel=document.getElementById('he-code');
   cSel.innerHTML='<option value="">— Select —</option>';
   codes.forEach(c=>{
