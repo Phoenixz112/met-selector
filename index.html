@@ -1700,14 +1700,18 @@ function searchShaft(){
       if(tr<=r.tr_min||tr>r.tr_max) return false;
     }
 
-    // AH/BH check with tolerance
+    // AH/BH check — Recommended (catalog + tolerance) must fit within available shaft
     const fpCheck=fp||r.fireproof;
     const gateVal=r.gate;
     const rAH=getAH(r,fpCheck,gateVal);
     const rBH=getBH(r,fpCheck,gateVal);
     if(!rAH||!rBH) return false;
     const{ahTol,bhTol}=getTolerance(tr,gateVal);
-    if(rAH>(ah+ahTol)||rBH>(bh+bhTol)) return false;
+    // Recommended = catalog + tolerance
+    // Condition: Recommended AH ≤ available AH AND Recommended BH ≤ available BH
+    const recAH=rAH+ahTol;
+    const recBH=rBH+bhTol;
+    if(recAH>ah||recBH>bh) return false;
 
     // Other filters
     if(r.capacity<minC) return false;
