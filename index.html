@@ -1624,7 +1624,7 @@ function showModelResult(){
     tbl('r-mr',[
       ['Machine Room Width (AM)',row.am,'mm'],
       ['Machine Room Depth (BM)',row.bm,'mm'],
-      ['Machine Room Height (HM)',vt?.hm||'—',vt?.hm?'mm':''],
+      ['Machine Room Height (HM)',vt?.hm||'Please consult MET',vt?.hm?'mm':''],
     ]);
   }
 
@@ -1653,8 +1653,8 @@ function showModelResult(){
 function getOHDisplay(r){
   const oh = r.oh || (r._vt&&(r._vt.oh||r._vt.oh_mit));
   const pd = r.pd || (r._vt&&(r._vt.pit||r._vt.pd));
-  if(oh) return `OH: <span>${oh}</span> mm &nbsp;·&nbsp; PD: <span>${pd||'—'}</span> mm`;
-  return '<span style="color:#b45309">⚠ No OH/PD data for this TR</span>';
+  if(oh) return `OH: <span>${oh}</span> mm &nbsp;·&nbsp; PD: <span>${pd!=null&&pd!==undefined?pd:'<span style="color:#b45309">Please consult MET</span>'}</span> mm`;
+  return '<span style="color:#b45309">⚠ Please consult MET</span>';
 }
 function searchShaft(){
   const ah=parseInt(document.getElementById('sh-ah').value);
@@ -1764,7 +1764,7 @@ function searchShaft(){
           <div class="match-dims">
             Car: <span>${r.car_aa}×${r.car_bb}</span> mm &nbsp;·&nbsp; Entrance: <span>${r.entrance}</span> mm (${r.entrance_type}) &nbsp;·&nbsp; FP: <span>${r.fireproof==='yes'?'Yes':'No'}</span><br>
             Min. Shaft: <span>${r._ah}×${r._bh}</span> mm${r.am?` &nbsp;·&nbsp; M/R: <span>${r.am}×${r.bm}</span> mm`:''}<br>
-            ${r._vt?`OH: <span>${r._vt.oh}</span> mm &nbsp;·&nbsp; PD: <span>${r._vt.pit}</span> mm`:'<span style="color:#b45309">⚠ No vertical data for this TR</span>'}
+            ${getOHDisplay(r)}
           </div>
           ${renderTolBox(r._ah,r._bh,tr,r.gate)}
         </div>`;
