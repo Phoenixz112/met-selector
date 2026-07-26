@@ -1600,17 +1600,27 @@ function searchShaft(){
   if(!tr){alert('Please enter Travel Height (TR).');return;}
 
   const seen=new Set();
-  const phRows=phForType(); // only search within current passType
+  const phRows=phForType();
   let matches=phRows.filter(r=>{
-    // Get correct AH/BH based on gate and fp filter
+    // Speed filter
+    const rSpd=+(r.spd_min||r.speed_ms||0);
+    if(spd&&rSpd&&Math.abs(rSpd-spd)>0.001) return false;
+
+    // TR range filter (MASTER format: tr_min/tr_max per row)
+    if(r.tr_min!=null&&r.tr_max!=null){
+      if(tr<=r.tr_min||tr>r.tr_max) return false;
+    }
+
+    // AH/BH check with tolerance
     const fpCheck=fp||r.fireproof;
     const gateVal=r.gate;
     const rAH=getAH(r,fpCheck,gateVal);
     const rBH=getBH(r,fpCheck,gateVal);
     if(!rAH||!rBH) return false;
-
     const{ahTol,bhTol}=getTolerance(tr,gateVal);
     if(rAH>(ah+ahTol)||rBH>(bh+bhTol)) return false;
+
+    // Other filters
     if(r.capacity<minC) return false;
     if(door&&r.door!==door) return false;
     if(cwt&&r.cwt&&r.cwt!==cwt) return false;
@@ -1618,17 +1628,18 @@ function searchShaft(){
     if(std&&r.standard!==std) return false;
     if(fp&&r.fireproof!==fp) return false;
 
-    // Check vertical exists for this TR
-    const vt=PV.find(v=>v.series===r.series&&r.capacity>=v.min_cap&&r.capacity<=v.max_cap&&tr>v.tr_min&&tr<=v.tr_max);
-    const vtOH=vt?(r.standard==='EN81'?vt.oh_en:vt.oh_mit):null;
-    const vtPIT=vt?vt.pit:null;
-
+    // Dedup
     const key=`${r.origin}|${r.series}|${r.code}|${r.door}|${r.gate}|${r.entrance}|${r.car_aa}x${r.car_bb}|${r.cwt||''}|${r.fireproof}`;
     if(seen.has(key)) return false;
     seen.add(key);
 
-    const vtOH2=vt?(r.standard==='EN81'?vt.oh_en:vt.oh_mit):null;
-    r._ah=rAH; r._bh=rBH; r._vt=vt; r._vtOH=vtOH2; r._vtPIT=vt?vt.pit:null;
+    // OH/PD: MASTER has it in PH row directly
+    let vt=null;
+    if(r.oh!=null){ vt=r; }
+    else { vt=PV.find(v=>v.series===r.series&&r.capacity>=v.min_cap&&r.capacity<=v.max_cap&&tr>v.tr_min&&tr<=v.tr_max); }
+    r._ah=rAH; r._bh=rBH; r._vt=vt;
+    r._vtOH=r.oh||(vt?(r.standard==='EN81'?vt.oh_en:vt.oh_mit):null);
+    r._vtPIT=r.pd||(vt?vt.pit:null);
     return true;
   });
 
