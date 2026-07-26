@@ -494,7 +494,7 @@ body{
       <span style="font-size:32px;flex-shrink:0">🛗</span>
       <div style="flex:1">
         <div style="font-size:15px;font-weight:700;color:#111827">Passenger Elevator</div>
-        <div style="font-size:11px;color:#9ca3af;margin-top:2px">Machine Room · Machine Room-Less · Bed (Machine Room)</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:2px">MRL · Machine Room · Bed</div>
       </div>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
     </div>
@@ -510,7 +510,7 @@ body{
       <img src="https://phoenixz112.github.io/met-selector/freight.png" style="width:36px;height:36px;object-fit:contain;flex-shrink:0">
       <div>
         <span class="type-label" style="font-size:15px">Freight Elevator</span>
-        <span class="type-sub" style="display:block;margin-top:3px">GFM-T · GFCL2 · GFCL3 · LEHY-G · LEHY-L-G</span>
+        <span class="type-sub" style="display:block;margin-top:3px">GFM-T · GFCL2 · GFCL3 · LEHY</span>
       </div>
       <svg style="margin-left:auto;flex-shrink:0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
     </div>
@@ -538,12 +538,12 @@ body{
       <div class="type-card" onclick="selectPassType('mrl')" id="pt-mrl">
         <span class="type-icon">🏬</span>
         <span class="type-label">Machine Room-Less</span>
-        <span class="type-sub">NEXIEZ-MRL II<br>NEXIEZ-FIT<br>NEXIEZ-S</span>
+        <span class="type-sub">NEXIEZ-MRL II<br>NEXIEZ-FIT · S</span>
       </div>
       <div class="type-card" onclick="selectPassType('mr')" id="pt-mr">
         <span class="type-icon">🏢</span>
         <span class="type-label">Machine Room</span>
-        <span class="type-sub">NEXIEZ-MR<br>NEXWAY-S-AP II<br>NEXWAY-S-Package R</span>
+        <span class="type-sub">NEXIEZ-MR<br>NEXWAY-S-AP II<br>Package R</span>
       </div>
       <div class="type-card" onclick="selectPassType('bed')" id="pt-bed">
         <span class="type-icon">🛏️</span>
@@ -571,7 +571,6 @@ body{
       </div>
     </div>
     <button class="btn-secondary" onclick="goPassHome()">← Back</button>
-    <button class="btn-secondary no-print" onclick="showPage('home')">← Back to Menu</button>
   </div>
 
   <!-- BY SHAFT -->
@@ -630,29 +629,12 @@ body{
           <option value="yes">With fireproof</option>
         </select>
       </div>
-      <div class="form-row">
+      <div class="form-row" style="margin-bottom:0">
         <label class="form-label">Counterweight Position</label>
         <select class="form-select" id="sh-cwt">
           <option value="">Any</option>
           <option value="Rear">Rear</option>
           <option value="Side">Side</option>
-        </select>
-      </div>
-      <div class="form-row" style="margin-bottom:0">
-        <label class="form-label">Rated Speed (m/s) <span style="color:var(--red)">*</span></label>
-        <select class="form-select" id="sh-spd">
-          <option value="">— Select —</option>
-          <option value="0.5">0.50 m/s</option>
-          <option value="0.75">0.75 m/s</option>
-          <option value="1.0">1.00 m/s</option>
-          <option value="1.5">1.50 m/s</option>
-          <option value="1.6">1.60 m/s</option>
-          <option value="1.75">1.75 m/s</option>
-          <option value="2.0">2.00 m/s</option>
-          <option value="2.5">2.50 m/s</option>
-          <option value="3.0">3.00 m/s</option>
-          <option value="3.5">3.50 m/s</option>
-          <option value="4.0">4.00 m/s</option>
         </select>
       </div>
     </div>
@@ -672,7 +654,6 @@ body{
         Print / Export PDF
       </button>
       <button class="btn-secondary no-print" onclick="document.getElementById('shaft-results').style.display='none'">← Edit Search</button>
-      <button class="btn-secondary no-print" onclick="showPage('home')">← Back to Menu</button>
     </div>
   </div>
 
@@ -690,7 +671,6 @@ body{
         Next <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </button>
       <button class="btn-secondary" onclick="goMode()">← Back</button>
-      <button class="btn-secondary no-print" onclick="showPage('home')">← Back to Menu</button>
     </div>
     <div id="em2" style="display:none">
       <div class="steps-bar">
@@ -713,7 +693,6 @@ body{
         View Result <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </button>
       <button class="btn-secondary" onclick="goMS(1)">← Back</button>
-      <button class="btn-secondary no-print" onclick="showPage('home')">← Back to Menu</button>
     </div>
     <div id="em3" style="display:none">
       <div class="result-header">
@@ -746,7 +725,7 @@ body{
         Print / Export PDF
       </button>
       <button class="btn-reset" onclick="goMS(2)">← Change Specs</button>
-      <button class="btn-secondary" onclick="showPage('home')">← Back to Menu</button>
+      <button class="btn-secondary" onclick="showPage('home')">New Query</button>
     </div>
   </div>
 </div>
@@ -774,8 +753,7 @@ body{
     <button class="btn-primary" onclick="showFreightResult()">
       View Result <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
     </button>
-    <button class="btn-secondary" onclick="resetFreight()">← Back</button>
-    <button class="btn-secondary no-print" onclick="showPage('home')">← Back to Menu</button>
+    <button class="btn-secondary" onclick="resetFreight()">← Back to Freight</button>
     <div id="fr-result" style="display:none">
       <div class="result-header" style="margin-top:12px">
         <div class="result-model" id="fr-r-title">—</div>
@@ -794,7 +772,6 @@ body{
         Print / Export PDF
       </button>
       <button class="btn-reset" onclick="document.getElementById('fr-result').style.display='none'">← Edit</button>
-      <button class="btn-secondary no-print" onclick="showPage('home')">← Back to Menu</button>
     </div>
   </div>
 </div>
@@ -885,7 +862,6 @@ body{
       View Result <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
     </button>
     <button class="btn-secondary" onclick="resetHe()">← Back</button>
-    <button class="btn-secondary no-print" onclick="showPage('home')">← Back to Menu</button>
     <div id="he-result" style="display:none">
       <div class="result-header" style="margin-top:12px">
         <div class="result-model" id="he-r-title">—</div>
@@ -912,7 +888,7 @@ body{
         Print / Export PDF
       </button>
       <button class="btn-reset" onclick="document.getElementById('he-result').style.display='none'">← Edit</button>
-      <button class="btn-secondary" onclick="showPage('home')">← Back to Menu</button>
+      <button class="btn-secondary" onclick="showPage('home')">New Query</button>
     </div>
   </div>
 </div>
@@ -1018,7 +994,7 @@ body{
 // ============================================================
 const SHEET_ID = '1OjCye8QlxaNXojs6fckuyjIK9wQ3F-L5QIfwHemvQps';
 const LOG_URL  = 'https://script.google.com/macros/s/AKfycby6znY3yWgyUNqV8C0cxYG1AOZ4am5IIbLw04fGBzfQN4oyicWHymY9NnhyoJ4tJ3Rg/exec';
-const sheetURL = s => `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(s)}&headers=1&range=A:ZZ`;
+const sheetURL = s => `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(s)}`;
 
 // ============================================================
 // DATA STORE
@@ -1069,14 +1045,22 @@ async function loadAll(){
     }
     // Normalize numbers
     PH = PH.map(r=>({...r,
-      persons:+r.persons, capacity:+r.capacity,
-      gate:+r.gate, entrance:+r.entrance,
-      car_aa:+r.car_aa, car_bb:+r.car_bb,
-      ah_nofp:n(r.ah_nofp), bh_nofp:n(r.bh_nofp),
-      ah_fp:n(r.ah_fp),     bh_fp:n(r.bh_fp),
-      g2_ah_nofp:n(r.g2_ah_nofp), g2_bh_nofp:n(r.g2_bh_nofp),
-      g2_ah_fp:n(r.g2_ah_fp),     g2_bh_fp:n(r.g2_bh_fp),
-      spd_min:+r.spd_min, spd_max:+r.spd_max, am:n(r.am), bm:n(r.bm),
+      persons:n(r.persons)||0, capacity:n(r.capacity)||0,
+      gate:n(r.gate)||1, entrance:n(r.entrance)||0,
+      car_aa:n(r.car_aa), car_bb:n(r.car_bb),
+      // New MASTER format
+      ah:n(r.ah), bh:n(r.bh),
+      oh:n(r.oh), oh_sets:n(r.oh_sets),
+      pd:n(r.pd), pd_sets:n(r.pd_sets),
+      hm:n(r.hm),
+      tr_min:n(r.tr_min), tr_max:n(r.tr_max),
+      spd_min:n(r.spd_min)??n(r.speed_ms), spd_max:n(r.spd_max)??n(r.speed_ms),
+      am:n(r.am), bm:n(r.bm),
+      // Legacy format
+      ah_nofp:n(r.ah_nofp)??n(r.ah), bh_nofp:n(r.bh_nofp)??n(r.bh),
+      ah_fp:n(r.ah_fp)??n(r.ah),     bh_fp:n(r.bh_fp)??n(r.bh),
+      g2_ah_nofp:n(r.g2_ah_nofp)??n(r.ah), g2_bh_nofp:n(r.g2_bh_nofp)??n(r.bh),
+      g2_ah_fp:n(r.g2_ah_fp)??n(r.ah),     g2_bh_fp:n(r.g2_bh_fp)??n(r.bh),
     }));
     PV = PV.map(r=>({...r,
       speed:+r.speed, min_cap:+r.min_cap, max_cap:+r.max_cap,
@@ -1261,7 +1245,7 @@ function seriesForType(t){
   const seriesMap={
     home:  ['SHA','SVC'],
     mrl:   ['NEXIEZ-MRL II','NEXIEZ-FIT','NEXIEZ-S'],
-    mr:    ['NEXIEZ-MR','NEXWAY-S-AP II','NEXWAY-S-Package R'],
+    mr:    ['NEXIEZ-MR','NEXWAY-S-AP II','NEXWAY Package R'],
     bed:   ['NEXIEZ-MR BED'],
   };
   return seriesMap[t]||[];
@@ -1321,7 +1305,7 @@ function initSpecs(){
   ['m-std','m-door','m-gate','m-ent','m-fp','m-cwt','m-spd'].forEach(id=>
     document.getElementById(id).innerHTML='<option value="">— Select code first —</option>');
   // Show/hide CWT row based on series
-  const hasCWT=['NEXIEZ-MR','NEXWAY-S-AP II','NEXWAY-S-Package R','NEXIEZ-MR BED'].includes(ST.series);
+  const hasCWT=['NEXIEZ-MR','NEXWAY-S-AP II','NEXWAY Package R','NEXIEZ-MR BED'].includes(ST.series);
   document.getElementById('cwt-row').style.display=hasCWT?'':'none';
 }
 function onCode(){
@@ -1376,7 +1360,7 @@ function onEnt(){
 }
 function onFp(){
   const rows=fRows();
-  const hasCWT=['NEXIEZ-MR','NEXWAY-S-AP II','NEXWAY-S-Package R','NEXIEZ-MR BED'].includes(ST.series);
+  const hasCWT=['NEXIEZ-MR','NEXWAY-S-AP II','NEXWAY Package R','NEXIEZ-MR BED'].includes(ST.series);
   if(hasCWT){
     const cwts=uniq(rows,r=>r.cwt);
     if(cwts.length>1){
@@ -1418,18 +1402,25 @@ function fillSpeeds(rows){
 // ============================================================
 // VERTICAL LOOKUP
 // ============================================================
-function lookupVT(series, capacity, speed, tr, std){
+function lookupVT(series, capacity, speed, tr, std, phRow){
   const sp=parseFloat(speed), trF=parseFloat(tr);
+  // New MASTER: OH/PD in PH, find matching row by speed+TR
+  if(phRow&&phRow.ah!=null){
+    const m=PH.find(r=>
+      r.series===series && r.capacity===capacity &&
+      (r.spd_min==null||sp>=r.spd_min) && (r.spd_max==null||sp<=r.spd_max) &&
+      (r.tr_min==null||trF>r.tr_min) && (r.tr_max==null||trF<=r.tr_max)
+    );
+    if(m&&m.oh!=null) return {oh:m.oh, pit:m.pd, hm:m.hm, max_floors:null};
+  }
+  // Legacy PV
   const row=PV.find(v=>
     v.series===series &&
     capacity>=v.min_cap && capacity<=v.max_cap &&
-    sp===v.speed &&
-    trF>v.tr_min && trF<=v.tr_max
+    sp===v.speed && trF>v.tr_min && trF<=v.tr_max
   );
   if(!row) return null;
-  const oh   = std==='EN81' ? row.oh_en   : row.oh_mit;
-  const pit  = row.pit;
-  return {oh, pit, hm:row.hm, max_floors:row.max_floors};
+  return {oh:std==='EN81'?row.oh_en:row.oh_mit, pit:row.pit, hm:row.hm, max_floors:row.max_floors};
 }
 
 // ============================================================
@@ -1486,11 +1477,13 @@ function renderTolBox(ah, bh, tr, gate){
 // BY MODEL — RESULT
 // ============================================================
 function getAH(row, fp, gate){
+  if(row.ah!=null) return row.ah; // New MASTER format
   const g=parseInt(gate), u=fp==='yes';
   if(g===2) return u ? row.g2_ah_fp : row.g2_ah_nofp;
   return u ? row.ah_fp : row.ah_nofp;
 }
 function getBH(row, fp, gate){
+  if(row.bh!=null) return row.bh; // New MASTER format
   const g=parseInt(gate), u=fp==='yes';
   if(g===2) return u ? row.g2_bh_fp : row.g2_bh_nofp;
   return u ? row.bh_fp : row.bh_nofp;
@@ -1523,7 +1516,7 @@ function showModelResult(){
   const bh=getBH(row,fp,gate);
   if(!ah||!bh){alert('No dimension data for this configuration.');return;}
 
-  const vt=lookupVT(ST.series,row.capacity,spd,tr,std);
+  const vt=lookupVT(ST.series,row.capacity,spd,tr,std,row);
 
   document.getElementById('r-title').textContent=`${ST.series} · ${code}`;
   document.getElementById('r-sub').textContent=
@@ -1579,7 +1572,6 @@ function searchShaft(){
   const ah=parseInt(document.getElementById('sh-ah').value);
   const bh=parseInt(document.getElementById('sh-bh').value);
   const tr=parseFloat(document.getElementById('sh-tr').value);
-  const spd=parseFloat(document.getElementById('sh-spd').value);
   const minC=parseInt(document.getElementById('sh-cap').value)||0;
   const door=document.getElementById('sh-door').value;
   const cwt=document.getElementById('sh-cwt').value;
@@ -1589,7 +1581,6 @@ function searchShaft(){
 
   if(!ah||!bh){alert('Please enter AH and BH.');return;}
   if(!tr){alert('Please enter Travel Height (TR).');return;}
-  if(!spd){alert('Please select Rated Speed.');return;}
 
   const seen=new Set();
   const phRows=phForType(); // only search within current passType
@@ -1609,11 +1600,9 @@ function searchShaft(){
     if(origin&&r.origin!==origin) return false;
     if(std&&r.standard!==std) return false;
     if(fp&&r.fireproof!==fp) return false;
-    // Filter by speed — must be within spd_min/spd_max range of this row
-    if(spd&&r.spd_min&&r.spd_max&&(spd<r.spd_min||spd>r.spd_max)) return false;
 
-    // Check vertical exists for this TR and speed
-    const vt=PV.find(v=>v.series===r.series&&r.capacity>=v.min_cap&&r.capacity<=v.max_cap&&tr>v.tr_min&&tr<=v.tr_max&&(!spd||v.speed===spd));
+    // Check vertical exists for this TR
+    const vt=PV.find(v=>v.series===r.series&&r.capacity>=v.min_cap&&r.capacity<=v.max_cap&&tr>v.tr_min&&tr<=v.tr_max);
     const vtOH=vt?(r.standard==='EN81'?vt.oh_en:vt.oh_mit):null;
     const vtPIT=vt?vt.pit:null;
 
@@ -1652,7 +1641,7 @@ function searchShaft(){
         Entrance: <span>${best.entrance}</span> mm (${best.entrance_type})<br>
         Min. Shaft: <span>${best._ah}×${best._bh}</span> mm
         ${best.am?` &nbsp;·&nbsp; M/R: <span>${best.am}×${best.bm}</span> mm`:''}<br>
-        ${best._vt?`OH: <span>${best._vt.oh}</span> mm &nbsp;·&nbsp; PD: <span>${best._vt.pit}</span> mm`:'<span style="color:#b45309">⚠ No vertical data for TR '+tr+'m</span>'}
+        ${best._vt&&(best._vt.oh||best._vt.oh_mit)?`OH: <span>${best._vt.oh??best._vt.oh_mit}</span> mm &nbsp;·&nbsp; PD: <span>${best._vt.pit??best._vt.pd}</span> mm`:'<span style="color:#b45309">⚠ No OH/PD data for this TR</span>'}
       </div>
       ${renderTolBox(best._ah,best._bh,tr,best.gate)}
     </div>`;
@@ -1695,32 +1684,17 @@ function toggleAcc(el){
 // ============================================================
 function buildFreightList(){
   if(!FR||!FR.length){ console.warn('FR empty'); return; }
-  const FR_INFO={
-    'GFM-T':   'Mitsubishi Elevator — Japan',
-    'GFCL2':   'Mitsubishi Elevator — Taiwan',
-    'GFCL3':   'Mitsubishi Elevator — Taiwan',
-    'LEHY-G':  'Shanghai Mitsubishi Elevator — China',
-    'LEHY-L-G':'Shanghai Mitsubishi Elevator — China',
-  };
-  const ORDER=['GFM-T','GFCL2','GFCL3','LEHY-G','LEHY-L-G'];
-  const series=[...new Set(FR.map(r=>`${r.origin}||${r.series}`))].sort((a,b)=>{
-    const sa=a.split('||')[1], sb=b.split('||')[1];
-    const ia=ORDER.indexOf(sa), ib=ORDER.indexOf(sb);
-    if(ia===-1&&ib===-1) return sa.localeCompare(sb);
-    if(ia===-1) return 1;
-    if(ib===-1) return -1;
-    return ia-ib;
-  });
+  const series=[...new Set(FR.map(r=>`${r.origin}||${r.series}`))].sort();
   const list=document.getElementById('fr-series-list');
   if(!list) return;
   list.innerHTML='';
-  const icons={Melina:'',TMEC:'',SMEC:''};
+  const icons={Melina:'🇹🇭',TMEC:'🏗️',SMEC:'🇨🇳'};
   series.forEach(s=>{
     const[org,ser]=s.split('||');
     const rows=FR.filter(r=>r.origin===org&&r.series===ser);
     const caps=[...new Set(rows.map(r=>r.capacity))].sort((a,b)=>a-b);
     const div=document.createElement('div');div.className='model-row';
-    div.innerHTML=`<div><div class="model-code">${ser}</div><div class="model-cap">${FR_INFO[ser]||org} · ${caps[0].toLocaleString()}–${caps[caps.length-1].toLocaleString()} kg</div></div><div style="display:flex;align-items:center"><div class="model-check">✓</div></div>`;
+    div.innerHTML=`<div><div class="model-code">${icons[org]||'🏭'} ${ser}</div><div class="model-cap">${org} · ${caps[0].toLocaleString()}–${caps[caps.length-1].toLocaleString()} kg</div></div><div style="display:flex;align-items:center"><div class="model-check">✓</div></div>`;
     div.onclick=()=>{
       ST.frSeries={org,ser};
       document.querySelectorAll('#fr-series-list .model-row').forEach(c=>c.classList.remove('selected'));
@@ -2114,9 +2088,7 @@ function initHE(){
 function showHeForm(){
   if(!HE_series) return;
   const rows=HE.filter(r=>r.series===HE_series);
-  ['he-home','he-model','he-shaft'].forEach(id=>{
-    const el=document.getElementById(id);if(el)el.style.display='none';
-  });
+  document.getElementById('he-home').style.display='none';
   document.getElementById('he-form').style.display='';
   document.getElementById('he-result').style.display='none';
   const codes=[...new Set(rows.map(r=>r.code))].sort();
@@ -2157,17 +2129,9 @@ function onHeCode(){
 function onHeDoor(){
   const code=document.getElementById('he-code').value;
   const door=document.getElementById('he-door').value;
-  if(!code||!door){
-    document.getElementById('he-gate').innerHTML='<option value="">— Select —</option>';
-    return;
-  }
-  const rows=HE.filter(r=>r.series===HE_series&&r.code===code&&r.door===door);
-  const gates=[...new Set(rows.map(r=>+r.gate))].filter(g=>!isNaN(g)).sort((a,b)=>a-b);
+  const rows=HE.filter(r=>r.series===HE_series&&r.code===code&&(!door||r.door===door));
+  const gates=[...new Set(rows.map(r=>r.gate))].sort();
   const gSel=document.getElementById('he-gate');
-  if(!gates.length){
-    gSel.innerHTML='<option value="">— No data —</option>';
-    return;
-  }
   if(gates.length>1){
     gSel.innerHTML='<option value="">— Select —</option>';
     gates.forEach(g=>{const o=document.createElement('option');o.value=g;o.textContent=g+' Gate';gSel.appendChild(o);});
