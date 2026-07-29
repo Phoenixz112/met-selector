@@ -1576,13 +1576,15 @@ function getBH(row, fp, gate){
 }
 
 function validateTR(){
-  const tr    = parseFloat(document.getElementById('m-tr').value);
+  const trVal = document.getElementById('m-tr').value;
+  const tr    = parseFloat(trVal);
   const code  = document.getElementById('m-code')?.value;
   const warn  = document.getElementById('m-tr-warn');
   const ok    = document.getElementById('m-tr-ok');
   const input = document.getElementById('m-tr');
 
-  if(!tr || !ST.series || !code) {
+  // ยังไม่กรอก → ไม่ให้ผ่าน (border เทา ไม่มีข้อความ)
+  if(!trVal || trVal === '') {
     warn.style.display='none';
     ok.style.display='none';
     input.style.borderColor='';
@@ -1590,7 +1592,15 @@ function validateTR(){
     return;
   }
 
-  // Get TR range from PH rows matching series + code
+  if(!ST.series || !code) {
+    warn.style.display='none';
+    ok.style.display='none';
+    input.style.borderColor='';
+    input.style.boxShadow='';
+    return;
+  }
+
+  // Get TR range from PH rows
   const rows = PH.filter(r =>
     r.series === ST.series &&
     r.code   === code &&
@@ -1598,6 +1608,7 @@ function validateTR(){
   );
 
   if(!rows.length){
+    // ไม่มีข้อมูล TR → ไม่บล็อก แต่ไม่แสดงอะไร
     warn.style.display='none';
     ok.style.display='none';
     input.style.borderColor='';
@@ -1613,7 +1624,7 @@ function validateTR(){
     ok.style.display='none';
     input.style.borderColor='#ef4444';
     input.style.boxShadow='0 0 0 3px rgba(239,68,68,.15)';
-    warn.textContent = `⚠ Out of standard (max TR = ${trMax}m) — กรุณาปรึกษา MET`;
+    warn.textContent = `⚠ Out of standard (max TR = ${trMax}m) — Please consult MET`;
   } else {
     warn.style.display='none';
     ok.style.display='';
