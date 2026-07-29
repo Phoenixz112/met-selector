@@ -721,7 +721,10 @@ body{
         <div class="form-row"><label class="form-label">Fireproof Door</label><select class="form-select" id="m-fp" onchange="onFp()"></select></div>
         <div class="form-row" id="cwt-row"><label class="form-label">Counterweight Position</label><select class="form-select" id="m-cwt" onchange="onCwt()"></select></div>
         <div class="form-row"><label class="form-label">Rated Speed (m/s)</label><select class="form-select" id="m-spd"></select></div>
-        <div class="form-row" style="margin-bottom:0"><label class="form-label">Travel Height — TR (m)</label><input class="form-input" type="number" id="m-tr" placeholder="e.g. 45" step="0.1"></div>
+        <div class="form-row" style="margin-bottom:0"><label class="form-label">Travel Height — TR (m)</label><input class="form-input" type="number" id="m-tr" placeholder="e.g. 45" step="0.1" oninput="validateTR()">
+          <div id="m-tr-warn" style="display:none;margin-top:6px;font-size:12px;color:#991b1b;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:6px 10px">⚠ Out of standard — กรุณาปรึกษา MET</div>
+          <div id="m-tr-ok" style="display:none;margin-top:6px;font-size:12px;color:#0f7556;background:#f0fdf8;border:1px solid #a7f3d0;border-radius:6px;padding:6px 10px">✓ Within range</div>
+        </div>
       </div>
       <button class="btn-primary" onclick="showModelResult()">
         View Result <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -1570,6 +1573,50 @@ function getBH(row, fp, gate){
   const g=parseInt(gate), u=fp==='yes';
   if(g===2) return u ? row.g2_bh_fp : row.g2_bh_nofp;
   return u ? row.bh_fp : row.bh_nofp;
+}
+
+function validateTR(){
+  const tr = parseFloat(document.getElementById('m-tr').value);
+  const warn = document.getElementById('m-tr-warn');
+  const ok   = document.getElementById('m-tr-ok');
+  const input = document.getElementById('m-tr');
+
+  if(!tr || !ST.series || !ST.code) {
+    warn.style.display='none';
+    ok.style.display='none';
+    input.style.borderColor='';
+    return;
+  }
+
+  // Get TR range from PH rows matching current selection
+  const rows = PH.filter(r =>
+    r.series === ST.series &&
+    r.code   === ST.code
+  ).filter(r => r.tr_max != null && r.tr_max > 0);
+
+  if(!rows.length){
+    warn.style.display='none';
+    ok.style.display='none';
+    input.style.borderColor='';
+    return;
+  }
+
+  const trMax = Math.max(...rows.map(r => r.tr_max));
+  const trMin = Math.min(...rows.map(r => r.tr_min || 0));
+
+  if(tr > trMax || tr < trMin) {
+    warn.style.display='';
+    ok.style.display='none';
+    input.style.borderColor='#ef4444';
+    input.style.boxShadow='0 0 0 3px rgba(239,68,68,.15)';
+    warn.textContent = `⚠ Out of standard (max TR = ${trMax}m) — กรุณาปรึกษา MET`;
+  } else {
+    warn.style.display='none';
+    ok.style.display='';
+    ok.textContent = `✓ Within range (TR ${trMin}–${trMax}m)`;
+    input.style.borderColor='#0f7556';
+    input.style.boxShadow='0 0 0 3px rgba(15,117,86,.1)';
+  }
 }
 
 function showModelResult(){
