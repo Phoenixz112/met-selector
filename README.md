@@ -19,9 +19,9 @@ MET Selector คือเครื่องมือภายในสำหร�
 
 | ประเภท | Series |
 |--------|--------|
-| 🛗 ลิฟต์โดยสาร | NEXIEZ-MRL II, NEXIEZ-FIT, NEXIEZ-S, NEXIEZ-MR, NEXWAY-S-AP II, NEXWAY Package R, NEXIEZ-MR BED |
+| 🛗 ลิฟต์โดยสาร | NEXIEZ-MRL II, NEXIEZ-FIT, NEXIEZ-S, NEXIEZ-MR, NEXWAY-S-AP II, NEXWAY Package R, NEXIEZ-MR BED, NEXWAY-S(MESE), NEXIEZ-MRL(MESE) |
 | 🏠 ลิฟต์บ้าน | SHA, SVC |
-| 🏭 ลิฟต์ขนของ | GFM-T (Melina), GFCL2/GFCL3 (TMEC), LEHY (SMEC) |
+| 🏭 ลิฟต์ขนของ | GFM-T (Melina), GFCL2/GFCL3 (TMEC), LEHY-G/L-G (SMEC) |
 | 🪜 บันไดเลื่อน | Smart K-II (S1200/S1000/S800) |
 
 ---
