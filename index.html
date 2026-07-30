@@ -785,7 +785,12 @@ body{
       <div class="form-row"><label class="form-label">Product Type</label><select class="form-select" id="fr-type" onchange="onFrType()"></select></div>
       <div class="form-row"><label class="form-label">Door Type</label><select class="form-select" id="fr-door" onchange="onFrDoor()"></select></div>
       <div class="form-row"><label class="form-label">Speed (m/s)</label><select class="form-select" id="fr-spd"></select></div>
-      <div class="form-row" style="margin-bottom:0"><label class="form-label">Travel Height — TR (m)</label><input class="form-input" type="number" id="fr-tr" placeholder="e.g. 30" step="0.1"></div>
+      <div class="form-row" style="margin-bottom:0">
+        <label class="form-label">Travel Height — TR (m)</label>
+        <input class="form-input" type="number" id="fr-tr" placeholder="e.g. 30" step="0.1" oninput="validateFrTR()">
+        <div id="fr-tr-warn" style="display:none;margin-top:6px;font-size:12px;color:#991b1b;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:6px 10px"></div>
+        <div id="fr-tr-ok" style="display:none;margin-top:6px;font-size:12px;color:#0f7556;background:#f0fdf8;border:1px solid #a7f3d0;border-radius:6px;padding:6px 10px"></div>
+      </div>
     </div>
     <button class="btn-primary" onclick="showFreightResult()">
       View Result <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -1924,6 +1929,47 @@ function onFrDoor(){
   const speeds=[...new Set(rows.map(r=>r.speed))].sort((a,b)=>a-b);
   opt(document.getElementById('fr-spd'),speeds,s=>s+' m/s');
 }
+function validateFrTR(){
+  const trVal = document.getElementById('fr-tr').value;
+  const tr    = parseFloat(trVal);
+  const series= FR_series;
+  const warn  = document.getElementById('fr-tr-warn');
+  const ok    = document.getElementById('fr-tr-ok');
+  const input = document.getElementById('fr-tr');
+
+  if(!trVal||trVal===''){
+    warn.style.display='none'; ok.style.display='none';
+    input.style.borderColor=''; input.style.boxShadow='';
+    return;
+  }
+  if(!series){
+    warn.style.display='none'; ok.style.display='none';
+    input.style.borderColor=''; input.style.boxShadow='';
+    return;
+  }
+
+  const rows = FR.filter(r => r.series===series && r.max_travel!=null && r.max_travel>0);
+  if(!rows.length){
+    warn.style.display='none'; ok.style.display='none';
+    input.style.borderColor=''; input.style.boxShadow='';
+    return;
+  }
+
+  const trMax = Math.max(...rows.map(r => +r.max_travel));
+
+  if(tr > trMax) {
+    warn.style.display=''; ok.style.display='none';
+    input.style.borderColor='#ef4444';
+    input.style.boxShadow='0 0 0 3px rgba(239,68,68,.15)';
+    warn.textContent = `⚠ Out of standard (max TR = ${trMax}m) — Please consult MET`;
+  } else {
+    warn.style.display='none'; ok.style.display='';
+    ok.textContent = `✓ Within range (TR ≤ ${trMax}m)`;
+    input.style.borderColor='#0f7556';
+    input.style.boxShadow='0 0 0 3px rgba(15,117,86,.1)';
+  }
+}
+
 function showFreightResult(){
   if(!ST.frSeries) return;
   const{org,ser}=ST.frSeries;
@@ -1932,6 +1978,8 @@ function showFreightResult(){
   const door=document.getElementById('fr-door').value;
   const spd=+document.getElementById('fr-spd').value;
   const tr=parseFloat(document.getElementById('fr-tr').value)||0;
+  const frTrWarn=document.getElementById('fr-tr-warn');
+  if(frTrWarn&&frTrWarn.style.display!=='none'){alert('Travel Height (TR) is out of standard range.\nPlease consult MET or adjust TR value.');return;}
 
   const row=FR.find(r=>r.origin===org&&r.series===ser&&r.capacity===cap&&(!type||r.product_type===type)&&r.door===door&&r.speed===spd);
   if(!row){alert('No matching record found.');return;}
