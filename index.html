@@ -722,7 +722,7 @@ body{
         <div class="form-row"><label class="form-label">Entrance Width (mm)</label><select class="form-select" id="m-ent" onchange="onEnt()"></select></div>
         <div class="form-row"><label class="form-label">Fireproof Door</label><select class="form-select" id="m-fp" onchange="onFp()"></select></div>
         <div class="form-row" id="cwt-row"><label class="form-label">Counterweight Position</label><select class="form-select" id="m-cwt" onchange="onCwt()"></select></div>
-        <div class="form-row"><label class="form-label">Rated Speed (m/s)</label><select class="form-select" id="m-spd"></select></div>
+        <div class="form-row"><label class="form-label">Rated Speed (m/s)</label><select class="form-select" id="m-spd" onchange="validateTR()"></select></div>
         <div class="form-row" style="margin-bottom:0"><label class="form-label">Travel Height — TR (m)</label><input class="form-input" type="number" id="m-tr" placeholder="e.g. 45" step="0.1" oninput="validateTR()">
           <div id="m-tr-warn" style="display:none;margin-top:6px;font-size:12px;color:#991b1b;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:6px 10px">⚠ Out of standard — กรุณาปรึกษา MET</div>
           <div id="m-tr-ok" style="display:none;margin-top:6px;font-size:12px;color:#0f7556;background:#f0fdf8;border:1px solid #a7f3d0;border-radius:6px;padding:6px 10px">✓ Within range</div>
@@ -1592,6 +1592,7 @@ function fillSpeeds(rows){
   )].sort((a,b)=>a-b);
 
   opt(document.getElementById('m-spd'), speeds, s=>s+' m/s');
+  validateTR();
 }
 
 // ============================================================
@@ -1700,19 +1701,32 @@ function validateTR(){
     return;
   }
 
-  // Get TR range from PH rows
+  // Get TR range from PH rows — must also match the selected Rated Speed,
+  // otherwise the green "within range" check can pass for a TR/speed combo
+  // that has no actual OH/PD data (mismatched with the vertical data lookup).
+  const spdVal = parseFloat(document.getElementById('m-spd')?.value);
   const rows = PH.filter(r =>
     r.series === ST.series &&
     r.code   === code &&
-    r.tr_max != null && r.tr_max > 0
+    r.tr_max != null && r.tr_max > 0 &&
+    (isNaN(spdVal) || r.spd_min==null || spdVal>=r.spd_min) &&
+    (isNaN(spdVal) || r.spd_max==null || spdVal<=r.spd_max)
   );
 
   if(!rows.length){
-    // ไม่มีข้อมูล TR → ไม่บล็อก แต่ไม่แสดงอะไร
-    warn.style.display='none';
-    ok.style.display='none';
-    input.style.borderColor='';
-    input.style.boxShadow='';
+    // ไม่มีข้อมูล TR สำหรับ speed นี้ → เตือนแทนที่จะปล่อยผ่านเงียบๆ
+    if(!isNaN(spdVal)){
+      warn.style.display='';
+      ok.style.display='none';
+      input.style.borderColor='#ef4444';
+      input.style.boxShadow='0 0 0 3px rgba(239,68,68,.15)';
+      warn.textContent = `⚠ No TR data for this Speed — Please consult MET`;
+    } else {
+      warn.style.display='none';
+      ok.style.display='none';
+      input.style.borderColor='';
+      input.style.boxShadow='';
+    }
     return;
   }
 
