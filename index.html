@@ -1088,7 +1088,31 @@ let ST={ passType:null, series:null, escSeries:null, frSeries:null };
 // ============================================================
 // FETCH
 // ============================================================
-async function fetchSheet(name){
+// Primary: read raw cell values via the Apps Script Web App (SpreadsheetApp.getDataRange().getValues()).
+// This ignores any "Filter" applied on the sheet — filters only hide rows for display,
+// they never affect the underlying cell data that Apps Script reads.
+async function fetchSheetViaAppsScript(name){
+  const url = `${LOG_URL}?action=getSheet&sheet=${encodeURIComponent(name)}`;
+  const res = await fetch(url);
+  if(!res.ok) throw new Error('Apps Script endpoint returned '+res.status);
+  const json = await res.json();
+  if(json.error) throw new Error(json.error);
+  const rows = json.values || [];
+  if(!rows.length) return [];
+  const headers = rows[0].map(h=>String(h).trim());
+  return rows.slice(1)
+    .filter(r=>r.some(c=>c!==null&&c!==''))
+    .map(r=>{
+      const obj={};
+      headers.forEach((h,i)=>{obj[h]=(r[i]!=null?r[i]:'');});
+      return obj;
+    });
+}
+
+// Fallback: legacy gviz API. NOTE — this respects Google Sheets' "Filter" (Data > Create a filter):
+// if a filter is applied by any editor, filtered-out rows are hidden for everyone, including this API.
+// Use "Filter views" instead of "Filter" to avoid this, or rely on the Apps Script path above.
+async function fetchSheetViaGviz(name){
   const res  = await fetch(sheetURL(name));
   const text = await res.text();
   const json = JSON.parse(text.replace(/^[^\(]+\(/,'').replace(/\);?\s*$/,''));
@@ -1100,6 +1124,19 @@ async function fetchSheet(name){
       cols.forEach((col,i)=>{const cell=r.c[i];obj[col]=cell?(cell.v!==null?cell.v:''):'';});
       return obj;
     });
+}
+
+async function fetchSheet(name){
+  try {
+    const rows = await fetchSheetViaAppsScript(name);
+    if(rows && rows.length) return rows;
+    // Apps Script endpoint responded but returned nothing (e.g. sheet exists but truly empty) —
+    // don't silently fall back in that case, empty is a valid result.
+    return rows;
+  } catch(e){
+    console.warn('Apps Script sheet fetch failed for', name, '— falling back to gviz (may be affected by filters):', e.message);
+    return await fetchSheetViaGviz(name);
+  }
 }
 
 async function safeSheet(name){
