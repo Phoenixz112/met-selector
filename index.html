@@ -596,6 +596,7 @@ body{
       <div class="step-pill active">1 · Input</div>
       <div class="step-pill">2 · Results</div>
     </div>
+    <div id="shaft-input">
     <div class="card">
       <div class="section-title" style="margin-top:0">Hoistway Dimensions (Available)</div>
       <div class="input-row">
@@ -677,6 +678,7 @@ body{
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
     </button>
     <button class="btn-secondary no-print" onclick="goMode()">← Back</button>
+    </div>
     <div id="shaft-results" style="display:none;margin-top:4px">
       <div class="steps-bar">
         <div class="step-pill done">1 · Input</div>
@@ -687,7 +689,7 @@ body{
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
         Print / Export PDF
       </button>
-      <button class="btn-secondary no-print" onclick="document.getElementById('shaft-results').style.display='none'">← Edit Search</button>
+      <button class="btn-secondary no-print" onclick="goShaftEdit()">← Edit Search</button>
     </div>
   </div>
 
@@ -784,6 +786,7 @@ body{
     <button class="btn-secondary no-print" onclick="showPage('home')">← Back to Menu</button>
   </div>
   <div id="fr-form" style="display:none">
+    <div id="fr-input">
     <div class="card">
       <div class="form-row"><label class="form-label">Capacity (kg)</label><select class="form-select" id="fr-cap" onchange="onFrCap()"></select></div>
       <div class="form-row"><label class="form-label">Product Type</label><select class="form-select" id="fr-type" onchange="onFrType()"></select></div>
@@ -804,6 +807,7 @@ body{
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
       Reset
     </button>
+    </div>
     <div id="fr-result" style="display:none">
       <div class="result-header" style="margin-top:12px">
         <div class="result-model" id="fr-r-title">—</div>
@@ -821,7 +825,7 @@ body{
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
         Print / Export PDF
       </button>
-      <button class="btn-reset" onclick="document.getElementById('fr-result').style.display='none'">← Edit</button>
+      <button class="btn-reset" onclick="goFrEdit()">← Edit</button>
     </div>
   </div>
 </div>
@@ -848,6 +852,7 @@ body{
 
   <!-- HE By Shaft -->
   <div id="he-shaft" style="display:none">
+    <div id="he-shaft-input">
     <div class="steps-bar">
       <div class="step-pill active">1 · Input</div>
       <div class="step-pill">2 · Results</div>
@@ -878,6 +883,7 @@ body{
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
     </button>
     <button class="btn-secondary no-print" onclick="backHeHome()">← Back</button>
+    </div>
     <div id="he-shaft-results" style="display:none;margin-top:4px">
       <div class="steps-bar">
         <div class="step-pill done">1 · Input</div>
@@ -888,7 +894,7 @@ body{
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
         Print / Export PDF
       </button>
-      <button class="btn-secondary no-print" onclick="document.getElementById('he-shaft-results').style.display='none'">← Edit Search</button>
+      <button class="btn-secondary no-print" onclick="goHeShaftEdit()">← Edit Search</button>
     </div>
   </div>
 
@@ -902,6 +908,7 @@ body{
     <button class="btn-secondary no-print" onclick="backHeHome()">← Back</button>
   </div>
   <div id="he-form" style="display:none">
+    <div id="he-input">
     <div class="card">
       <div class="form-row"><label class="form-label">Code / Capacity</label><select class="form-select" id="he-code" onchange="onHeCode()"></select></div>
       <div class="form-row"><label class="form-label">Car Ceiling Height</label><select class="form-select" id="he-ceiling"></select></div>
@@ -916,6 +923,7 @@ body{
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
       Reset
     </button>
+    </div>
     <div id="he-result" style="display:none">
       <div class="result-header" style="margin-top:12px">
         <div class="result-model" id="he-r-title">—</div>
@@ -941,7 +949,7 @@ body{
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
         Print / Export PDF
       </button>
-      <button class="btn-reset" onclick="document.getElementById('he-result').style.display='none'">← Edit</button>
+      <button class="btn-reset" onclick="goHeEdit()">← Edit</button>
       <button class="btn-secondary" onclick="showPage('home')">New Query</button>
     </div>
   </div>
@@ -949,101 +957,117 @@ body{
 
 <!-- ESCALATOR -->
 <div id="main-escalator" class="page">
-  <div class="result-header" style="margin-bottom:12px">
-    <div class="result-model">Smart K-II</div>
-    <div class="result-sub">SMEC · Escalator · Beam to Beam Calculator</div>
-    <div class="result-badge">Escalator</div>
-  </div>
-  <div class="card">
-    <div class="form-row">
-      <label class="form-label">Model</label>
-      <select class="form-select" id="esc-model" onchange="escCalc()">
-        <option value="S1200">S1200 · Step 1000 mm</option>
-        <option value="S1000">S1000 · Step 800 mm</option>
-        <option value="S800">S800 · Step 600 mm</option>
-      </select>
+  <div id="esc-input">
+    <div class="steps-bar">
+      <div class="step-pill active">1 · Input</div>
+      <div class="step-pill">2 · Results</div>
     </div>
-    <div class="input-row">
+    <div class="result-header" style="margin-bottom:12px">
+      <div class="result-model">Smart K-II</div>
+      <div class="result-sub">SMEC · Escalator · Beam to Beam Calculator</div>
+      <div class="result-badge">Escalator</div>
+    </div>
+    <div class="card">
       <div class="form-row">
-        <label class="form-label">Inclination</label>
-        <select class="form-select" id="esc-deg" onchange="escCalc()">
-          <option value="30">30°</option>
-          <option value="35">35°</option>
+        <label class="form-label">Model</label>
+        <select class="form-select" id="esc-model" onchange="escCalc()">
+          <option value="S1200">S1200 · Step 1000 mm</option>
+          <option value="S1000">S1000 · Step 800 mm</option>
+          <option value="S800">S800 · Step 600 mm</option>
         </select>
       </div>
+      <div class="input-row">
+        <div class="form-row">
+          <label class="form-label">Inclination</label>
+          <select class="form-select" id="esc-deg" onchange="escCalc()">
+            <option value="30">30°</option>
+            <option value="35">35°</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Speed (m/s)</label>
+          <select class="form-select" id="esc-spd" onchange="escCalc()">
+            <option value="0.4">0.40 m/s</option>
+            <option value="0.5">0.50 m/s</option>
+            <option value="0.65">0.65 m/s</option>
+          </select>
+        </div>
+      </div>
       <div class="form-row">
-        <label class="form-label">Speed (m/s)</label>
-        <select class="form-select" id="esc-spd" onchange="escCalc()">
-          <option value="0.4">0.40 m/s</option>
-          <option value="0.5">0.50 m/s</option>
-          <option value="0.65">0.65 m/s</option>
+        <label class="form-label">Rise — H (mm)</label>
+        <input class="form-input" type="number" id="esc-rise" placeholder="e.g. 4500" step="10" oninput="escCalc()">
+        <div style="font-size:11px;color:var(--text-soft);margin-top:4px" id="esc-rise-hint">—</div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Flat Step</label>
+        <div style="display:flex;gap:8px">
+          <button class="esc-flat-btn" data-flat="2" onclick="escSetFlat(this)">2</button>
+          <button class="esc-flat-btn" data-flat="3" onclick="escSetFlat(this)">3</button>
+          <button class="esc-flat-btn" data-flat="4" onclick="escSetFlat(this)">4</button>
+        </div>
+        <div style="font-size:11px;color:var(--text-soft);margin-top:4px" id="esc-flat-hint"></div>
+      </div>
+      <div class="form-row" style="margin-bottom:0">
+        <label class="form-label">Installation Environment</label>
+        <select class="form-select" id="esc-env" onchange="escCalc()">
+          <option value="Indoor">Indoor</option>
+          <option value="Semi-outdoor">Semi-outdoor</option>
+          <option value="Outdoor">Outdoor</option>
         </select>
       </div>
     </div>
-    <div class="form-row">
-      <label class="form-label">Rise — H (mm)</label>
-      <input class="form-input" type="number" id="esc-rise" placeholder="e.g. 4500" step="10" oninput="escCalc()">
-      <div style="font-size:11px;color:var(--text-soft);margin-top:4px" id="esc-rise-hint">—</div>
-    </div>
-    <div class="form-row">
-      <label class="form-label">Flat Step</label>
-      <div style="display:flex;gap:8px">
-        <button class="esc-flat-btn" data-flat="2" onclick="escSetFlat(this)">2</button>
-        <button class="esc-flat-btn" data-flat="3" onclick="escSetFlat(this)">3</button>
-        <button class="esc-flat-btn" data-flat="4" onclick="escSetFlat(this)">4</button>
-      </div>
-      <div style="font-size:11px;color:var(--text-soft);margin-top:4px" id="esc-flat-hint"></div>
-    </div>
-    <div class="form-row" style="margin-bottom:0">
-      <label class="form-label">Installation Environment</label>
-      <select class="form-select" id="esc-env" onchange="escCalc()">
-        <option value="Indoor">Indoor</option>
-        <option value="Semi-outdoor">Semi-outdoor</option>
-        <option value="Outdoor">Outdoor</option>
-      </select>
-    </div>
+    <button class="btn-primary" onclick="showEscResult()">
+      View Result <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+    <button class="btn-secondary no-print" onclick="showPage('home')">← Back to Menu</button>
+    <button class="btn-reset no-print" onclick="resetEscForm()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      Reset
+    </button>
   </div>
-  <!-- Results -->
-  <div id="esc-results-wrap">
-    <div class="section-title">Results</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
-      <div class="card" style="padding:14px;text-align:center">
-        <div style="font-size:10px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Step Width</div>
-        <div style="font-size:22px;font-weight:700;color:var(--navy);font-family:'Roboto Mono',monospace" id="esc-sw">—</div>
-        <div style="font-size:10px;color:var(--text-soft)">mm</div>
-      </div>
-      <div class="card" style="padding:14px;text-align:center;border-color:#9e0c23;background:#C8102E">
-        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Beam to Beam</div>
-        <div style="font-size:22px;font-weight:700;color:#fff;font-family:'Roboto Mono',monospace" id="esc-b2b">—</div>
-        <div style="font-size:10px;color:rgba(255,255,255,.5)">mm</div>
-      </div>
-      <div class="card" style="padding:14px;text-align:center">
-        <div style="font-size:10px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">TG</div>
-        <div style="font-size:22px;font-weight:700;color:var(--navy);font-family:'Roboto Mono',monospace" id="esc-tg">—</div>
-        <div style="font-size:10px;color:var(--text-soft)">mm</div>
-      </div>
+  <div id="esc-output" style="display:none">
+    <div class="steps-bar">
+      <div class="step-pill done">1 · Input</div>
+      <div class="step-pill active">2 · Results</div>
     </div>
-    <div class="card" id="esc-sup-card" style="padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px">
-      <div id="esc-sup-dot" style="width:10px;height:10px;border-radius:50%;background:var(--text-soft);flex-shrink:0"></div>
-      <div style="font-size:13px">Intermediate Support: <strong id="esc-sup-txt">—</strong></div>
-      <div style="margin-left:auto;font-size:11px;color:var(--text-soft);font-family:'Roboto Mono',monospace" id="esc-sup-meta"></div>
+    <!-- Results -->
+    <div id="esc-results-wrap">
+      <div class="section-title">Results</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+        <div class="card" style="padding:14px;text-align:center">
+          <div style="font-size:10px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Step Width</div>
+          <div style="font-size:22px;font-weight:700;color:var(--navy);font-family:'Roboto Mono',monospace" id="esc-sw">—</div>
+          <div style="font-size:10px;color:var(--text-soft)">mm</div>
+        </div>
+        <div class="card" style="padding:14px;text-align:center;border-color:#9e0c23;background:#C8102E">
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Beam to Beam</div>
+          <div style="font-size:22px;font-weight:700;color:#fff;font-family:'Roboto Mono',monospace" id="esc-b2b">—</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.5)">mm</div>
+        </div>
+        <div class="card" style="padding:14px;text-align:center">
+          <div style="font-size:10px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">TG</div>
+          <div style="font-size:22px;font-weight:700;color:var(--navy);font-family:'Roboto Mono',monospace" id="esc-tg">—</div>
+          <div style="font-size:10px;color:var(--text-soft)">mm</div>
+        </div>
+      </div>
+      <div class="card" id="esc-sup-card" style="padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px">
+        <div id="esc-sup-dot" style="width:10px;height:10px;border-radius:50%;background:var(--text-soft);flex-shrink:0"></div>
+        <div style="font-size:13px">Intermediate Support: <strong id="esc-sup-txt">—</strong></div>
+        <div style="margin-left:auto;font-size:11px;color:var(--text-soft);font-family:'Roboto Mono',monospace" id="esc-sup-meta"></div>
+      </div>
+      <div class="card" style="padding:10px;margin-bottom:12px"><div id="esc-svg-host"></div></div>
+      <div class="card" style="padding:12px 14px;margin-bottom:12px">
+        <div style="font-size:10px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Formula</div>
+        <div style="font-size:11px;color:var(--text-soft);font-family:'Roboto Mono',monospace;line-height:1.7;word-break:break-all" id="esc-formula">—</div>
+      </div>
+      <div id="esc-alerts"></div>
     </div>
-    <div class="card" style="padding:10px;margin-bottom:12px"><div id="esc-svg-host"></div></div>
-    <div class="card" style="padding:12px 14px;margin-bottom:12px">
-      <div style="font-size:10px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Formula</div>
-      <div style="font-size:11px;color:var(--text-soft);font-family:'Roboto Mono',monospace;line-height:1.7;word-break:break-all" id="esc-formula">—</div>
-    </div>
-    <div id="esc-alerts"></div>
+    <button class="btn-export no-print" onclick="window.print()" style="margin-top:8px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Print / Export PDF
+    </button>
+    <button class="btn-secondary no-print" onclick="editEscForm()" style="margin-top:8px">← Edit</button>
   </div>
-  <button class="btn-export no-print" onclick="window.print()" style="margin-top:8px">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-    Print / Export PDF
-  </button>
-  <button class="btn-secondary no-print" onclick="showPage('home')" style="margin-top:8px">← Back to Menu</button>
-  <button class="btn-reset no-print" onclick="resetEscForm()" style="margin-top:8px">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-    Reset
-  </button>
 </div>
 
 <script>
@@ -1242,6 +1266,8 @@ function goCategory(cat){
   }
   if(cat==='escalator'){
     showPage('escalator');
+    const eIn=document.getElementById('esc-input'); if(eIn) eIn.style.display='';
+    const eOut=document.getElementById('esc-output'); if(eOut) eOut.style.display='none';
     setTimeout(()=>{ if(typeof escCalc==='function') escCalc(); }, 50);
     return;
   }
@@ -1276,6 +1302,7 @@ function startMode(m){
   document.getElementById('pass-mode').style.display='none';
   if(m==='shaft'){
     document.getElementById('pass-shaft').style.display='';
+    document.getElementById('shaft-input').style.display='';
     document.getElementById('shaft-results').style.display='none';
     setTimeout(()=>{
       const rows=phForType();
@@ -1303,10 +1330,10 @@ function startMode(m){
         });
       }
 
-      // Speed - from actual data
+      // Speed - from actual data (required field, no "Any")
       const sSel=document.getElementById('sh-spd');
       if(sSel){
-        sSel.innerHTML='<option value="">Any</option>';
+        sSel.innerHTML='<option value="">— Please select —</option>';
         [...new Set(rows.map(r=>+(r.spd_min||r.speed_ms||0)).filter(s=>s>0))].sort((a,b)=>a-b).forEach(s=>{
           const el=document.createElement('option');el.value=s;el.textContent=s.toFixed(2)+' m/s';sSel.appendChild(el);
         });
@@ -1347,6 +1374,7 @@ function goMS(n){
     initSpecs();
     lastSpecsSeries=ST.series;
   }
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 function resetPassSpecsForm(){
   initSpecs();
@@ -1882,9 +1910,15 @@ function searchShaft(){
     body.innerHTML=html;
   }
 
+  document.getElementById('shaft-input').style.display='none';
   document.getElementById('shaft-results').style.display='';
-  document.getElementById('shaft-results').scrollIntoView({behavior:'smooth'});
+  window.scrollTo({top:0,behavior:'smooth'});
   sendLog({mode:'By Shaft',ah_input:ah,bh_input:bh,travel_m:tr,results_count:matches.length,tolerance_mm:getTolerance(tr,1).side,factory:matches[0]?.origin||'',series:matches[0]?.series||''});
+}
+function goShaftEdit(){
+  document.getElementById('shaft-results').style.display='none';
+  document.getElementById('shaft-input').style.display='';
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
 function toggleAcc(el){
@@ -1925,6 +1959,7 @@ function showFreightForm(){
   const rows=FR.filter(r=>r.origin===org&&r.series===ser);
   document.getElementById('fr-home').style.display='none';
   document.getElementById('fr-form').style.display='';
+  document.getElementById('fr-input').style.display='';
   document.getElementById('fr-result').style.display='none';
   // Populate capacity
   const caps=[...new Set(rows.map(r=>r.capacity))].sort((a,b)=>a-b);
@@ -2054,8 +2089,14 @@ function showFreightResult(){
       `<div class="alert-warn" style="margin-top:8px">ℹ ${row.note}</div>`);
   }
 
+  document.getElementById('fr-input').style.display='none';
   document.getElementById('fr-result').style.display='';
-  document.getElementById('fr-result').scrollIntoView({behavior:'smooth'});
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goFrEdit(){
+  document.getElementById('fr-result').style.display='none';
+  document.getElementById('fr-input').style.display='';
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 function resetFreight(){
   ST.frSeries=null;
@@ -2235,6 +2276,7 @@ function startHeMode(m){
   document.getElementById('he-home').style.display='none';
   if(m==='shaft'){
     document.getElementById('he-shaft').style.display='';
+    document.getElementById('he-shaft-input').style.display='';
     document.getElementById('he-shaft-results').style.display='none';
   } else {
     document.getElementById('he-model').style.display='';
@@ -2297,8 +2339,14 @@ function searchHeShaft(){
     }
     body.innerHTML=html2;
   }
+  document.getElementById('he-shaft-input').style.display='none';
   document.getElementById('he-shaft-results').style.display='';
-  document.getElementById('he-shaft-results').scrollIntoView({behavior:'smooth'});
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goHeShaftEdit(){
+  document.getElementById('he-shaft-results').style.display='none';
+  document.getElementById('he-shaft-input').style.display='';
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
 function buildHeSeriesList(){
@@ -2356,6 +2404,7 @@ function showHeForm(){
   const rows=HE.filter(r=>r.series===HE_series);
   document.getElementById('he-home').style.display='none';
   document.getElementById('he-form').style.display='';
+  document.getElementById('he-input').style.display='';
   document.getElementById('he-result').style.display='none';
   const codes=[...new Set(rows.map(r=>r.code))].sort((a,b)=>{
     const ca=rows.find(r=>r.code===a)?.capacity||0;
@@ -2459,9 +2508,15 @@ function showHeResult(){
     document.getElementById('he-note').style.display='none';
   }
 
+  document.getElementById('he-input').style.display='none';
   document.getElementById('he-result').style.display='';
-  document.getElementById('he-result').scrollIntoView({behavior:'smooth'});
+  window.scrollTo({top:0,behavior:'smooth'});
   sendLog({mode:'Home Elevator',series:HE_series,code,capacity:row.capacity,door,gate});
+}
+function goHeEdit(){
+  document.getElementById('he-result').style.display='none';
+  document.getElementById('he-input').style.display='';
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
 function svgHeTop(row){
@@ -2643,6 +2698,24 @@ function resetHeForm(){
     escFlat='3';
     document.querySelectorAll('.esc-flat-btn').forEach(b=>b.classList.remove('active'));
     escCalc();
+    const out=document.getElementById('esc-output'); if(out) out.style.display='none';
+    const inp=document.getElementById('esc-input'); if(inp) inp.style.display='';
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
+
+  window.showEscResult=function(){
+    const rVal=parseFloat(document.getElementById('esc-rise')?.value);
+    if(isNaN(rVal)){ alert('Please enter Rise (H) value.'); return; }
+    escCalc();
+    document.getElementById('esc-input').style.display='none';
+    document.getElementById('esc-output').style.display='';
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
+
+  window.editEscForm=function(){
+    document.getElementById('esc-output').style.display='none';
+    document.getElementById('esc-input').style.display='';
+    window.scrollTo({top:0,behavior:'smooth'});
   };
 
   function escRanges(){
