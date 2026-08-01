@@ -730,6 +730,10 @@ body{
         View Result <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </button>
       <button class="btn-secondary" onclick="goMS(1)">← Back</button>
+      <button class="btn-reset" onclick="resetPassSpecsForm()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        Reset
+      </button>
     </div>
     <div id="em3" style="display:none">
       <div class="result-header">
@@ -796,6 +800,10 @@ body{
       View Result <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
     </button>
     <button class="btn-secondary" onclick="resetFreight()">← Back to Freight</button>
+    <button class="btn-reset" onclick="resetFrForm()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      Reset
+    </button>
     <div id="fr-result" style="display:none">
       <div class="result-header" style="margin-top:12px">
         <div class="result-model" id="fr-r-title">—</div>
@@ -904,6 +912,10 @@ body{
       View Result <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
     </button>
     <button class="btn-secondary" onclick="resetHe()">← Back</button>
+    <button class="btn-reset" onclick="resetHeForm()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+      Reset
+    </button>
     <div id="he-result" style="display:none">
       <div class="result-header" style="margin-top:12px">
         <div class="result-model" id="he-r-title">—</div>
@@ -1028,6 +1040,10 @@ body{
     Print / Export PDF
   </button>
   <button class="btn-secondary no-print" onclick="showPage('home')" style="margin-top:8px">← Back to Menu</button>
+  <button class="btn-reset no-print" onclick="resetEscForm()" style="margin-top:8px">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+    Reset
+  </button>
 </div>
 
 <script>
@@ -1321,9 +1337,23 @@ function startMode(m){
     setTimeout(()=>buildSeriesList(), 50);
   }
 }
+let lastSpecsSeries=null;
 function goMS(n){
   for(let i=1;i<=3;i++) document.getElementById('em'+i).style.display=(i===n?'':'none');
-  if(n===2) initSpecs();
+  // Only rebuild the specs form when the selected series actually changed.
+  // This keeps the user's filled-in data intact when navigating back
+  // (e.g. "← Change Specs" from the Result step).
+  if(n===2 && lastSpecsSeries!==ST.series){
+    initSpecs();
+    lastSpecsSeries=ST.series;
+  }
+}
+function resetPassSpecsForm(){
+  initSpecs();
+  lastSpecsSeries=ST.series;
+  const tr=document.getElementById('m-tr'); if(tr) tr.value='';
+  const w=document.getElementById('m-tr-warn'); if(w) w.style.display='none';
+  const o=document.getElementById('m-tr-ok'); if(o) o.style.display='none';
 }
 
 // ============================================================
@@ -2027,6 +2057,14 @@ function resetFreight(){
   document.getElementById('fr-home').style.display='';
   document.getElementById('fr-form').style.display='none';
 }
+function resetFrForm(){
+  // Rebuild the spec dropdowns to their defaults but keep the same series selected
+  showFreightForm();
+  const tr=document.getElementById('fr-tr'); if(tr) tr.value='';
+  const w=document.getElementById('fr-tr-warn'); if(w) w.style.display='none';
+  const o=document.getElementById('fr-tr-ok'); if(o) o.style.display='none';
+  document.getElementById('fr-result').style.display='none';
+}
 
 // ============================================================
 // ESCALATOR
@@ -2507,6 +2545,11 @@ function resetHe(){
   document.getElementById('he-home').style.display='';
   document.getElementById('he-form').style.display='none';
 }
+function resetHeForm(){
+  // Rebuild the spec dropdowns to their defaults but keep the same series selected
+  showHeForm();
+  document.getElementById('he-result').style.display='none';
+}
 
 // ============================================================
 // KII ESCALATOR CALCULATOR — Data from Google Sheets
@@ -2580,6 +2623,18 @@ function resetHe(){
   window.escSetFlat=function(btn){
     if(btn.disabled) return;
     escFlat=btn.getAttribute('data-flat');
+    escCalc();
+  };
+
+  window.resetEscForm=function(){
+    const modelSel=document.getElementById('esc-model');
+    if(modelSel&&modelSel.options.length) modelSel.selectedIndex=0;
+    const degSel=document.getElementById('esc-deg'); if(degSel) degSel.value='30';
+    const spdSel=document.getElementById('esc-spd'); if(spdSel) spdSel.value='0.5';
+    const riseInp=document.getElementById('esc-rise'); if(riseInp) riseInp.value='';
+    const envSel=document.getElementById('esc-env'); if(envSel) envSel.value='Indoor';
+    escFlat='3';
+    document.querySelectorAll('.esc-flat-btn').forEach(b=>b.classList.remove('active'));
     escCalc();
   };
 
