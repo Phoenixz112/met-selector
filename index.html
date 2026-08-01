@@ -423,8 +423,20 @@ body{
 @media print{
   .app-header,.btn-primary,.btn-secondary,.btn-export,.btn-reset,.no-print{display:none!important}
   body{background:#fff}
-  .page{display:block!important;padding:0}
+  /* Only the currently active category page prints — prevents
+     Elevator and Escalator content from mixing on the same printout */
+  .page{display:none!important}
+  .page.active{display:block!important;padding:0}
   .card,.result-header,.drawing-container,.tol-box{box-shadow:none;break-inside:avoid}
+  /* Show only Spec + Layout: hide step navigation pills */
+  .steps-bar{display:none!important}
+  /* Print both drawing views (Top/Side or Shaft/Elevation) instead of
+     only whichever tab happens to be active on screen */
+  .drawing-tabs{display:none!important}
+  .dview{display:block!important;margin-bottom:16px;break-inside:avoid}
+  /* Expand any collapsed "Other matches" so their spec details print too */
+  .accordion-body{display:block!important}
+  .accordion-header span:last-child{display:none!important}
 }
 
 /* ── RESPONSIVE ──────────────────────────────────────────── */
@@ -1917,7 +1929,7 @@ function searchShaft(){
     const{ahTol,bhTol,side}=getTolerance(tr,best.gate);
 
     // Best match card
-    let html=`<div class="alert-info">Found <strong>${matches.length}</strong> configuration${matches.length>1?'s':''} · Shaft ${ah}×${bh} mm · TR ${tr}m · Speed ${spd.toFixed(2)} m/s</div>`;
+    let html=`<div class="alert-info no-print">Found <strong>${matches.length}</strong> configuration${matches.length>1?'s':''} · Shaft ${ah}×${bh} mm · TR ${tr}m · Speed ${spd.toFixed(2)} m/s</div>`;
     html+=`<div class="match-best">
       <div class="match-header">
         <div class="match-code">${best.origin} · ${best.series} · ${best.code}</div>
@@ -2353,7 +2365,7 @@ function searchHeShaft(){
     body.innerHTML=`<div class="no-result"><div style="font-size:36px;margin-bottom:12px">🔍</div><div style="font-size:15px;font-weight:700;margin-bottom:6px">No matching models</div><div style="font-size:13px">AH ${ah} × BH ${bh} mm is too small.</div></div>`;
   } else {
     const best=matches[0];
-    let html2=`<div class="alert-info">Found <strong>${matches.length}</strong> model${matches.length>1?'s':''} fitting AH ${ah} × BH ${bh} mm</div>`;
+    let html2=`<div class="alert-info no-print">Found <strong>${matches.length}</strong> model${matches.length>1?'s':''} fitting AH ${ah} × BH ${bh} mm</div>`;
     html2+=`<div class="match-best">
       <div class="match-header">
         <div class="match-code">${best.series} · ${best.code}</div>
