@@ -655,9 +655,9 @@ body{
         </select>
       </div>
       <div class="form-row" style="margin-top:12px">
-        <label class="form-label">Rated Speed (m/s)</label>
-        <select class="form-select" id="sh-spd">
-          <option value="">Any</option>
+        <label class="form-label">Rated Speed (m/s) <span style="color:#C8102E">*</span></label>
+        <select class="form-select" id="sh-spd" required>
+          <option value="">— Please select —</option>
           <option value="0.5">0.50 m/s</option>
           <option value="0.75">0.75 m/s</option>
           <option value="1.0">1.00 m/s</option>
@@ -1754,6 +1754,10 @@ function getOHDisplay(r){
   if(oh) return `OH: <span>${oh}</span> mm &nbsp;·&nbsp; PD: <span>${pd!=null&&pd!==undefined?pd:'<span style="color:#b45309">Please consult MET</span>'}</span> mm`;
   return '<span style="color:#b45309">⚠ Please consult MET</span>';
 }
+function fmtSpd(r,fallback){
+  const v=+(r.spd_min||r.speed_ms||fallback||0);
+  return v?v.toFixed(2):'—';
+}
 function searchShaft(){
   const ah=parseInt(document.getElementById('sh-ah').value);
   const bh=parseInt(document.getElementById('sh-bh').value);
@@ -1768,6 +1772,7 @@ function searchShaft(){
 
   if(!ah||!bh){alert('Please enter AH and BH.');return;}
   if(!tr){alert('Please enter Travel Height (TR).');return;}
+  if(!spd){alert('Please select Rated Speed (m/s).');return;}
 
   const seen=new Set();
   const phRows=phForType();
@@ -1827,13 +1832,13 @@ function searchShaft(){
 
   const body=document.getElementById('shaft-body');
   if(!matches.length){
-    body.innerHTML=`<div class="no-result"><div style="font-size:36px;margin-bottom:12px">🔍</div><div style="font-size:15px;font-weight:700;margin-bottom:6px">No matching models</div><div style="font-size:13px">AH ${ah} × BH ${bh} mm with TR ${tr}m tolerance — try larger dimensions or relax filters.</div></div>`;
+    body.innerHTML=`<div class="no-result"><div style="font-size:36px;margin-bottom:12px">🔍</div><div style="font-size:15px;font-weight:700;margin-bottom:6px">No matching models</div><div style="font-size:13px">AH ${ah} × BH ${bh} mm with TR ${tr}m, Speed ${spd.toFixed(2)} m/s — try relaxing filters.</div></div>`;
   } else {
     const best=matches[0];
     const{ahTol,bhTol,side}=getTolerance(tr,best.gate);
 
     // Best match card
-    let html=`<div class="alert-info">Found <strong>${matches.length}</strong> configuration${matches.length>1?'s':''} · Shaft ${ah}×${bh} mm · TR ${tr}m</div>`;
+    let html=`<div class="alert-info">Found <strong>${matches.length}</strong> configuration${matches.length>1?'s':''} · Shaft ${ah}×${bh} mm · TR ${tr}m · Speed ${spd.toFixed(2)} m/s</div>`;
     html+=`<div class="match-best">
       <div class="match-header">
         <div class="match-code">${best.origin} · ${best.series} · ${best.code}</div>
@@ -1841,6 +1846,7 @@ function searchShaft(){
       </div>
       <div class="match-dims">
         Capacity: <span>${best.capacity} kg (${best.persons}P)</span> &nbsp;·&nbsp;
+        Speed: <span>${fmtSpd(best,spd)} m/s</span> &nbsp;·&nbsp;
         Door: <span>${best.door}</span> &nbsp;·&nbsp;
         Gate: <span>${best.gate}</span> &nbsp;·&nbsp;
         ${best.cwt?`CWT: <span>${best.cwt}</span> &nbsp;·&nbsp;`:''} 
@@ -1859,11 +1865,12 @@ function searchShaft(){
       html+=`<div style="font-size:11px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin:12px 0 8px">Other ${matches.length-1} match${matches.length>2?'es':''}</div>`;
       matches.slice(1).forEach(r=>{
         html+=`<div class="accordion-header" onclick="toggleAcc(this)">
-          <span>${r.origin} · ${r.series} · ${r.code} — ${r.capacity}kg · ${r.door} · Gate ${r.gate}${r.cwt?` · ${r.cwt}`:''}</span>
+          <span>${r.origin} · ${r.series} · ${r.code} — ${r.capacity}kg · ${fmtSpd(r,spd)} m/s · ${r.door} · Gate ${r.gate}${r.cwt?` · ${r.cwt}`:''}</span>
           <span style="font-size:18px;color:var(--text-soft)">＋</span>
         </div>
         <div class="accordion-body">
           <div class="match-dims">
+            Speed: <span>${fmtSpd(r,spd)} m/s</span> &nbsp;·&nbsp;
             Car: <span>${r.car_aa}×${r.car_bb}</span> mm &nbsp;·&nbsp; Entrance: <span>${r.entrance}</span> mm (${r.entrance_type}) &nbsp;·&nbsp; FP: <span>${r.fireproof==='yes'?'Yes':'No'}</span><br>
             Min. Shaft: <span>${r._ah}×${r._bh}</span> mm${r.am?` &nbsp;·&nbsp; M/R: <span>${r.am}×${r.bm}</span> mm`:''}<br>
             ${getOHDisplay(r)}
