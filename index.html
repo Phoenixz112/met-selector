@@ -2018,7 +2018,7 @@ function buildFreightList(){
     const caps=[...new Set(rows.map(r=>r.capacity))].sort((a,b)=>a-b);
     const div=document.createElement('div');div.className='model-row';
     const flagCode=flagCodes[org];
-    const flagImg=flagCode?`<img src="https://flagcdn.com/${flagCode}.svg" alt="${org}" style="width:18px;height:13px;object-fit:cover;border-radius:2px;vertical-align:-2px;margin-right:2px">`:'🏭';
+    const flagImg=flagCode?`<img src="flags/${flagCode}.svg" alt="${org}" style="width:18px;height:13px;object-fit:cover;border-radius:2px;vertical-align:-2px;margin-right:2px">`:'🏭';
     div.innerHTML=`<div><div class="model-code">${flagImg} ${ser}</div><div class="model-cap">${org} · ${caps[0].toLocaleString()}–${caps[caps.length-1].toLocaleString()} kg</div></div><div style="display:flex;align-items:center"><div class="model-check">✓</div></div>`;
     div.onclick=()=>{
       ST.frSeries={org,ser};
