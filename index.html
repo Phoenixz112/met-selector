@@ -1198,6 +1198,7 @@ async function loadAll(){
       capacity:+r.capacity, speed:+r.speed,
       jj:n(r.jj), hh:n(r.hh), hl:n(r.hl),
       ah:n(r.ah), bh:n(r.bh), am:n(r.am), bm:n(r.bm),
+      car_aa:n(r.car_aa), car_bb:n(r.car_bb),
       oh:n(r.oh), pit:n(r.pit),
       mr_height:n(r.mr_height), max_travel:n(r.max_travel),
       floor_height:n(r.floor_height),
@@ -2128,7 +2129,8 @@ function showFreightResult(){
   tbl('fr-r-shaft',[
     ['Hoistway Width (AH)',row.ah,'mm'],
     ['Hoistway Depth (BH)',row.bh,'mm'],
-    ['Car Size',row.car,'mm'],
+    row.car_aa!=null?['Car Width (AA)',row.car_aa,'mm']:null,
+    row.car_bb!=null?['Car Depth (BB)',row.car_bb,'mm']:null,
     ['Door Opening (JJ)',row.jj,'mm'],
     ['Door Height (HH)',row.hh,'mm'],
     row.hl?['Car Clear Height (HL)',row.hl,'mm']:null,
