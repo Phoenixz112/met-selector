@@ -2970,65 +2970,10 @@ function resetHeForm(){
   function nf(n){return Math.round(n).toLocaleString('en-US');}
 
   function escDrawDiagram(r,degree,b2b,tg){
-    var ang=degree*Math.PI/180;
-    var scale=0.013;
-    var h=Math.max(r*scale,12);
-    var run=h/Math.tan(ang);
-    var x0=90,landing=44;
-    var topPad=60,botPad=35;
-    var H=topPad+h+botPad;
-    var ybase=H-botPad;
-    var sx=x0+landing,sy=ybase;
-    var ex=sx+run,ey=ybase-h;
-    var uex=ex+landing,uey=ey;
-    var W=Math.max(560,uex+130);
-    var d=16; // corner rounding radius
-    var cos=Math.cos(ang),sin=Math.sin(ang);
-    var p1x=sx-d, p1y=sy;
-    var p2x=sx+d*cos, p2y=sy-d*sin;
-    var p3x=ex-d*cos, p3y=ey+d*sin;
-    var p4x=ex+d, p4y=ey;
-    var R='#C8102E',N='#1a2744',G='#64748b';
-
-    // step ticks along the straight incline segment
-    var steps='';
-    var nSteps=5;
-    for(var i=1;i<nSteps;i++){
-      var t=i/nSteps;
-      var px=p2x+(p3x-p2x)*t, py=p2y+(p3y-p2y)*t;
-      var tlen=6;
-      steps+=`<line x1="${px-cos*0.3*tlen}" y1="${py+sin*0.3*tlen}" x2="${px+sin*tlen}" y2="${py+cos*tlen}" stroke="${G}" stroke-width="1"/>`;
-    }
-
-    var dimY=uey-40;
-
-    var svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%">
-    <line x1="10" y1="${ybase}" x2="${W-10}" y2="${ybase}" stroke="${G}" stroke-width="1" stroke-dasharray="4,4"/>
-    <line x1="10" y1="${uey}" x2="${W-10}" y2="${uey}" stroke="${G}" stroke-width="1" stroke-dasharray="4,4"/>
-    <text x="12" y="${ybase-6}" font-size="10" fill="${N}" font-family="Roboto Mono,monospace" font-weight="600">1st FLOOR</text>
-    <text x="${W-92}" y="${uey-6}" font-size="10" fill="${N}" font-family="Roboto Mono,monospace" font-weight="600">2nd FLOOR</text>
-
-    <rect x="${x0-5}" y="${ybase-2}" width="10" height="12" rx="2" fill="#94a3b8"/>
-    <rect x="${uex-5}" y="${uey-2}" width="10" height="12" rx="2" fill="#94a3b8"/>
-
-    <path d="M ${x0} ${ybase} L ${p1x} ${p1y} Q ${sx} ${sy} ${p2x} ${p2y} L ${p3x} ${p3y} Q ${ex} ${ey} ${p4x} ${p4y} L ${uex} ${uey}" fill="none" stroke="${N}" stroke-width="2.5" stroke-linecap="round"/>
-    ${steps}
-
-    <circle cx="${sx}" cy="${sy}" r="2.6" fill="${R}"/>
-    <text x="${sx}" y="${sy+16}" font-size="9" fill="${R}" font-family="Roboto Mono,monospace" text-anchor="middle">W.P.</text>
-    <circle cx="${ex}" cy="${ey}" r="2.6" fill="${R}"/>
-    <text x="${ex}" y="${ey-8}" font-size="9" fill="${R}" font-family="Roboto Mono,monospace" text-anchor="middle">W.P.</text>
-
-    <line x1="${x0}" y1="${dimY}" x2="${uex}" y2="${dimY}" stroke="${R}" stroke-width="1"/>
-    <line x1="${x0}" y1="${dimY-5}" x2="${x0}" y2="${dimY+5}" stroke="${R}" stroke-width="1"/>
-    <line x1="${uex}" y1="${dimY-5}" x2="${uex}" y2="${dimY+5}" stroke="${R}" stroke-width="1"/>
-    <line x1="${x0}" y1="${dimY}" x2="${x0}" y2="${ybase}" stroke="${R}" stroke-width=".6" stroke-dasharray="2,2"/>
-    <line x1="${uex}" y1="${dimY}" x2="${uex}" y2="${uey}" stroke="${R}" stroke-width=".6" stroke-dasharray="2,2"/>
-    <text x="${(x0+uex)/2}" y="${dimY-8}" text-anchor="middle" font-size="10" fill="${N}" font-family="Roboto Mono,monospace" font-weight="600">DIM. BETWEEN SUPPORT BEAM</text>
-    <text x="${(x0+uex)/2}" y="${dimY+15}" text-anchor="middle" font-size="11" fill="${R}" font-family="Roboto Mono,monospace" font-weight="700">B2B ${nf(b2b)} mm</text>
-
-    <text x="${(sx+ex)/2+10}" y="${(sy+ey)/2-10}" font-size="10" fill="${G}" font-family="Roboto Mono,monospace">Rise ${nf(r)}mm · ${degree}° · TG ${nf(tg)}mm</text>
-    </svg>`;
+    var svg=`<div style="position:relative;width:100%">
+      <img src="assets/esc-diagram.png" alt="Escalator elevation diagram" style="width:100%;display:block">
+      <div style="position:absolute;left:58%;top:5.5%;font-family:'Roboto Mono',monospace;font-weight:700;font-size:1.3vw;color:#C8102E;white-space:nowrap">${nf(b2b)} mm</div>
+    </div>`;
     var host=document.getElementById('esc-svg-host');
     if(host) host.innerHTML=svg;
   }
