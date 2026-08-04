@@ -955,7 +955,13 @@ body{
       <div class="form-row"><label class="form-label">Code / Capacity</label><select class="form-select" id="he-code" onchange="onHeCode()"></select></div>
       <div class="form-row"><label class="form-label">Car Ceiling Height</label><select class="form-select" id="he-ceiling"></select></div>
       <div class="form-row"><label class="form-label">Door Type</label><select class="form-select" id="he-door" onchange="onHeDoor()"></select></div>
-      <div class="form-row" style="margin-bottom:0"><label class="form-label">Gate</label><select class="form-select" id="he-gate"></select></div>
+      <div class="form-row"><label class="form-label">Gate</label><select class="form-select" id="he-gate"></select></div>
+      <div class="form-row" style="margin-bottom:0">
+        <label class="form-label">Travel Height — TR (m)</label>
+        <input class="form-input" type="number" id="he-tr" placeholder="e.g. 12" step="0.1" oninput="validateHeTR()">
+        <div id="he-tr-warn" style="display:none;margin-top:6px;font-size:12px;color:#991b1b;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:6px 10px"></div>
+        <div id="he-tr-ok" style="display:none;margin-top:6px;font-size:12px;color:#0f7556;background:#f0fdf8;border:1px solid #a7f3d0;border-radius:6px;padding:6px 10px"></div>
+      </div>
     </div>
     <button class="btn-primary" onclick="showHeResult()">
       View Result <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -2525,6 +2531,9 @@ function showHeForm(){
   document.getElementById('he-form').style.display='';
   document.getElementById('he-input').style.display='';
   document.getElementById('he-result').style.display='none';
+  const trF=document.getElementById('he-tr'); if(trF) trF.value='';
+  const trW=document.getElementById('he-tr-warn'); if(trW) trW.style.display='none';
+  const trO=document.getElementById('he-tr-ok'); if(trO) trO.style.display='none';
   const codes=[...new Set(rows.map(r=>r.code))].sort((a,b)=>{
     const ca=rows.find(r=>r.code===a)?.capacity||0;
     const cb=rows.find(r=>r.code===b)?.capacity||0;
@@ -2562,6 +2571,7 @@ function onHeCode(){
   });
   document.getElementById('he-gate').innerHTML='<option value="">— Select —</option>';
   onHeDoor();
+  validateHeTR();
 }
 
 function onHeDoor(){
@@ -2576,6 +2586,61 @@ function onHeDoor(){
   } else {
     gSel.innerHTML=`<option value="${gates[0]}">${gates[0]} Gate</option>`;
   }
+  validateHeTR();
+}
+
+function validateHeTR(){
+  const trVal = document.getElementById('he-tr')?.value;
+  const tr    = parseFloat(trVal);
+  const code  = document.getElementById('he-code')?.value;
+  const warn  = document.getElementById('he-tr-warn');
+  const ok    = document.getElementById('he-tr-ok');
+  const input = document.getElementById('he-tr');
+  if(!warn||!ok||!input) return;
+
+  if(!trVal||trVal===''){
+    warn.style.display='none'; ok.style.display='none';
+    input.style.borderColor=''; input.style.boxShadow='';
+    return;
+  }
+  if(!HE_series||!code){
+    warn.style.display='none'; ok.style.display='none';
+    input.style.borderColor=''; input.style.boxShadow='';
+    return;
+  }
+
+  const door=document.getElementById('he-door')?.value;
+  const gate=document.getElementById('he-gate')?.value;
+
+  let rows = HE.filter(r=>r.series===HE_series&&r.code===code&&r.max_travel!=null&&r.max_travel>0);
+  if(door){
+    const doorRows=rows.filter(r=>r.door===door);
+    if(doorRows.length) rows=doorRows;
+  }
+  if(gate){
+    const gateRows=rows.filter(r=>String(r.gate)===String(gate));
+    if(gateRows.length) rows=gateRows;
+  }
+
+  if(!rows.length){
+    warn.style.display='none'; ok.style.display='none';
+    input.style.borderColor=''; input.style.boxShadow='';
+    return;
+  }
+
+  const trMax = Math.max(...rows.map(r=>+r.max_travel));
+
+  if(tr > trMax){
+    warn.style.display=''; ok.style.display='none';
+    input.style.borderColor='#ef4444';
+    input.style.boxShadow='0 0 0 3px rgba(239,68,68,.15)';
+    warn.textContent = `⚠ Out of standard (max TR = ${trMax}m) — Please consult MET`;
+  } else {
+    warn.style.display='none'; ok.style.display='';
+    ok.textContent = `✓ Within range (TR ≤ ${trMax}m)`;
+    input.style.borderColor='#0f7556';
+    input.style.boxShadow='0 0 0 3px rgba(15,117,86,.1)';
+  }
 }
 
 function showHeResult(){
@@ -2583,9 +2648,15 @@ function showHeResult(){
   const door=document.getElementById('he-door').value;
   const gate=parseInt(document.getElementById('he-gate').value);
   const ceilOpt=document.getElementById('he-ceiling')?.value||'std';
+  const tr=parseFloat(document.getElementById('he-tr')?.value)||0;
   if(!code||!door||!gate){alert('Please complete all selections.');return;}
+  const heTrWarn=document.getElementById('he-tr-warn');
+  if(heTrWarn&&heTrWarn.style.display!=='none'){alert('Travel Height (TR) is out of standard range.\nPlease consult MET or adjust TR value.');return;}
   const row=HE.find(r=>r.series===HE_series&&r.code===code&&r.door===door&&r.gate===gate);
   if(!row){alert('No matching record found.');return;}
+  if(tr&&row.max_travel&&tr>row.max_travel){
+    alert(`Travel ${tr}m exceeds max ${row.max_travel}m for this configuration.`);return;
+  }
 
   const isOpt=ceilOpt==='opt';
   const ceiling = isOpt&&row.ceiling_opt ? row.ceiling_opt : row.ceiling_std;
@@ -2595,7 +2666,7 @@ function showHeResult(){
   const entH    = isOpt&&row.ent_h_opt  ? row.ent_h_opt  : row.ent_h_std;
 
   document.getElementById('he-r-title').textContent=`${HE_series} · ${code}`;
-  document.getElementById('he-r-sub').textContent=`MHE · ${door} Door · ${gate} Gate · ${ceiling}mm Ceiling · ${row.capacity} kg (${row.persons}P)`;
+  document.getElementById('he-r-sub').textContent=`MHE · ${door} Door · ${gate} Gate · ${ceiling}mm Ceiling · ${row.capacity} kg (${row.persons}P)${tr?` · TR ${tr}m`:''}`;
 
   // Shaft plan
   tbl('he-r-shaft',[
@@ -2730,6 +2801,9 @@ function resetHe(){
 function resetHeForm(){
   // Rebuild the spec dropdowns to their defaults but keep the same series selected
   showHeForm();
+  const tr=document.getElementById('he-tr'); if(tr) tr.value='';
+  const w=document.getElementById('he-tr-warn'); if(w) w.style.display='none';
+  const o=document.getElementById('he-tr-ok'); if(o) o.style.display='none';
   document.getElementById('he-result').style.display='none';
 }
 
