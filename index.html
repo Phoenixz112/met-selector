@@ -2974,27 +2974,72 @@ function resetHeForm(){
     var scale=0.013;
     var h=Math.max(r*scale,12);
     var run=h/Math.tan(ang);
-    var x0=60,ybase=170,landing=48;
+    var x0=90,landing=44;
+    var topPad=75,botPad=50;
+    var H=topPad+h+botPad;
+    var ybase=H-botPad;
     var sx=x0+landing,sy=ybase;
     var ex=sx+run,ey=ybase-h;
     var uex=ex+landing,uey=ey;
-    var W=Math.max(460,uex+80);
-    var dimY=ybase+22;
+    var W=Math.max(560,uex+130);
+    var d=16; // corner rounding radius
+    var cos=Math.cos(ang),sin=Math.sin(ang);
+    var p1x=sx-d, p1y=sy;
+    var p2x=sx+d*cos, p2y=sy-d*sin;
+    var p3x=ex-d*cos, p3y=ey+d*sin;
+    var p4x=ex+d, p4y=ey;
     var R='#C8102E',N='#1a2744',G='#64748b';
-    var svg=`<svg viewBox="0 0 ${W} 210" xmlns="http://www.w3.org/2000/svg" style="width:100%">
-    <line x1="30" y1="${ybase}" x2="${W-20}" y2="${ybase}" stroke="${G}" stroke-width="1" stroke-dasharray="4,4"/>
-    <rect x="${x0-5}" y="${ybase-2}" width="12" height="14" rx="2" fill="#94a3b8"/>
-    <rect x="${uex-5}" y="${uey-2}" width="12" height="14" rx="2" fill="#94a3b8"/>
-    <line x1="${x0}" y1="${sy}" x2="${sx}" y2="${sy}" stroke="${N}" stroke-width="2.5"/>
-    <line x1="${sx}" y1="${sy}" x2="${ex}" y2="${ey}" stroke="${N}" stroke-width="2.5"/>
-    <line x1="${ex}" y1="${ey}" x2="${uex}" y2="${uey}" stroke="${N}" stroke-width="2.5"/>
-    <line x1="${uex}" y1="${uey}" x2="${uex}" y2="${ybase}" stroke="${G}" stroke-width="1" stroke-dasharray="4,4"/>
-    <text x="${uex+7}" y="${(uey+ybase)/2+4}" font-size="11" fill="${G}" font-family="Roboto Mono,monospace">Rise ${nf(r)}</text>
-    <text x="${sx+28}" y="${sy-8}" font-size="11" fill="${R}" font-family="Roboto Mono,monospace" font-weight="600">${degree}°</text>
+
+    // step ticks along the straight incline segment
+    var steps='';
+    var nSteps=5;
+    for(var i=1;i<nSteps;i++){
+      var t=i/nSteps;
+      var px=p2x+(p3x-p2x)*t, py=p2y+(p3y-p2y)*t;
+      var tlen=6;
+      steps+=`<line x1="${px-cos*0.3*tlen}" y1="${py+sin*0.3*tlen}" x2="${px+sin*tlen}" y2="${py+cos*tlen}" stroke="${G}" stroke-width="1"/>`;
+    }
+
+    var dimY=uey-55;
+    var rbTop=uey-35;
+    var raBottom=ybase+32;
+
+    var svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%">
+    <line x1="10" y1="${ybase}" x2="${W-10}" y2="${ybase}" stroke="${G}" stroke-width="1" stroke-dasharray="4,4"/>
+    <line x1="10" y1="${uey}" x2="${W-10}" y2="${uey}" stroke="${G}" stroke-width="1" stroke-dasharray="4,4"/>
+    <text x="12" y="${ybase-6}" font-size="10" fill="${N}" font-family="Roboto Mono,monospace" font-weight="600">1st FLOOR</text>
+    <text x="${W-92}" y="${uey-6}" font-size="10" fill="${N}" font-family="Roboto Mono,monospace" font-weight="600">2nd FLOOR</text>
+
+    <rect x="${x0-5}" y="${ybase-2}" width="10" height="12" rx="2" fill="#94a3b8"/>
+    <rect x="${uex-5}" y="${uey-2}" width="10" height="12" rx="2" fill="#94a3b8"/>
+
+    <path d="M ${x0} ${ybase} L ${p1x} ${p1y} Q ${sx} ${sy} ${p2x} ${p2y} L ${p3x} ${p3y} Q ${ex} ${ey} ${p4x} ${p4y} L ${uex} ${uey}" fill="none" stroke="${N}" stroke-width="2.5" stroke-linecap="round"/>
+    ${steps}
+
+    <circle cx="${sx}" cy="${sy}" r="2.6" fill="${R}"/>
+    <text x="${sx}" y="${sy+16}" font-size="9" fill="${R}" font-family="Roboto Mono,monospace" text-anchor="middle">W.P.</text>
+    <circle cx="${ex}" cy="${ey}" r="2.6" fill="${R}"/>
+    <text x="${ex}" y="${ey-8}" font-size="9" fill="${R}" font-family="Roboto Mono,monospace" text-anchor="middle">W.P.</text>
+
     <line x1="${x0}" y1="${dimY}" x2="${uex}" y2="${dimY}" stroke="${R}" stroke-width="1"/>
     <line x1="${x0}" y1="${dimY-5}" x2="${x0}" y2="${dimY+5}" stroke="${R}" stroke-width="1"/>
     <line x1="${uex}" y1="${dimY-5}" x2="${uex}" y2="${dimY+5}" stroke="${R}" stroke-width="1"/>
-    <text x="${(x0+uex)/2}" y="${dimY+16}" text-anchor="middle" font-size="11" fill="${N}" font-family="Roboto Mono,monospace" font-weight="600">B2B ${nf(b2b)}  ·  TG ${nf(tg)}</text>
+    <line x1="${x0}" y1="${dimY}" x2="${x0}" y2="${ybase}" stroke="${R}" stroke-width=".6" stroke-dasharray="2,2"/>
+    <line x1="${uex}" y1="${dimY}" x2="${uex}" y2="${uey}" stroke="${R}" stroke-width=".6" stroke-dasharray="2,2"/>
+    <text x="${(x0+uex)/2}" y="${dimY-8}" text-anchor="middle" font-size="10" fill="${N}" font-family="Roboto Mono,monospace" font-weight="600">DIM. BETWEEN SUPPORT BEAM</text>
+    <text x="${(x0+uex)/2}" y="${dimY+15}" text-anchor="middle" font-size="11" fill="${R}" font-family="Roboto Mono,monospace" font-weight="700">B2B ${nf(b2b)} mm</text>
+
+    <line x1="${x0+18}" y1="${ybase}" x2="${x0+18}" y2="${raBottom}" stroke="${N}" stroke-width="1"/>
+    <line x1="${x0+13}" y1="${ybase}" x2="${x0+23}" y2="${ybase}" stroke="${N}" stroke-width="1"/>
+    <line x1="${x0+13}" y1="${raBottom}" x2="${x0+23}" y2="${raBottom}" stroke="${N}" stroke-width="1"/>
+    <text x="${x0+28}" y="${(ybase+raBottom)/2+3}" font-size="10" fill="${N}" font-family="Roboto Mono,monospace" font-weight="600">RA</text>
+
+    <line x1="${uex-18}" y1="${rbTop}" x2="${uex-18}" y2="${uey}" stroke="${N}" stroke-width="1"/>
+    <line x1="${uex-23}" y1="${rbTop}" x2="${uex-13}" y2="${rbTop}" stroke="${N}" stroke-width="1"/>
+    <line x1="${uex-23}" y1="${uey}" x2="${uex-13}" y2="${uey}" stroke="${N}" stroke-width="1"/>
+    <text x="${uex-40}" y="${(rbTop+uey)/2+3}" font-size="10" fill="${N}" font-family="Roboto Mono,monospace" font-weight="600">RB</text>
+
+    <text x="${(sx+ex)/2+10}" y="${(sy+ey)/2-10}" font-size="10" fill="${G}" font-family="Roboto Mono,monospace">Rise ${nf(r)}mm · ${degree}° · TG ${nf(tg)}mm</text>
     </svg>`;
     var host=document.getElementById('esc-svg-host');
     if(host) host.innerHTML=svg;
