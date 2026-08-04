@@ -911,6 +911,10 @@ body{
           <input class="form-input" type="number" id="he-sh-bh" placeholder="e.g. 1350">
         </div>
       </div>
+      <div class="form-row">
+        <label class="form-label">Travel Height — TR (m) <span style="color:#C8102E">*</span></label>
+        <input class="form-input" type="number" id="he-sh-tr" placeholder="e.g. 12" step="0.1" required>
+      </div>
       <div class="form-row" style="margin-bottom:0">
         <label class="form-label">Gate</label>
         <select class="form-select" id="he-sh-gate">
@@ -2434,22 +2438,25 @@ function startHeMode(m){
 function searchHeShaft(){
   const ah=parseInt(document.getElementById('he-sh-ah').value);
   const bh=parseInt(document.getElementById('he-sh-bh').value);
+  const tr=parseFloat(document.getElementById('he-sh-tr').value);
   const gate=document.getElementById('he-sh-gate').value;
   if(!ah||!bh){alert('Please enter AH and BH.');return;}
+  if(!tr){alert('Please enter Travel Height (TR).');return;}
 
   let matches=HE.filter(r=>{
     if(r.ah>ah||r.bh>bh) return false;
     if(gate&&r.gate!==parseInt(gate)) return false;
+    if(!r.max_travel||r.max_travel<tr) return false;
     return true;
   });
   matches.sort((a,b)=>b.capacity-a.capacity);
 
   const body=document.getElementById('he-shaft-body');
   if(!matches.length){
-    body.innerHTML=`<div class="no-result"><div style="font-size:36px;margin-bottom:12px">🔍</div><div style="font-size:15px;font-weight:700;margin-bottom:6px">No matching models</div><div style="font-size:13px">AH ${ah} × BH ${bh} mm is too small.</div></div>`;
+    body.innerHTML=`<div class="no-result"><div style="font-size:36px;margin-bottom:12px">🔍</div><div style="font-size:15px;font-weight:700;margin-bottom:6px">No matching models</div><div style="font-size:13px">AH ${ah} × BH ${bh} mm with TR ${tr}m — try relaxing filters or a smaller travel height.</div></div>`;
   } else {
     const best=matches[0];
-    let html2=`<div class="alert-info no-print">Found <strong>${matches.length}</strong> model${matches.length>1?'s':''} fitting AH ${ah} × BH ${bh} mm</div>`;
+    let html2=`<div class="alert-info no-print">Found <strong>${matches.length}</strong> model${matches.length>1?'s':''} fitting AH ${ah} × BH ${bh} mm · TR ${tr}m</div>`;
     html2+=`<div class="match-best">
       <div class="match-header">
         <div class="match-code">${best.series} · ${best.code}</div>
@@ -2459,7 +2466,8 @@ function searchHeShaft(){
         Capacity: <span>${best.capacity} kg (${best.persons}P)</span> &nbsp;·&nbsp;
         Door: <span>${best.door}</span> &nbsp;·&nbsp;
         Gate: <span>${best.gate}</span><br>
-        Rated Speed: <span>Up 20m/min · Down 30m/min</span><br>
+        Rated Speed: <span>Up 20m/min · Down 30m/min</span> &nbsp;·&nbsp;
+        Max. Travel: <span>${best.max_travel}</span> m<br>
         Car: <span>${best.car_aa}×${best.car_bb}</span> mm &nbsp;·&nbsp;
         Entrance: <span>${best.entrance}</span> mm<br>
         Min. Shaft: <span>${best.ah}×${best.bh}</span> mm &nbsp;·&nbsp;
@@ -2477,7 +2485,7 @@ function searchHeShaft(){
         </div>
         <div class="accordion-body">
           <div class="match-dims">
-            Rated Speed: <span>Up 20m/min · Down 30m/min</span><br>
+            Rated Speed: <span>Up 20m/min · Down 30m/min</span> &nbsp;·&nbsp; Max. Travel: <span>${r.max_travel}</span> m<br>
             Car: <span>${r.car_aa}×${r.car_bb}</span> mm &nbsp;·&nbsp; Entrance: <span>${r.entrance}</span> mm<br>
             Min. Shaft: <span>${r.ah}×${r.bh}</span> mm &nbsp;·&nbsp;
             OH: <span>${r.oh_std}</span> mm &nbsp;·&nbsp; Pit: <span>${r.pit_std}</span> mm
