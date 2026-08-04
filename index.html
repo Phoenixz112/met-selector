@@ -2086,6 +2086,9 @@ function showFreightForm(){
   document.getElementById('fr-form').style.display='';
   document.getElementById('fr-input').style.display='';
   document.getElementById('fr-result').style.display='none';
+  const trF=document.getElementById('fr-tr'); if(trF) trF.value='';
+  const trW=document.getElementById('fr-tr-warn'); if(trW) trW.style.display='none';
+  const trO=document.getElementById('fr-tr-ok'); if(trO) trO.style.display='none';
   // Populate capacity
   const caps=[...new Set(rows.map(r=>r.capacity))].sort((a,b)=>a-b);
   opt(document.getElementById('fr-cap'),caps,c=>c.toLocaleString()+' kg');
@@ -2125,27 +2128,45 @@ function onFrDoor(){
   const rows=FR.filter(r=>r.origin===org&&r.series===ser&&r.capacity===cap&&(!type||r.product_type===type)&&(!door||r.door===door));
   const speeds=[...new Set(rows.map(r=>r.speed))].sort((a,b)=>a-b);
   opt(document.getElementById('fr-spd'),speeds,s=>s+' m/s');
+  validateFrTR();
 }
 function validateFrTR(){
-  const trVal = document.getElementById('fr-tr').value;
+  const trVal = document.getElementById('fr-tr')?.value;
   const tr    = parseFloat(trVal);
-  const series= FR_series;
   const warn  = document.getElementById('fr-tr-warn');
   const ok    = document.getElementById('fr-tr-ok');
   const input = document.getElementById('fr-tr');
+  if(!warn||!ok||!input) return;
 
   if(!trVal||trVal===''){
     warn.style.display='none'; ok.style.display='none';
     input.style.borderColor=''; input.style.boxShadow='';
     return;
   }
-  if(!series){
+  if(!ST.frSeries){
     warn.style.display='none'; ok.style.display='none';
     input.style.borderColor=''; input.style.boxShadow='';
     return;
   }
+  const{org,ser}=ST.frSeries;
+  const cap=+document.getElementById('fr-cap')?.value||0;
+  const type=document.getElementById('fr-type')?.value;
+  const door=document.getElementById('fr-door')?.value;
 
-  const rows = FR.filter(r => r.series===series && r.max_travel!=null && r.max_travel>0);
+  let rows = FR.filter(r => r.origin===org && r.series===ser && r.max_travel!=null && r.max_travel>0);
+  if(cap){
+    const capRows=rows.filter(r=>r.capacity===cap);
+    if(capRows.length) rows=capRows;
+  }
+  if(type){
+    const typeRows=rows.filter(r=>r.product_type===type);
+    if(typeRows.length) rows=typeRows;
+  }
+  if(door){
+    const doorRows=rows.filter(r=>r.door===door);
+    if(doorRows.length) rows=doorRows;
+  }
+
   if(!rows.length){
     warn.style.display='none'; ok.style.display='none';
     input.style.borderColor=''; input.style.boxShadow='';
