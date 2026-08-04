@@ -1108,10 +1108,6 @@ body{
         <div style="margin-left:auto;font-size:11px;color:var(--text-soft);font-family:'Roboto Mono',monospace" id="esc-sup-meta"></div>
       </div>
       <div class="card" style="padding:10px;margin-bottom:12px"><div id="esc-svg-host"></div></div>
-      <div class="card" style="padding:12px 14px;margin-bottom:12px">
-        <div style="font-size:10px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Formula</div>
-        <div style="font-size:11px;color:var(--text-soft);font-family:'Roboto Mono',monospace;line-height:1.7;word-break:break-all" id="esc-formula">—</div>
-      </div>
       <div id="esc-alerts"></div>
     </div>
     <button class="btn-export no-print" onclick="window.print()" style="margin-top:8px">
@@ -3006,7 +3002,6 @@ function resetHeForm(){
       document.getElementById('esc-tg').textContent='—';
       document.getElementById('esc-sup-txt').textContent='—';
       document.getElementById('esc-sup-meta').textContent='';
-      document.getElementById('esc-formula').textContent='Enter a Rise value';
       document.getElementById('esc-alerts').innerHTML=escAlert('err','Enter a rise value');
       document.getElementById('esc-svg-host').innerHTML='';
       return;
@@ -3056,10 +3051,6 @@ function resetHeForm(){
     document.getElementById('esc-sup-meta').textContent='TG '+nf(tg)+' / limit '+nf(th);
     if(dot) dot.style.background=req?'#92400e':'#0f7556';
     if(supCard) supCard.style.background=req?'var(--amber-bg)':'#f0fdf8';
-
-    // Formula
-    document.getElementById('esc-formula').textContent=
-      'B2B = '+k+' × '+nf(rVal)+' + '+set.tj+' (TJ) + '+set.tk+' (TK) + 80  =  '+nf(b2b)+' mm  |  TG = B2B − 80  =  '+nf(tg)+' mm';
 
     escDrawDiagram(rVal,parseFloat(dVal),b2b,tg);
 
