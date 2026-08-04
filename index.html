@@ -3035,8 +3035,8 @@ function resetHeForm(){
 
     var set=rg.flats[escFlat];
     var k=K_COEF[dVal];
-    var b2b=k*rVal+set.tj+set.tk+80;
-    var tg=b2b-80;
+    var tg=k*rVal+set.tj+set.tk;
+    var b2b=tg+80;
 
     document.getElementById('esc-sw').textContent=nf(meta.step);
     document.getElementById('esc-b2b').textContent=nf(b2b);
