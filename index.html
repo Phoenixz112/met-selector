@@ -2719,8 +2719,10 @@ function showHeResult(){
     pitOpt?['(E) Min. Pit (With Isolation Unit)',pitOpt,'mm']:null,
   ].filter(Boolean));
 
-  // Drawings
-  document.getElementById('he-svg-top').innerHTML=svgHeTop(row);
+  // Drawings — prefer a hand-made template (assets/he-shaft-templates/{code}.svg) if one
+  // exists for this exact model, filling in the real calculated values by element ID.
+  // Falls back to the auto-generated diagram if no template has been made yet.
+  loadHeShaftPlan(row);
   document.getElementById('he-svg-side').innerHTML=svgHeSide(row,oh,pit,ceiling,entH,row.max_travel);
 
   if(row.note){
@@ -2739,6 +2741,46 @@ function goHeEdit(){
   document.getElementById('he-result').style.display='none';
   document.getElementById('he-input').style.display='';
   window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// Template SVG values map — each key is an element ID the template file may contain.
+// Any ID present in the template gets its textContent set to the matching value.
+function heTemplateValueMap(row){
+  return {
+    'val-ah': row.ah,
+    'val-bh': row.bh,
+    'val-car': `${row.car_aa}×${row.car_bb}`,
+    'val-car-aa': row.car_aa,
+    'val-car-bb': row.car_bb,
+    'val-jj': row.entrance,
+    'val-entrance': row.entrance,
+  };
+}
+const heShaftTemplateCache={}; // code -> svg text | null (null = confirmed no template)
+async function loadHeShaftPlan(row){
+  const host=document.getElementById('he-svg-top');
+  const code=row.code;
+  try{
+    let svgText=heShaftTemplateCache[code];
+    if(svgText===undefined){
+      const res=await fetch(`assets/he-shaft-templates/${code}.svg`);
+      svgText = res.ok ? await res.text() : null;
+      heShaftTemplateCache[code]=svgText;
+    }
+    if(svgText===null){ host.innerHTML=svgHeTop(row); return; }
+
+    host.innerHTML=svgText;
+    const svgEl=host.querySelector('svg');
+    if(svgEl) svgEl.style.width='100%';
+    const values=heTemplateValueMap(row);
+    Object.entries(values).forEach(([id,val])=>{
+      const el=host.querySelector('#'+CSS.escape(id));
+      if(el && val!=null) el.textContent=val;
+    });
+  }catch(e){
+    console.warn('HE shaft template load failed for',code,'— using auto-generated diagram.',e.message);
+    host.innerHTML=svgHeTop(row);
+  }
 }
 
 function svgHeTop(row){
