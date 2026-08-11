@@ -454,7 +454,7 @@
 <g clip-path="url(#clip_3)">
 </g>
 
-<g id="value-overlays" font-family="monospace" font-weight="700" fill="#C8102E">
+<g id="value-overlays" font-family="monospace" font-weight="700" fill="#1a1a1a">
   <text id="val-b2b" x="690" y="120" text-anchor="middle" font-size="10">0000 mm</text>
   <text id="val-tg" x="1100" y="410" text-anchor="middle" font-size="10" transform="rotate(-90 1100 410)">0000 mm</text>
   <text id="val-pit" x="70" y="600" text-anchor="middle" font-size="10" transform="rotate(-90 70 600)">0000 mm</text>
