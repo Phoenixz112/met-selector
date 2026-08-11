@@ -2927,7 +2927,7 @@ function resetHeForm(){
           k35: +(r.k_35||1.428),
         };
       } else if (r.set_name && r.tj) {
-        ESC_SETS[r.set_name] = { tj: +r.tj, tk: +r.tk };
+        ESC_SETS[r.set_name] = { tj: +r.tj, tk: +r.tk, pit: r.pit_depth?+r.pit_depth:null };
       }
     });
 
@@ -3104,7 +3104,7 @@ function resetHeForm(){
     var k=K_COEF[dVal];
     var tg=k*rVal+set.tj+set.tk;
     var b2b=tg+80;
-    var pitDepth=(escFlat==='4')?1210:1110;
+    var pitDepth=(set.pit!=null)?set.pit:((escFlat==='4')?1210:1110);
 
     document.getElementById('esc-sw').textContent=nf(meta.step);
     document.getElementById('esc-b2b').textContent=nf(b2b);
