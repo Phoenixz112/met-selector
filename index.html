@@ -1137,6 +1137,7 @@ const sheetURL = s => `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/t
 let PH=[], PV=[], FR=[], ESC=[], HE=[]; // PV kept for compatibility but unused
 let PROFILE={ company:'', type:'' };
 let ST={ passType:null, series:null, escSeries:null, frSeries:null };
+const diagramComingSoonHTML=`<div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Diagram under development — coming soon</div>`;
 
 // ============================================================
 // FETCH
@@ -1875,8 +1876,8 @@ function showModelResult(){
   ].filter(Boolean));
 
   document.getElementById('r-tol').innerHTML=renderTolBox(ah,bh,tr,gate);
-  document.getElementById('svg-top').innerHTML=svgTop({ah,bh,aa:row.car_aa,bb:row.car_bb,ent:row.entrance,cwt:row.cwt||'Side'});
-  document.getElementById('svg-side').innerHTML=vt?svgSide({bh,oh:vt.oh,pit:vt.pit,hasMR:hasMR,hm:vt.hm},spd):'<p style="padding:16px;color:#64748b">Side view requires vertical data (check TR range).</p>';
+  document.getElementById('svg-top').innerHTML=diagramComingSoonHTML;
+  document.getElementById('svg-side').innerHTML=diagramComingSoonHTML;
 
   sendLog({mode:'By Model',factory:row.origin,series:ST.series,code,capacity:row.capacity,door,gate,entrance_type:row.entrance_type,speed:spd,travel_m:tr,ah_std:ah,bh_std:bh,tolerance_mm:getTolerance(tr,gate).side});
   goMS(3);
@@ -2728,7 +2729,7 @@ function showHeResult(){
   // exists for this exact model, filling in the real calculated values by element ID.
   // Falls back to the auto-generated diagram if no template has been made yet.
   loadHeShaftPlan(row);
-  document.getElementById('he-svg-side').innerHTML=heComingSoonHTML;
+  document.getElementById('he-svg-side').innerHTML=diagramComingSoonHTML;
 
   if(row.note){
     document.getElementById('he-note').textContent='ℹ '+row.note;
@@ -2762,7 +2763,6 @@ function heTemplateValueMap(row){
   };
 }
 const heShaftTemplateCache={}; // code -> svg text | null (null = confirmed no template)
-const heComingSoonHTML=`<div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Diagram under development — coming soon</div>`;
 async function loadHeShaftPlan(row){
   const host=document.getElementById('he-svg-top');
   const code=row.code;
@@ -2773,7 +2773,7 @@ async function loadHeShaftPlan(row){
       svgText = res.ok ? await res.text() : null;
       heShaftTemplateCache[code]=svgText;
     }
-    if(svgText===null){ host.innerHTML=heComingSoonHTML; return; }
+    if(svgText===null){ host.innerHTML=diagramComingSoonHTML; return; }
 
     host.innerHTML=svgText;
     const svgEl=host.querySelector('svg');
@@ -2785,7 +2785,7 @@ async function loadHeShaftPlan(row){
     });
   }catch(e){
     console.warn('HE shaft template load failed for',code,'— showing placeholder.',e.message);
-    host.innerHTML=heComingSoonHTML;
+    host.innerHTML=diagramComingSoonHTML;
   }
 }
 
@@ -3051,7 +3051,7 @@ function resetHeForm(){
         escTemplateCache[key]=svgText;
       }
       if(svgText===null){
-        host.innerHTML=`<div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Diagram coming soon (${key})</div>`;
+        host.innerHTML=`<div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Diagram under development — coming soon (${key})</div>`;
         return;
       }
       host.innerHTML=svgText;
@@ -3065,7 +3065,7 @@ function resetHeForm(){
       if(valPit) valPit.textContent=nf(pitDepth)+' mm';
     }catch(e){
       console.warn('Escalator template load failed for',key,e.message);
-      host.innerHTML=`<div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Diagram coming soon (${key})</div>`;
+      host.innerHTML=`<div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Diagram under development — coming soon (${key})</div>`;
     }
   }
 
