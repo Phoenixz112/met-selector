@@ -3030,11 +3030,42 @@ function resetHeForm(){
 
   function nf(n){return Math.round(n).toLocaleString('en-US');}
 
-  function escDrawDiagram(r,degree,b2b,tg){
-    // Old PNG-based diagram removed — waiting on a new SVG template.
-    // Shows a plain placeholder in the meantime so nothing looks broken.
-    var host=document.getElementById('esc-svg-host');
-    if(host) host.innerHTML=`<div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Diagram coming soon</div>`;
+  // Escalator elevation diagrams — 3 hand-made templates depending on angle + support:
+  //   assets/esc-templates/30-no-support.svg
+  //   assets/esc-templates/30-with-support.svg
+  //   assets/esc-templates/35.svg
+  const escTemplateCache={}; // key -> svg text | null
+  function escTemplateKey(degree,req){
+    if(degree===35) return '35';
+    return req ? '30-with-support' : '30-no-support';
+  }
+  async function escDrawDiagram(r,degree,b2b,tg,req,pitDepth){
+    const host=document.getElementById('esc-svg-host');
+    const key=escTemplateKey(degree,req);
+    try{
+      let svgText=escTemplateCache[key];
+      if(svgText===undefined){
+        const res=await fetch(`assets/esc-templates/${key}.svg`);
+        svgText = res.ok ? await res.text() : null;
+        escTemplateCache[key]=svgText;
+      }
+      if(svgText===null){
+        host.innerHTML=`<div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Diagram coming soon (${key})</div>`;
+        return;
+      }
+      host.innerHTML=svgText;
+      const svgEl=host.querySelector('svg');
+      if(svgEl) svgEl.style.width='100%';
+      const val=host.querySelector('#val-b2b');
+      if(val) val.textContent=nf(b2b)+' mm';
+      const valTg=host.querySelector('#val-tg');
+      if(valTg) valTg.textContent=nf(tg)+' mm';
+      const valPit=host.querySelector('#val-pit');
+      if(valPit) valPit.textContent=nf(pitDepth)+' mm';
+    }catch(e){
+      console.warn('Escalator template load failed for',key,e.message);
+      host.innerHTML=`<div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Diagram coming soon (${key})</div>`;
+    }
   }
 
   window.escCalc=function(){
@@ -3119,7 +3150,7 @@ function resetHeForm(){
     if(dot) dot.style.background=req?'#92400e':'#0f7556';
     if(supCard) supCard.style.background=req?'var(--amber-bg)':'#f0fdf8';
 
-    escDrawDiagram(rVal,parseFloat(dVal),b2b,tg);
+    escDrawDiagram(rVal,parseFloat(dVal),b2b,tg,req,pitDepth);
 
     // Alerts
     var a='';
