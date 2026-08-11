@@ -1085,7 +1085,7 @@ body{
     <!-- Results -->
     <div id="esc-results-wrap">
       <div class="section-title">Results</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:12px">
         <div class="card" style="padding:14px;text-align:center">
           <div style="font-size:10px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Step Width</div>
           <div style="font-size:22px;font-weight:700;color:var(--navy);font-family:'Roboto Mono',monospace" id="esc-sw">—</div>
@@ -1099,6 +1099,11 @@ body{
         <div class="card" style="padding:14px;text-align:center">
           <div style="font-size:10px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">TG</div>
           <div style="font-size:22px;font-weight:700;color:var(--navy);font-family:'Roboto Mono',monospace" id="esc-tg">—</div>
+          <div style="font-size:10px;color:var(--text-soft)">mm</div>
+        </div>
+        <div class="card" style="padding:14px;text-align:center">
+          <div style="font-size:10px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Pit Depth</div>
+          <div style="font-size:22px;font-weight:700;color:var(--navy);font-family:'Roboto Mono',monospace" id="esc-pit">—</div>
           <div style="font-size:10px;color:var(--text-soft)">mm</div>
         </div>
       </div>
@@ -3060,6 +3065,7 @@ function resetHeForm(){
       document.getElementById('esc-sw').textContent='—';
       document.getElementById('esc-b2b').textContent='—';
       document.getElementById('esc-tg').textContent='—';
+      document.getElementById('esc-pit').textContent='—';
       document.getElementById('esc-sup-txt').textContent='—';
       document.getElementById('esc-sup-meta').textContent='';
       document.getElementById('esc-alerts').innerHTML=escAlert('err','Enter a rise value');
@@ -3074,6 +3080,7 @@ function resetHeForm(){
         escAlert('err','Rise '+nf(rVal)+' mm is out of range — must be '+nf(sp.min)+'–'+nf(sp.max)+' mm');
       document.getElementById('esc-b2b').textContent='—';
       document.getElementById('esc-tg').textContent='—';
+      document.getElementById('esc-pit').textContent='—';
       document.getElementById('esc-svg-host').innerHTML='';
       return;
     }
@@ -3097,10 +3104,12 @@ function resetHeForm(){
     var k=K_COEF[dVal];
     var tg=k*rVal+set.tj+set.tk;
     var b2b=tg+80;
+    var pitDepth=(escFlat==='4')?1210:1110;
 
     document.getElementById('esc-sw').textContent=nf(meta.step);
     document.getElementById('esc-b2b').textContent=nf(b2b);
     document.getElementById('esc-tg').textContent=nf(tg);
+    document.getElementById('esc-pit').textContent=nf(pitDepth);
 
     // Intermediate support
     var th=(envVal==='Indoor')?meta.indoorTh:16000;
