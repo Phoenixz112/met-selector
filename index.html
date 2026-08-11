@@ -3031,12 +3031,10 @@ function resetHeForm(){
   function nf(n){return Math.round(n).toLocaleString('en-US');}
 
   function escDrawDiagram(r,degree,b2b,tg){
-    var svg=`<div style="position:relative;width:100%">
-      <img src="assets/esc-diagram.png" alt="Escalator elevation diagram" style="width:100%;display:block">
-      <div style="position:absolute;left:58%;top:5.5%;font-family:'Roboto Mono',monospace;font-weight:700;font-size:1.3vw;color:#C8102E;white-space:nowrap">${nf(b2b)} mm</div>
-    </div>`;
+    // Old PNG-based diagram removed — waiting on a new SVG template.
+    // Shows a plain placeholder in the meantime so nothing looks broken.
     var host=document.getElementById('esc-svg-host');
-    if(host) host.innerHTML=svg;
+    if(host) host.innerHTML=`<div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Diagram coming soon</div>`;
   }
 
   window.escCalc=function(){
