@@ -1110,7 +1110,6 @@ body{
       <div class="card" id="esc-sup-card" style="padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px">
         <div id="esc-sup-dot" style="width:10px;height:10px;border-radius:50%;background:var(--text-soft);flex-shrink:0"></div>
         <div style="font-size:13px">Intermediate Support: <strong id="esc-sup-txt">—</strong></div>
-        <div style="margin-left:auto;font-size:11px;color:var(--text-soft);font-family:'Roboto Mono',monospace" id="esc-sup-meta"></div>
       </div>
       <div class="card" style="padding:10px;margin-bottom:12px"><div id="esc-svg-host"></div></div>
       <div id="esc-alerts"></div>
@@ -3103,7 +3102,6 @@ function resetHeForm(){
       document.getElementById('esc-tg').textContent='—';
       document.getElementById('esc-pit').textContent='—';
       document.getElementById('esc-sup-txt').textContent='—';
-      document.getElementById('esc-sup-meta').textContent='';
       document.getElementById('esc-alerts').innerHTML=escAlert('err','Enter a rise value');
       document.getElementById('esc-svg-host').innerHTML='';
       return;
@@ -3158,7 +3156,6 @@ function resetHeForm(){
     var dot=document.getElementById('esc-sup-dot');
     var supCard=document.getElementById('esc-sup-card');
     document.getElementById('esc-sup-txt').textContent=req?'Required':'Not required';
-    document.getElementById('esc-sup-meta').textContent='TG '+nf(tg)+' / limit '+nf(th);
     if(dot) dot.style.background=req?'#92400e':'#0f7556';
     if(supCard) supCard.style.background=req?'var(--amber-bg)':'#f0fdf8';
 
