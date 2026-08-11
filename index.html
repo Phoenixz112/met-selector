@@ -2728,7 +2728,7 @@ function showHeResult(){
   // exists for this exact model, filling in the real calculated values by element ID.
   // Falls back to the auto-generated diagram if no template has been made yet.
   loadHeShaftPlan(row);
-  document.getElementById('he-svg-side').innerHTML=svgHeSide(row,oh,pit,ceiling,entH,row.max_travel);
+  document.getElementById('he-svg-side').innerHTML=heComingSoonHTML;
 
   if(row.note){
     document.getElementById('he-note').textContent='ℹ '+row.note;
@@ -2762,6 +2762,7 @@ function heTemplateValueMap(row){
   };
 }
 const heShaftTemplateCache={}; // code -> svg text | null (null = confirmed no template)
+const heComingSoonHTML=`<div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Diagram under development — coming soon</div>`;
 async function loadHeShaftPlan(row){
   const host=document.getElementById('he-svg-top');
   const code=row.code;
@@ -2772,7 +2773,7 @@ async function loadHeShaftPlan(row){
       svgText = res.ok ? await res.text() : null;
       heShaftTemplateCache[code]=svgText;
     }
-    if(svgText===null){ host.innerHTML=svgHeTop(row); return; }
+    if(svgText===null){ host.innerHTML=heComingSoonHTML; return; }
 
     host.innerHTML=svgText;
     const svgEl=host.querySelector('svg');
@@ -2783,8 +2784,8 @@ async function loadHeShaftPlan(row){
       if(el && val!=null) el.textContent=val;
     });
   }catch(e){
-    console.warn('HE shaft template load failed for',code,'— using auto-generated diagram.',e.message);
-    host.innerHTML=svgHeTop(row);
+    console.warn('HE shaft template load failed for',code,'— showing placeholder.',e.message);
+    host.innerHTML=heComingSoonHTML;
   }
 }
 
