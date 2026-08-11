@@ -2993,6 +2993,12 @@ function resetHeForm(){
   window.showEscResult=function(){
     const rVal=parseFloat(document.getElementById('esc-rise')?.value);
     if(isNaN(rVal)){ alert('Please enter Rise (H) value.'); return; }
+    const sp=escSpan();
+    const rg=escFindRange(rVal);
+    if(!rg){
+      alert('Rise '+nf(rVal)+' mm is out of range — must be '+nf(sp.min)+'–'+nf(sp.max)+' mm.\nPlease adjust the Rise value before continuing.');
+      return;
+    }
     escCalc();
     document.getElementById('esc-input').style.display='none';
     document.getElementById('esc-output').style.display='';
@@ -3119,12 +3125,17 @@ function resetHeForm(){
     var note='';
     flatBtns.forEach(b=>{
       var f=b.getAttribute('data-flat');
-      var ok=!!rg.flats[f];
+      // 35° escalators never offer 4 flat step, regardless of what the sheet data says
+      var ok=!!rg.flats[f] && !(dVal==='35' && f==='4');
       b.disabled=!ok;
       b.classList.toggle('active',ok&&f===escFlat);
     });
-    if(!rg.flats[escFlat]){
-      var avail=Object.keys(rg.flats);
+    if(dVal==='35' && escFlat==='4'){
+      escFlat='3';
+      note='4 flat step is not available for 35° — switched to 3';
+    }
+    if(!rg.flats[escFlat] || (dVal==='35' && escFlat==='4')){
+      var avail=Object.keys(rg.flats).filter(f=>!(dVal==='35'&&f==='4'));
       var old=escFlat; escFlat=avail[0];
       note='Flat step '+old+' not available for this rise — switched to '+escFlat;
       flatBtns.forEach(b=>{b.classList.toggle('active',b.getAttribute('data-flat')===escFlat);});
