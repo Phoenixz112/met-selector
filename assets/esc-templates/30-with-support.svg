@@ -709,7 +709,7 @@
 <g clip-path="url(#clip_4)">
 </g>
 
-<g id="value-overlays" font-family="monospace" font-weight="700" fill="#C8102E">
+<g id="value-overlays" font-family="monospace" font-weight="700" fill="#1a1a1a">
   <text id="val-b2b" x="705" y="140" text-anchor="middle" font-size="10">0000 mm</text>
   <text id="val-tg" x="1150" y="400" text-anchor="middle" font-size="10" transform="rotate(-90 1150 400)">0000 mm</text>
   <text id="val-pit" x="50" y="600" text-anchor="middle" font-size="10" transform="rotate(-90 50 600)">0000 mm</text>
