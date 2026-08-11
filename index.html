@@ -3063,11 +3063,11 @@ function resetHeForm(){
       const svgEl=host.querySelector('svg');
       if(svgEl) svgEl.style.width='100%';
       const val=host.querySelector('#val-b2b');
-      if(val) val.textContent=nf(b2b)+' mm';
+      if(val) val.textContent=nf(b2b);
       const valTg=host.querySelector('#val-tg');
-      if(valTg) valTg.textContent=nf(tg)+' mm';
+      if(valTg) valTg.textContent=nf(r);
       const valPit=host.querySelector('#val-pit');
-      if(valPit) valPit.textContent=nf(pitDepth)+' mm';
+      if(valPit) valPit.textContent=nf(pitDepth);
     }catch(e){
       console.warn('Escalator template load failed for',key,e.message);
       host.innerHTML=`<div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Diagram under development — coming soon (${key})</div>`;
