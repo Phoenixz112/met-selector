@@ -2924,10 +2924,15 @@ async function loadPassElevationPlan(row,vt,tr){
     host.innerHTML=svgText;
     const svgEl=host.querySelector('svg');
     if(svgEl) svgEl.style.width='100%';
+    const travelMm = tr?Math.round(tr*1000):0;
+    const ohVal = vt?Number(vt.oh)||0:0;
+    const pitVal = vt?Number(vt.pit)||0:0;
+    const totalHeight = pitVal+ohVal+travelMm;
     const values={
       'val-oh': vt?vt.oh:null,
       'val-pit': vt?vt.pit:null,
-      'val-travel': tr?Math.round(tr*1000):null,
+      'val-travel': tr?travelMm:null,
+      'val-total': (vt&&tr)?totalHeight.toLocaleString():null,
     };
     Object.entries(values).forEach(([id,val])=>{
       const el=host.querySelector('#'+CSS.escape(id));
