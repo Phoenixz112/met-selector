@@ -1870,9 +1870,9 @@
 </g>
 
 <g id="value-overlays" font-family="monospace" font-weight="700" fill="#1a1a1a">
-  <text id="val-oh" x="210" y="310" text-anchor="middle" font-size="12" transform="rotate(-90 210 310)">0</text>
-  <text id="val-total" x="150" y="505" text-anchor="middle" font-size="12" transform="rotate(-90 150 505)">0</text>
-  <text id="val-travel" x="210" y="717" text-anchor="middle" font-size="12" transform="rotate(-90 210 717)">0</text>
-  <text id="val-pit" x="210" y="1020" text-anchor="middle" font-size="12" transform="rotate(-90 210 1020)">0</text>
+  <text id="val-oh" x="210" y="310" text-anchor="middle" font-size="14" transform="rotate(-90 210 310)">0</text>
+  <text id="val-total" x="150" y="505" text-anchor="middle" font-size="14" transform="rotate(-90 150 505)">0</text>
+  <text id="val-travel" x="210" y="717" text-anchor="middle" font-size="14" transform="rotate(-90 210 717)">0</text>
+  <text id="val-pit" x="210" y="1020" text-anchor="middle" font-size="14" transform="rotate(-90 210 1020)">0</text>
 </g>
 </svg>
