@@ -2723,11 +2723,18 @@ function showHeResult(){
     pitOpt?['(E) Min. Pit (With Isolation Unit)',pitOpt,'mm']:null,
   ].filter(Boolean));
 
-  // Drawings — prefer a hand-made template (assets/he-shaft-templates/{code}.svg) if one
-  // exists for this exact model, filling in the real calculated values by element ID.
-  // Falls back to the auto-generated diagram if no template has been made yet.
+  // Drawings — prefer hand-made templates (keyed by Door+Gate for Shaft, Gate for Elevation)
+  // if one exists for this configuration, filling in the real calculated values by element ID.
+  // Falls back to a placeholder if no matching template has been made yet.
   loadHeShaftPlan(row);
-  document.getElementById('he-svg-side').innerHTML=diagramComingSoonHTML;
+  loadHeElevationPlan(row, {
+    'val-ceiling': ceiling,
+    'val-enth': entH,
+    'val-oh': oh,
+    'val-travel': row.max_travel?.toLocaleString(),
+    'val-pit': pit,
+    'val-pit-opt': pitOpt,
+  });
 
   if(row.note){
     document.getElementById('he-note').textContent='ℹ '+row.note;
@@ -2749,6 +2756,18 @@ function goHeEdit(){
 
 // Template SVG values map — each key is an element ID the template file may contain.
 // Any ID present in the template gets its textContent set to the matching value.
+// Shaft Plan templates: keyed by Door + Gate combination (3 files planned)
+//   assets/he-shaft-templates/co-1gate.svg    (CO door, 1 gate)
+//   assets/he-shaft-templates/2co-1gate.svg   (2CO door, 1 gate)
+//   assets/he-shaft-templates/2co-2gate.svg   (2CO door, 2 gate)
+function heShaftTemplateKey(row){
+  const door=(row.door||'').toUpperCase();
+  const gate=row.gate;
+  if(door==='CO'&&gate===1) return 'co-1gate';
+  if(door==='2CO'&&gate===1) return '2co-1gate';
+  if(door==='2CO'&&gate===2) return '2co-2gate';
+  return null;
+}
 function heTemplateValueMap(row){
   return {
     'val-ah': row.ah,
@@ -2760,16 +2779,17 @@ function heTemplateValueMap(row){
     'val-entrance': row.entrance,
   };
 }
-const heShaftTemplateCache={}; // code -> svg text | null (null = confirmed no template)
+const heShaftTemplateCache={}; // key -> svg text | null (null = confirmed no template)
 async function loadHeShaftPlan(row){
   const host=document.getElementById('he-svg-top');
-  const code=row.code;
+  const key=heShaftTemplateKey(row);
+  if(!key){ host.innerHTML=diagramComingSoonHTML; return; }
   try{
-    let svgText=heShaftTemplateCache[code];
+    let svgText=heShaftTemplateCache[key];
     if(svgText===undefined){
-      const res=await fetch(`assets/he-shaft-templates/${code}.svg`);
+      const res=await fetch(`assets/he-shaft-templates/${key}.svg`);
       svgText = res.ok ? await res.text() : null;
-      heShaftTemplateCache[code]=svgText;
+      heShaftTemplateCache[key]=svgText;
     }
     if(svgText===null){ host.innerHTML=diagramComingSoonHTML; return; }
 
@@ -2782,7 +2802,42 @@ async function loadHeShaftPlan(row){
       if(el && val!=null) el.textContent=val;
     });
   }catch(e){
-    console.warn('HE shaft template load failed for',code,'— showing placeholder.',e.message);
+    console.warn('HE shaft template load failed for',key,'— showing placeholder.',e.message);
+    host.innerHTML=diagramComingSoonHTML;
+  }
+}
+
+// Elevation Plan templates: keyed by Gate count only (2 files planned)
+//   assets/he-elevation-templates/1gate.svg
+//   assets/he-elevation-templates/2gate.svg
+function heElevationTemplateKey(row){
+  if(row.gate===1) return '1gate';
+  if(row.gate===2) return '2gate';
+  return null;
+}
+const heElevationTemplateCache={};
+async function loadHeElevationPlan(row, evalues){
+  const host=document.getElementById('he-svg-side');
+  const key=heElevationTemplateKey(row);
+  if(!key){ host.innerHTML=diagramComingSoonHTML; return; }
+  try{
+    let svgText=heElevationTemplateCache[key];
+    if(svgText===undefined){
+      const res=await fetch(`assets/he-elevation-templates/${key}.svg`);
+      svgText = res.ok ? await res.text() : null;
+      heElevationTemplateCache[key]=svgText;
+    }
+    if(svgText===null){ host.innerHTML=diagramComingSoonHTML; return; }
+
+    host.innerHTML=svgText;
+    const svgEl=host.querySelector('svg');
+    if(svgEl) svgEl.style.width='100%';
+    Object.entries(evalues).forEach(([id,val])=>{
+      const el=host.querySelector('#'+CSS.escape(id));
+      if(el && val!=null) el.textContent=val;
+    });
+  }catch(e){
+    console.warn('HE elevation template load failed for',key,'— showing placeholder.',e.message);
     host.innerHTML=diagramComingSoonHTML;
   }
 }
