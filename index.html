@@ -2727,13 +2727,12 @@ function showHeResult(){
   // if one exists for this configuration, filling in the real calculated values by element ID.
   // Falls back to a placeholder if no matching template has been made yet.
   loadHeShaftPlan(row);
+  const totalHeight = (Number(pit)||0) + (Number(oh)||0) + (Number(row.max_travel)||0);
   loadHeElevationPlan(row, {
-    'val-ceiling': ceiling,
-    'val-enth': entH,
     'val-oh': oh,
     'val-travel': row.max_travel?.toLocaleString(),
     'val-pit': pit,
-    'val-pit-opt': pitOpt,
+    'val-total': totalHeight.toLocaleString(),
   });
 
   if(row.note){
