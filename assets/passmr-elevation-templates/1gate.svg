@@ -593,4 +593,4 @@
   <text id="val-travel" x="290" y="742.1" text-anchor="middle" font-size="12" transform="rotate(-90 290 742.1)">0</text>
   <text id="val-pit" x="290" y="1100" text-anchor="middle" font-size="12" transform="rotate(-90 290 1100)">0</text>
 </g>
-<text x="827.0" y="20" text-anchor="end" font-family="monospace" font-size="13" font-weight="700" fill="#1a1a1a">UNIT: mm</text></svg>
+<text x="827.0" y="20" text-anchor="end" font-family="monospace" font-size="16" font-weight="700" fill="#1a1a1a">UNIT: mm</text></svg>
