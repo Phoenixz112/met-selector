@@ -1880,6 +1880,9 @@ function showModelResult(){
   }else if(ST.passType==='bed'){
     loadPassBedShaftPlan(row,ah,bh,gate,door,cwt);
     loadPassBedElevationPlan(row,vt,tr);
+  }else if(ST.passType==='mr'){
+    loadPassMrShaftPlan(row,ah,bh,gate,door,cwt);
+    loadPassMrElevationPlan(row,vt,tr);
   }else{
     document.getElementById('svg-top').innerHTML=diagramComingSoonHTML;
     document.getElementById('svg-side').innerHTML=diagramComingSoonHTML;
@@ -3040,6 +3043,102 @@ async function loadPassBedElevationPlan(row,vt,tr){
     });
   }catch(e){
     console.warn('Passenger Bed elevation template load failed for',key,'— showing placeholder.',e.message);
+    host.innerHTML=diagramComingSoonHTML;
+  }
+}
+
+// ============================================================
+// PASSENGER (Machine Room) — Shaft Plan (3 files) + Elevation Plan (1 file)
+//   assets/passmr-shaft-templates/1gate-co-rear.svg
+//   assets/passmr-shaft-templates/1gate-co-side.svg
+//   assets/passmr-shaft-templates/1gate-2s-side.svg
+//   assets/passmr-elevation-templates/1gate.svg
+// Only active when the selected type is Machine Room (ST.passType==='mr')
+function passMrShaftTemplateKey(gate,door,cwt){
+  if(ST.passType!=='mr') return null;
+  const g=parseInt(gate);
+  const d=(door||'').toUpperCase();
+  const c=cwt||'Side';
+  if(g===1&&d==='CO'&&c==='Rear') return '1gate-co-rear';
+  if(g===1&&d==='CO'&&c==='Side') return '1gate-co-side';
+  if(g===1&&d==='2S'&&c==='Side') return '1gate-2s-side';
+  return null;
+}
+const passMrShaftTemplateCache={};
+async function loadPassMrShaftPlan(row,ah,bh,gate,door,cwt){
+  const host=document.getElementById('svg-top');
+  const key=passMrShaftTemplateKey(gate,door,cwt);
+  if(!key){ host.innerHTML=diagramComingSoonHTML; return; }
+  try{
+    let svgText=passMrShaftTemplateCache[key];
+    if(svgText===undefined){
+      const res=await fetch(`assets/passmr-shaft-templates/${key}.svg`);
+      svgText = res.ok ? await res.text() : null;
+      passMrShaftTemplateCache[key]=svgText;
+    }
+    if(svgText===null){ host.innerHTML=diagramComingSoonHTML; return; }
+
+    host.innerHTML=svgText;
+    const svgEl=host.querySelector('svg');
+    if(svgEl) svgEl.style.width='100%';
+    const values={
+      'val-ah': ah,
+      'val-bh': bh,
+      'val-car': `${row.car_aa}×${row.car_bb}`,
+      'val-car-aa': row.car_aa,
+      'val-car-bb': row.car_bb,
+      'val-jj': row.entrance,
+    };
+    Object.entries(values).forEach(([id,val])=>{
+      const el=host.querySelector('#'+CSS.escape(id));
+      if(el && val!=null) el.textContent=val;
+    });
+  }catch(e){
+    console.warn('Passenger MR shaft template load failed for',key,'— showing placeholder.',e.message);
+    host.innerHTML=diagramComingSoonHTML;
+  }
+}
+
+function passMrElevationTemplateKey(gate){
+  if(ST.passType!=='mr') return null;
+  if(parseInt(gate)===1) return '1gate';
+  return null;
+}
+const passMrElevationTemplateCache={};
+async function loadPassMrElevationPlan(row,vt,tr){
+  const host=document.getElementById('svg-side');
+  const gate=document.getElementById('m-gate')?.value||'1';
+  const key=passMrElevationTemplateKey(gate);
+  if(!key){ host.innerHTML=diagramComingSoonHTML; return; }
+  try{
+    let svgText=passMrElevationTemplateCache[key];
+    if(svgText===undefined){
+      const res=await fetch(`assets/passmr-elevation-templates/${key}.svg`);
+      svgText = res.ok ? await res.text() : null;
+      passMrElevationTemplateCache[key]=svgText;
+    }
+    if(svgText===null){ host.innerHTML=diagramComingSoonHTML; return; }
+
+    host.innerHTML=svgText;
+    const svgEl=host.querySelector('svg');
+    if(svgEl) svgEl.style.width='100%';
+    const travelMm = tr?Math.round(tr*1000):0;
+    const ohVal = vt?Number(vt.oh)||0:0;
+    const pitVal = vt?Number(vt.pit)||0:0;
+    const totalHeight = pitVal+ohVal+travelMm;
+    const values={
+      'val-oh': vt?vt.oh:null,
+      'val-pit': vt?vt.pit:null,
+      'val-travel': tr?travelMm:null,
+      'val-total': (vt&&tr)?totalHeight.toLocaleString():null,
+      'val-hm': vt?vt.hm:null,
+    };
+    Object.entries(values).forEach(([id,val])=>{
+      const el=host.querySelector('#'+CSS.escape(id));
+      if(el && val!=null) el.textContent=val;
+    });
+  }catch(e){
+    console.warn('Passenger MR elevation template load failed for',key,'— showing placeholder.',e.message);
     host.innerHTML=diagramComingSoonHTML;
   }
 }
