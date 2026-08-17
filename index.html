@@ -3032,6 +3032,7 @@ async function loadPassBedElevationPlan(row,vt,tr){
       'val-pit': vt?vt.pit:null,
       'val-travel': tr?travelMm:null,
       'val-total': (vt&&tr)?totalHeight.toLocaleString():null,
+      'val-hm': vt?vt.hm:null,
     };
     Object.entries(values).forEach(([id,val])=>{
       const el=host.querySelector('#'+CSS.escape(id));
