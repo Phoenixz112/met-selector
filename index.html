@@ -1874,8 +1874,16 @@ function showModelResult(){
   ].filter(Boolean));
 
   document.getElementById('r-tol').innerHTML=renderTolBox(ah,bh,tr,gate);
-  loadPassShaftPlan(row,ah,bh,gate,door,cwt);
-  loadPassElevationPlan(row,vt,tr);
+  if(ST.passType==='mrl'){
+    loadPassShaftPlan(row,ah,bh,gate,door,cwt);
+    loadPassElevationPlan(row,vt,tr);
+  }else if(ST.passType==='bed'){
+    loadPassBedShaftPlan(row,ah,bh,gate,door,cwt);
+    loadPassBedElevationPlan(row,vt,tr);
+  }else{
+    document.getElementById('svg-top').innerHTML=diagramComingSoonHTML;
+    document.getElementById('svg-side').innerHTML=diagramComingSoonHTML;
+  }
 
   sendLog({mode:'By Model',factory:row.origin,series:ST.series,code,capacity:row.capacity,door,gate,entrance_type:row.entrance_type,speed:spd,travel_m:tr,ah_std:ah,bh_std:bh,tolerance_mm:getTolerance(tr,gate).side});
   goMS(3);
@@ -2940,6 +2948,97 @@ async function loadPassElevationPlan(row,vt,tr){
     });
   }catch(e){
     console.warn('Passenger elevation template load failed for',key,'— showing placeholder.',e.message);
+    host.innerHTML=diagramComingSoonHTML;
+  }
+}
+
+// ============================================================
+// PASSENGER (MR-BED) — Shaft Plan (1 file) + Elevation Plan (1 file)
+//   assets/passbed-shaft-templates/1gate-2s-side.svg
+//   assets/passbed-elevation-templates/1gate.svg
+// Only active when the selected type is Bed Elevator (ST.passType==='bed')
+function passBedShaftTemplateKey(gate,door,cwt){
+  if(ST.passType!=='bed') return null;
+  const g=parseInt(gate);
+  const d=(door||'').toUpperCase();
+  const c=cwt||'Side';
+  if(g===1&&d==='2S'&&c==='Side') return '1gate-2s-side';
+  return null;
+}
+const passBedShaftTemplateCache={};
+async function loadPassBedShaftPlan(row,ah,bh,gate,door,cwt){
+  const host=document.getElementById('svg-top');
+  const key=passBedShaftTemplateKey(gate,door,cwt);
+  if(!key){ host.innerHTML=diagramComingSoonHTML; return; }
+  try{
+    let svgText=passBedShaftTemplateCache[key];
+    if(svgText===undefined){
+      const res=await fetch(`assets/passbed-shaft-templates/${key}.svg`);
+      svgText = res.ok ? await res.text() : null;
+      passBedShaftTemplateCache[key]=svgText;
+    }
+    if(svgText===null){ host.innerHTML=diagramComingSoonHTML; return; }
+
+    host.innerHTML=svgText;
+    const svgEl=host.querySelector('svg');
+    if(svgEl) svgEl.style.width='100%';
+    const values={
+      'val-ah': ah,
+      'val-bh': bh,
+      'val-car': `${row.car_aa}×${row.car_bb}`,
+      'val-car-aa': row.car_aa,
+      'val-car-bb': row.car_bb,
+      'val-jj': row.entrance,
+    };
+    Object.entries(values).forEach(([id,val])=>{
+      const el=host.querySelector('#'+CSS.escape(id));
+      if(el && val!=null) el.textContent=val;
+    });
+  }catch(e){
+    console.warn('Passenger Bed shaft template load failed for',key,'— showing placeholder.',e.message);
+    host.innerHTML=diagramComingSoonHTML;
+  }
+}
+
+function passBedElevationTemplateKey(gate){
+  if(ST.passType!=='bed') return null;
+  if(parseInt(gate)===1) return '1gate';
+  return null;
+}
+const passBedElevationTemplateCache={};
+async function loadPassBedElevationPlan(row,vt,tr){
+  const host=document.getElementById('svg-side');
+  const gate=document.getElementById('m-gate')?.value||'1';
+  const key=passBedElevationTemplateKey(gate);
+  if(!key){ host.innerHTML=diagramComingSoonHTML; return; }
+  try{
+    let svgText=passBedElevationTemplateCache[key];
+    if(svgText===undefined){
+      const res=await fetch(`assets/passbed-elevation-templates/${key}.svg`);
+      svgText = res.ok ? await res.text() : null;
+      passBedElevationTemplateCache[key]=svgText;
+    }
+    if(svgText===null){ host.innerHTML=diagramComingSoonHTML; return; }
+
+    host.innerHTML=svgText;
+    const svgEl=host.querySelector('svg');
+    if(svgEl) svgEl.style.width='100%';
+    const travelMm = tr?Math.round(tr*1000):0;
+    const ohVal = vt?Number(vt.oh)||0:0;
+    const pitVal = vt?Number(vt.pit)||0:0;
+    const totalHeight = pitVal+ohVal+travelMm;
+    const values={
+      'val-oh': vt?vt.oh:null,
+      'val-pit': vt?vt.pit:null,
+      'val-travel': tr?travelMm:null,
+      'val-total': (vt&&tr)?totalHeight.toLocaleString():null,
+    };
+    Object.entries(values).forEach(([id,val])=>{
+      const el=host.querySelector('#'+CSS.escape(id));
+      if(el && val!=null) el.textContent=val;
+    });
+  }catch(e){
+    console.warn('Passenger Bed elevation template load failed for',key,'— showing placeholder.',e.message);
     host.innerHTML=diagramComingSoonHTML;
   }
 }
