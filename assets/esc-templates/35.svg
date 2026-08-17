@@ -459,4 +459,4 @@
   <text id="val-tg" x="1121.9" y="445.0" text-anchor="middle" font-size="10" transform="rotate(-90 1121.9 445.0)">0000</text>
   <text id="val-pit" x="87.0" y="661.1" text-anchor="middle" font-size="10" transform="rotate(-90 87.0 661.1)">0000</text>
 </g>
-</svg>
+<text x="1176.0" y="20" text-anchor="end" font-family="monospace" font-size="13" font-weight="700" fill="#1a1a1a">UNIT: mm</text></svg>
