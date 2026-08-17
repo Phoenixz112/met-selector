@@ -12618,4 +12618,4 @@
   <text id="val-travel" x="280" y="705" text-anchor="middle" font-size="12" transform="rotate(-90 280 705)">0</text>
   <text id="val-pit" x="280" y="1065" text-anchor="middle" font-size="12" transform="rotate(-90 280 1065)">0</text>
 </g>
-</svg>
+<text x="827.0" y="20" text-anchor="end" font-family="monospace" font-size="13" font-weight="700" fill="#1a1a1a">UNIT: mm</text></svg>
