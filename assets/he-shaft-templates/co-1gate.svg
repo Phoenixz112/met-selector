@@ -460,4 +460,4 @@
   <text id="val-car-bb" x="934" y="346" text-anchor="middle" font-size="20" transform="rotate(-90 934 346)">0</text>
   <text id="val-bh" x="1030" y="285" text-anchor="middle" font-size="20" transform="rotate(-90 1030 285)">0</text>
 </g>
-</svg>
+<text x="1176.0" y="20" text-anchor="end" font-family="monospace" font-size="13" font-weight="700" fill="#1a1a1a">UNIT: mm</text></svg>
