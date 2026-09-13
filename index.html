@@ -2026,15 +2026,15 @@ function searchShaft(){
         <span class="tag-best">Best Fit</span>
       </div>
       <div class="match-dims">
-        Capacity: <span>${best.capacity} kg (${best.persons}P)</span> &nbsp;·&nbsp;
+        Capacity: <span>${fmt(best.capacity)} kg (${best.persons}P)</span> &nbsp;·&nbsp;
         Speed: <span>${fmtSpd(best,spd)} m/s</span> &nbsp;·&nbsp;
         Door: <span>${best.door}</span> &nbsp;·&nbsp;
         Gate: <span>${best.gate}</span> &nbsp;·&nbsp;
         ${best.cwt?`CWT: <span>${best.cwt}</span> &nbsp;·&nbsp;`:''} 
         Fireproof Door: <span>${best.fireproof==='yes'?'Yes':'No'}</span><br>
-        Car: <span>${best.car_aa}×${best.car_bb}</span> mm &nbsp;·&nbsp;
-        Entrance: <span>${best.entrance}</span> mm (${best.entrance_type})<br>
-        Min. Shaft: <span>${best._ah}×${best._bh}</span> mm
+        Car: <span>${fmt(best.car_aa)}×${fmt(best.car_bb)}</span> mm &nbsp;·&nbsp;
+        Entrance: <span>${fmt(best.entrance)}</span> mm (${best.entrance_type})<br>
+        Min. Shaft: <span>${fmt(best._ah)}×${fmt(best._bh)}</span> mm
         ${best.am?` &nbsp;·&nbsp; M/R: <span>${best.am}×${best.bm}</span> mm`:''}<br>
         ${getOHDisplay(best)}
       </div>
@@ -2056,8 +2056,8 @@ function searchShaft(){
         <div class="accordion-body">
           <div class="match-dims">
             Speed: <span>${fmtSpd(r,spd)} m/s</span> &nbsp;·&nbsp;
-            Car: <span>${r.car_aa}×${r.car_bb}</span> mm &nbsp;·&nbsp; Entrance: <span>${r.entrance}</span> mm (${r.entrance_type}) &nbsp;·&nbsp; Fireproof Door: <span>${r.fireproof==='yes'?'Yes':'No'}</span><br>
-            Min. Shaft: <span>${r._ah}×${r._bh}</span> mm${r.am?` &nbsp;·&nbsp; M/R: <span>${r.am}×${r.bm}</span> mm`:''}<br>
+            Car: <span>${fmt(r.car_aa)}×${fmt(r.car_bb)}</span> mm &nbsp;·&nbsp; Entrance: <span>${fmt(r.entrance)}</span> mm (${r.entrance_type}) &nbsp;·&nbsp; Fireproof Door: <span>${r.fireproof==='yes'?'Yes':'No'}</span><br>
+            Min. Shaft: <span>${fmt(r._ah)}×${fmt(r._bh)}</span> mm${r.am?` &nbsp;·&nbsp; M/R: <span>${fmt(r.am)}×${fmt(r.bm)}</span> mm`:''}<br>
             ${getOHDisplay(r)}
           </div>
           ${renderTolBox(r._ah,r._bh,tr,r.gate)}
@@ -2400,6 +2400,10 @@ function resetEsc(){
 // ============================================================
 // TABLES
 // ============================================================
+function fmt(n){
+  const num = typeof n==='number' ? n : (n!=null && n!=='' && !isNaN(+n) ? +n : NaN);
+  return isFinite(num) ? num.toLocaleString() : n;
+}
 function tbl(id,rows){
   const t=document.getElementById(id);if(!t)return;t.innerHTML='';
   rows.forEach(([l,v,u])=>{
@@ -2555,16 +2559,16 @@ function searchHeShaft(){
         <span class="tag-best">Best Fit</span>
       </div>
       <div class="match-dims">
-        Capacity: <span>${best.capacity} kg (${best.persons}P)</span> &nbsp;·&nbsp;
+        Capacity: <span>${fmt(best.capacity)} kg (${best.persons}P)</span> &nbsp;·&nbsp;
         Door: <span>${best.door}</span> &nbsp;·&nbsp;
         Gate: <span>${best.gate}</span><br>
         Rated Speed: <span>Up 20m/min · Down 30m/min</span> &nbsp;·&nbsp;
-        Max. Travel: <span>${best.max_travel}</span> m<br>
-        Car: <span>${best.car_aa}×${best.car_bb}</span> mm &nbsp;·&nbsp;
-        Entrance: <span>${best.entrance}</span> mm<br>
-        Min. Shaft: <span>${best.ah}×${best.bh}</span> mm &nbsp;·&nbsp;
-        OH: <span>${best.oh_std}</span> mm &nbsp;·&nbsp;
-        Pit: <span>${best.pit_std}</span> mm
+        Max. Travel: <span>${fmt(best.max_travel)}</span> m<br>
+        Car: <span>${fmt(best.car_aa)}×${fmt(best.car_bb)}</span> mm &nbsp;·&nbsp;
+        Entrance: <span>${fmt(best.entrance)}</span> mm<br>
+        Min. Shaft: <span>${fmt(best.ah)}×${fmt(best.bh)}</span> mm &nbsp;·&nbsp;
+        OH: <span>${fmt(best.oh_std)}</span> mm &nbsp;·&nbsp;
+        Pit: <span>${fmt(best.pit_std)}</span> mm
         ${best.note?`<br><span style="color:#b45309">ℹ ${best.note}</span>`:''}
       </div>
       <button class="btn-export no-print" onclick="exportHeShaftMatch(0)" style="margin-top:10px">
@@ -2581,10 +2585,10 @@ function searchHeShaft(){
         </div>
         <div class="accordion-body">
           <div class="match-dims">
-            Rated Speed: <span>Up 20m/min · Down 30m/min</span> &nbsp;·&nbsp; Max. Travel: <span>${r.max_travel}</span> m<br>
-            Car: <span>${r.car_aa}×${r.car_bb}</span> mm &nbsp;·&nbsp; Entrance: <span>${r.entrance}</span> mm<br>
-            Min. Shaft: <span>${r.ah}×${r.bh}</span> mm &nbsp;·&nbsp;
-            OH: <span>${r.oh_std}</span> mm &nbsp;·&nbsp; Pit: <span>${r.pit_std}</span> mm
+            Rated Speed: <span>Up 20m/min · Down 30m/min</span> &nbsp;·&nbsp; Max. Travel: <span>${fmt(r.max_travel)}</span> m<br>
+            Car: <span>${fmt(r.car_aa)}×${fmt(r.car_bb)}</span> mm &nbsp;·&nbsp; Entrance: <span>${fmt(r.entrance)}</span> mm<br>
+            Min. Shaft: <span>${fmt(r.ah)}×${fmt(r.bh)}</span> mm &nbsp;·&nbsp;
+            OH: <span>${fmt(r.oh_std)}</span> mm &nbsp;·&nbsp; Pit: <span>${fmt(r.pit_std)}</span> mm
             ${r.note?`<br><span style="color:#b45309">ℹ ${r.note}</span>`:''}
           </div>
           <button class="btn-export no-print" onclick="exportHeShaftMatch(${idx+1})" style="margin-top:10px">
@@ -2852,9 +2856,9 @@ function renderHeResultFromRow(row,{ceiling,oh,pit,pitOpt,entH,tr,isOpt}){
   loadHeShaftPlan(row);
   const totalHeight = (Number(pit)||0) + (Number(oh)||0) + (Number(travelMmHe)||0);
   loadHeElevationPlan(row, {
-    'val-oh': oh,
+    'val-oh': fmt(oh),
     'val-travel': travelMmHe?.toLocaleString(),
-    'val-pit': pit,
+    'val-pit': fmt(pit),
     'val-total': totalHeight.toLocaleString(),
   });
 
@@ -2887,13 +2891,13 @@ function heShaftTemplateKey(row){
 }
 function heTemplateValueMap(row){
   return {
-    'val-ah': row.ah,
-    'val-bh': row.bh,
-    'val-car': `${row.car_aa}×${row.car_bb}`,
-    'val-car-aa': row.car_aa,
-    'val-car-bb': row.car_bb,
-    'val-jj': row.entrance,
-    'val-entrance': row.entrance,
+    'val-ah': fmt(row.ah),
+    'val-bh': fmt(row.bh),
+    'val-car': `${fmt(row.car_aa)}×${fmt(row.car_bb)}`,
+    'val-car-aa': fmt(row.car_aa),
+    'val-car-bb': fmt(row.car_bb),
+    'val-jj': fmt(row.entrance),
+    'val-entrance': fmt(row.entrance),
   };
 }
 const heShaftTemplateCache={}; // key -> svg text | null (null = confirmed no template)
@@ -3000,12 +3004,12 @@ async function loadPassShaftPlan(row,ah,bh,gate,door,cwt){
     const svgEl=host.querySelector('svg');
     if(svgEl) svgEl.style.width='100%';
     const values={
-      'val-ah': ah,
-      'val-bh': bh,
-      'val-car': `${row.car_aa}×${row.car_bb}`,
-      'val-car-aa': row.car_aa,
-      'val-car-bb': row.car_bb,
-      'val-jj': row.entrance,
+      'val-ah': fmt(ah),
+      'val-bh': fmt(bh),
+      'val-car': `${fmt(row.car_aa)}×${fmt(row.car_bb)}`,
+      'val-car-aa': fmt(row.car_aa),
+      'val-car-bb': fmt(row.car_bb),
+      'val-jj': fmt(row.entrance),
     };
     Object.entries(values).forEach(([id,val])=>{
       const el=host.querySelector('#'+CSS.escape(id));
@@ -3047,8 +3051,8 @@ async function loadPassElevationPlan(row,vt,tr){
     const pitVal = vt?Number(vt.pit)||0:0;
     const totalHeight = pitVal+ohVal+travelMm;
     const values={
-      'val-oh': vt?vt.oh:null,
-      'val-pit': vt?vt.pit:null,
+      'val-oh': vt?fmt(vt.oh):null,
+      'val-pit': vt?fmt(vt.pit):null,
       'val-travel': tr?travelMm:null,
       'val-total': (vt&&tr)?totalHeight.toLocaleString():null,
     };
@@ -3093,12 +3097,12 @@ async function loadPassBedShaftPlan(row,ah,bh,gate,door,cwt){
     const svgEl=host.querySelector('svg');
     if(svgEl) svgEl.style.width='100%';
     const values={
-      'val-ah': ah,
-      'val-bh': bh,
-      'val-car': `${row.car_aa}×${row.car_bb}`,
-      'val-car-aa': row.car_aa,
-      'val-car-bb': row.car_bb,
-      'val-jj': row.entrance,
+      'val-ah': fmt(ah),
+      'val-bh': fmt(bh),
+      'val-car': `${fmt(row.car_aa)}×${fmt(row.car_bb)}`,
+      'val-car-aa': fmt(row.car_aa),
+      'val-car-bb': fmt(row.car_bb),
+      'val-jj': fmt(row.entrance),
     };
     Object.entries(values).forEach(([id,val])=>{
       const el=host.querySelector('#'+CSS.escape(id));
@@ -3138,8 +3142,8 @@ async function loadPassBedElevationPlan(row,vt,tr){
     const pitVal = vt?Number(vt.pit)||0:0;
     const totalHeight = pitVal+ohVal+travelMm;
     const values={
-      'val-oh': vt?vt.oh:null,
-      'val-pit': vt?vt.pit:null,
+      'val-oh': vt?fmt(vt.oh):null,
+      'val-pit': vt?fmt(vt.pit):null,
       'val-travel': tr?travelMm:null,
       'val-total': (vt&&tr)?totalHeight.toLocaleString():null,
       'val-hm': vt?vt.hm:null,
@@ -3189,12 +3193,12 @@ async function loadPassMrShaftPlan(row,ah,bh,gate,door,cwt){
     const svgEl=host.querySelector('svg');
     if(svgEl) svgEl.style.width='100%';
     const values={
-      'val-ah': ah,
-      'val-bh': bh,
-      'val-car': `${row.car_aa}×${row.car_bb}`,
-      'val-car-aa': row.car_aa,
-      'val-car-bb': row.car_bb,
-      'val-jj': row.entrance,
+      'val-ah': fmt(ah),
+      'val-bh': fmt(bh),
+      'val-car': `${fmt(row.car_aa)}×${fmt(row.car_bb)}`,
+      'val-car-aa': fmt(row.car_aa),
+      'val-car-bb': fmt(row.car_bb),
+      'val-jj': fmt(row.entrance),
     };
     Object.entries(values).forEach(([id,val])=>{
       const el=host.querySelector('#'+CSS.escape(id));
@@ -3234,8 +3238,8 @@ async function loadPassMrElevationPlan(row,vt,tr){
     const pitVal = vt?Number(vt.pit)||0:0;
     const totalHeight = pitVal+ohVal+travelMm;
     const values={
-      'val-oh': vt?vt.oh:null,
-      'val-pit': vt?vt.pit:null,
+      'val-oh': vt?fmt(vt.oh):null,
+      'val-pit': vt?fmt(vt.pit):null,
       'val-travel': tr?travelMm:null,
       'val-total': (vt&&tr)?totalHeight.toLocaleString():null,
       'val-hm': vt?vt.hm:null,
