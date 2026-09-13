@@ -1093,6 +1093,7 @@ body{
     </div>
     <!-- Results -->
     <div id="esc-results-wrap">
+      <div class="result-sub" id="esc-r-summary" style="margin-bottom:10px">—</div>
       <div class="section-title">Results</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:12px">
         <div class="card" style="padding:14px;text-align:center">
@@ -1120,7 +1121,7 @@ body{
         <div id="esc-sup-dot" style="width:10px;height:10px;border-radius:50%;background:var(--text-soft);flex-shrink:0"></div>
         <div style="font-size:13px">Intermediate Support: <strong id="esc-sup-txt">—</strong></div>
       </div>
-      <div class="card" style="padding:10px;margin-bottom:12px"><div id="esc-svg-host"></div></div>
+      <div class="card" style="padding:10px;margin-bottom:12px"><div class="svg-wrap" id="esc-svg-host"></div></div>
       <div id="esc-alerts"></div>
     </div>
     <button class="btn-export no-print" onclick="doPrint()" style="margin-top:8px">
@@ -3698,6 +3699,8 @@ function resetHeForm(){
     document.getElementById('esc-sw').textContent=nf(meta.step);
     document.getElementById('esc-b2b').textContent=nf(b2b);
     document.getElementById('esc-tg').textContent=nf(tg);
+    const summaryEl=document.getElementById('esc-r-summary');
+    if(summaryEl) summaryEl.textContent=`Model: ${mVal} · Speed: ${sVal} m/s · Rise: ${nf(rVal)} mm · Flat Step: ${escFlat} · ${dVal}° · ${envVal}`;
     document.getElementById('esc-pit').textContent=nf(pitDepth);
 
     // Intermediate support
