@@ -2137,6 +2137,7 @@ async function exportShaftMatch(i){
   // or em3 stays invisible (display:none on its parent) even with its own
   // display set, which is what was causing the blank print output.
   document.getElementById('main-passenger').classList.add('active');
+  document.getElementById('pass-home').style.display='none';
   document.getElementById('pass-mode').style.display='none';
   document.getElementById('pass-model').style.display='';
   document.getElementById('shaft-input').style.display='none';
@@ -2674,8 +2675,12 @@ async function exportHeShaftMatch(i){
   if(!r){ doPrint(); return; }
   // he-result lives inside #he-form, a sibling wrapper of #he-shaft (which holds
   // the shaft-search UI) — both wrappers must be toggled, not just he-result
-  // itself, or it stays invisible (display:none on its parent).
+  // itself, or it stays invisible (display:none on its parent). Also hide
+  // he-home/he-model defensively regardless of how the user navigated here,
+  // in case an earlier visit to "By Model" left #he-model visible.
   document.getElementById('main-home-elev').classList.add('active');
+  document.getElementById('he-home').style.display='none';
+  document.getElementById('he-model').style.display='none';
   document.getElementById('he-shaft').style.display='none';
   document.getElementById('he-form').style.display='';
   document.getElementById('he-shaft-input').style.display='none';
