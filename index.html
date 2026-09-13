@@ -439,7 +439,7 @@ body{
   .drawing-container{padding:6px;max-width:none}
   .dview{display:block!important;margin-bottom:0;break-inside:avoid}
   .svg-wrap{border:none;background:none}
-  .svg-wrap svg{width:100%!important;height:auto!important}
+  .svg-wrap svg{max-width:100%}
   /* Expand any collapsed "Other matches" so their spec details print too */
   .accordion-body{display:block!important}
   .accordion-header span:last-child{display:none!important}
@@ -815,7 +815,7 @@ body{
       </div>
       <div class="alert-info">All dimensions in mm · Source: Mitsubishi Electric Catalog</div>
       <div class="print-only-meta" id="r-print-footer"></div>
-      <button class="btn-export no-print" onclick="window.print()">
+      <button class="btn-export no-print" onclick="doPrint()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
         Print / Export PDF
       </button>
@@ -873,7 +873,7 @@ body{
         <div class="card"><table class="dim-table" id="fr-r-mr"></table></div>
       </div>
       <div class="alert-info">All dimensions in mm · Verify with Mitsubishi technical drawings</div>
-      <button class="btn-export no-print" onclick="window.print()">
+      <button class="btn-export no-print" onclick="doPrint()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
         Print / Export PDF
       </button>
@@ -1006,7 +1006,7 @@ body{
       </div>
       <div class="alert-info">All dimensions in mm · Source: Mitsubishi Electric Catalog (MHE)<br>*¹ When 100mm Higher Car Ceiling Height & Entrance Height (Optional) is applied<br>*² When Double Isolation Unit for Absorbing Vibration and Sound (Optional) is applied</div>
       <div class="print-only-meta" id="he-print-footer"></div>
-      <button class="btn-export no-print" onclick="window.print()">
+      <button class="btn-export no-print" onclick="doPrint()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
         Print / Export PDF
       </button>
@@ -1123,7 +1123,7 @@ body{
       <div class="card" style="padding:10px;margin-bottom:12px"><div id="esc-svg-host"></div></div>
       <div id="esc-alerts"></div>
     </div>
-    <button class="btn-export no-print" onclick="window.print()" style="margin-top:8px">
+    <button class="btn-export no-print" onclick="doPrint()" style="margin-top:8px">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
       Print / Export PDF
     </button>
@@ -1859,6 +1859,41 @@ function showModelResult(){
 // Shared renderer: fills the By-Model result view (title, spec tables, tolerance box,
 // shaft/elevation drawings) from a PH row + the resolved display values. Used by both
 // "By Model" search and the per-match Export from "By Shaft Size".
+// Before printing, explicitly size every visible diagram SVG (in px) so it fits
+// within one printable page. CSS alone (width:100%;height:auto) fails for very
+// tall portrait diagrams (elevation views) — the browser lets them overflow
+// across multiple print pages, splitting the CAD linework away from the text
+// labels instead of keeping the whole diagram on one page.
+function prepareSvgsForPrint(){
+  const maxW = 720, maxH = 930; // px — safe content area for one printed page
+  document.querySelectorAll('.svg-wrap svg').forEach(svg=>{
+    const vb=svg.getAttribute('viewBox');
+    if(!vb) return;
+    const parts=vb.trim().split(/\s+/).map(Number);
+    if(parts.length!==4) return;
+    const [,,vw,vh]=parts;
+    if(!vw||!vh) return;
+    const scale=Math.min(maxW/vw, maxH/vh);
+    svg.style.width=(vw*scale)+'px';
+    svg.style.height=(vh*scale)+'px';
+    svg.style.maxWidth='none';
+    svg.style.display='block';
+    svg.style.margin='0 auto';
+  });
+}
+function doPrint(){
+  prepareSvgsForPrint();
+  window.print();
+  restoreSvgsAfterPrint();
+}
+function restoreSvgsAfterPrint(){
+  document.querySelectorAll('.svg-wrap svg').forEach(svg=>{
+    svg.style.width='100%';
+    svg.style.height='';
+    svg.style.maxWidth='';
+    svg.style.margin='';
+  });
+}
 function printMetaText(title){
   const d=new Date();
   const dateStr=d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
@@ -2106,7 +2141,7 @@ function goShaftEdit(){
 function exportShaftMatch(i){
   const r=(window._shaftMatches||[])[i];
   const ctx=window._shaftSearchCtx||{};
-  if(!r){ window.print(); return; }
+  if(!r){ doPrint(); return; }
   renderModelResultFromRow(r,{
     ah:r._ah, bh:r._bh, tr:ctx.tr, spd:ctx.spd,
     gate:r.gate, door:r.door, cwt:r.cwt, std:r.standard, fp:r.fireproof,
@@ -2119,7 +2154,9 @@ function exportShaftMatch(i){
   document.getElementById('em3').style.display='';
   window.scrollTo({top:0,behavior:'smooth'});
   setTimeout(()=>{
+    prepareSvgsForPrint();
     window.print();
+    restoreSvgsAfterPrint();
     document.getElementById('em3').style.display='none';
     document.getElementById('shaft-results').style.display='';
   }, 150);
@@ -2634,7 +2671,7 @@ function goHeShaftEdit(){
 function exportHeShaftMatch(i){
   const r=(window._heShaftMatches||[])[i];
   const ctx=window._heShaftSearchCtx||{};
-  if(!r){ window.print(); return; }
+  if(!r){ doPrint(); return; }
   renderHeResultFromRow(r,{
     ceiling:r.ceiling_std, oh:r.oh_std, pit:r.pit_std, pitOpt:r.pit_opt,
     entH:r.ent_h_std, tr:ctx.tr, isOpt:false,
@@ -2644,7 +2681,9 @@ function exportHeShaftMatch(i){
   document.getElementById('he-result').style.display='';
   window.scrollTo({top:0,behavior:'smooth'});
   setTimeout(()=>{
+    prepareSvgsForPrint();
     window.print();
+    restoreSvgsAfterPrint();
     document.getElementById('he-result').style.display='none';
     document.getElementById('he-shaft-results').style.display='';
   }, 150);
