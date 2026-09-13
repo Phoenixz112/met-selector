@@ -1865,7 +1865,7 @@ function showModelResult(){
 // across multiple print pages, splitting the CAD linework away from the text
 // labels instead of keeping the whole diagram on one page.
 function prepareSvgsForPrint(){
-  const maxW = 650, maxH = 850; // px — safe content area for one printed page, with margin
+  const maxW = 650, maxH = 750; // px — safe content area for one printed page, leaving room for the footer line below
   document.querySelectorAll('.svg-wrap svg').forEach(svg=>{
     const vb=svg.getAttribute('viewBox');
     if(!vb) return;
