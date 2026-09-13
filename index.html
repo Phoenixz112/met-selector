@@ -1958,7 +1958,7 @@ function printMetaText(title){
   const dateStr=d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
   return `${title} · Exported ${dateStr}`;
 }
-function renderModelResultFromRow(row,{ah,bh,tr,spd,gate,door,cwt,std,fp,vt}){
+async function renderModelResultFromRow(row,{ah,bh,tr,spd,gate,door,cwt,std,fp,vt}){
   const code=row.code;
   const modelTitle=`${seriesDisplayName(row.series)} · ${code}`;
   document.getElementById('r-title').textContent=modelTitle;
@@ -2006,14 +2006,14 @@ function renderModelResultFromRow(row,{ah,bh,tr,spd,gate,door,cwt,std,fp,vt}){
 
   document.getElementById('r-tol').innerHTML=renderTolBox(ah,bh,tr,gate);
   if(ST.passType==='mrl'){
-    loadPassShaftPlan(row,ah,bh,gate,door,cwt);
-    loadPassElevationPlan(row,vt,tr);
+    await loadPassShaftPlan(row,ah,bh,gate,door,cwt);
+    await loadPassElevationPlan(row,vt,tr);
   }else if(ST.passType==='bed'){
-    loadPassBedShaftPlan(row,ah,bh,gate,door,cwt);
-    loadPassBedElevationPlan(row,vt,tr);
+    await loadPassBedShaftPlan(row,ah,bh,gate,door,cwt);
+    await loadPassBedElevationPlan(row,vt,tr);
   }else if(ST.passType==='mr'){
-    loadPassMrShaftPlan(row,ah,bh,gate,door,cwt);
-    loadPassMrElevationPlan(row,vt,tr);
+    await loadPassMrShaftPlan(row,ah,bh,gate,door,cwt);
+    await loadPassMrElevationPlan(row,vt,tr);
   }else{
     document.getElementById('svg-top').innerHTML=diagramComingSoonHTML;
     document.getElementById('svg-side').innerHTML=diagramComingSoonHTML;
@@ -2197,27 +2197,29 @@ function goShaftEdit(){
   document.getElementById('shaft-input').style.display='';
   window.scrollTo({top:0,behavior:'smooth'});
 }
-function exportShaftMatch(i){
+async function exportShaftMatch(i){
   const r=(window._shaftMatches||[])[i];
   const ctx=window._shaftSearchCtx||{};
   if(!r){ doPrint(); return; }
-  renderModelResultFromRow(r,{
-    ah:ctx.ah, bh:ctx.bh, tr:ctx.tr, spd:ctx.spd,
-    gate:r.gate, door:r.door, cwt:r.cwt, std:r.standard, fp:r.fireproof,
-    vt:r._vt,
-  });
   // Show the same result page used by "By Model" (with title/tables/drawings),
   // hide the shaft-search views, then print — restoring the shaft view after.
   document.getElementById('shaft-input').style.display='none';
   document.getElementById('shaft-results').style.display='none';
   document.getElementById('em3').style.display='';
   window.scrollTo({top:0,behavior:'smooth'});
-  setTimeout(()=>{
-    printAfterRepaint(()=>{
-      document.getElementById('em3').style.display='none';
-      document.getElementById('shaft-results').style.display='';
+  try{
+    await renderModelResultFromRow(r,{
+      ah:ctx.ah, bh:ctx.bh, tr:ctx.tr, spd:ctx.spd,
+      gate:r.gate, door:r.door, cwt:r.cwt, std:r.standard, fp:r.fireproof,
+      vt:r._vt,
     });
-  }, 150);
+    await printAfterRepaint();
+  }catch(e){
+    console.warn('Export print pipeline failed, falling back to plain print',e);
+    window.print();
+  }
+  document.getElementById('em3').style.display='none';
+  document.getElementById('shaft-results').style.display='';
 }
 
 function toggleAcc(el){
@@ -2726,25 +2728,27 @@ function goHeShaftEdit(){
   document.getElementById('he-shaft-input').style.display='';
   window.scrollTo({top:0,behavior:'smooth'});
 }
-function exportHeShaftMatch(i){
+async function exportHeShaftMatch(i){
   const r=(window._heShaftMatches||[])[i];
   const ctx=window._heShaftSearchCtx||{};
   if(!r){ doPrint(); return; }
-  renderHeResultFromRow(r,{
-    ceiling:r.ceiling_std, oh:r.oh_std, pit:r.pit_std, pitOpt:r.pit_opt,
-    entH:r.ent_h_std, tr:ctx.tr, isOpt:false,
-    ahOverride:ctx.ah, bhOverride:ctx.bh,
-  });
   document.getElementById('he-shaft-input').style.display='none';
   document.getElementById('he-shaft-results').style.display='none';
   document.getElementById('he-result').style.display='';
   window.scrollTo({top:0,behavior:'smooth'});
-  setTimeout(()=>{
-    printAfterRepaint(()=>{
-      document.getElementById('he-result').style.display='none';
-      document.getElementById('he-shaft-results').style.display='';
+  try{
+    await renderHeResultFromRow(r,{
+      ceiling:r.ceiling_std, oh:r.oh_std, pit:r.pit_std, pitOpt:r.pit_opt,
+      entH:r.ent_h_std, tr:ctx.tr, isOpt:false,
+      ahOverride:ctx.ah, bhOverride:ctx.bh,
     });
-  }, 150);
+    await printAfterRepaint();
+  }catch(e){
+    console.warn('Export print pipeline failed, falling back to plain print',e);
+    window.print();
+  }
+  document.getElementById('he-result').style.display='none';
+  document.getElementById('he-shaft-results').style.display='';
 }
 
 function buildHeSeriesList(){
@@ -2948,7 +2952,7 @@ function showHeResult(){
 // Shared renderer: fills the By-Model HE result view (title, tables, drawings) from
 // an HE row + resolved display values. Used by both "By Model" and the per-match
 // Export from "By Shaft Size".
-function renderHeResultFromRow(row,{ceiling,oh,pit,pitOpt,entH,tr,isOpt,ahOverride,bhOverride}){
+async function renderHeResultFromRow(row,{ceiling,oh,pit,pitOpt,entH,tr,isOpt,ahOverride,bhOverride}){
   const displayAh = ahOverride!=null ? ahOverride : row.ah;
   const displayBh = bhOverride!=null ? bhOverride : row.bh;
   const modelTitle=`${row.series} · ${row.code}`;
@@ -2980,9 +2984,9 @@ function renderHeResultFromRow(row,{ceiling,oh,pit,pitOpt,entH,tr,isOpt,ahOverri
   ].filter(Boolean));
 
   const rowForDiagram = (ahOverride!=null || bhOverride!=null) ? {...row, ah:displayAh, bh:displayBh} : row;
-  loadHeShaftPlan(rowForDiagram);
+  await loadHeShaftPlan(rowForDiagram);
   const totalHeight = (Number(pit)||0) + (Number(oh)||0) + (Number(travelMmHe)||0);
-  loadHeElevationPlan(row, {
+  await loadHeElevationPlan(row, {
     'val-oh': fmt(oh),
     'val-travel': travelMmHe?.toLocaleString(),
     'val-pit': fmt(pit),
