@@ -2838,20 +2838,22 @@ function renderHeResultFromRow(row,{ceiling,oh,pit,pitOpt,entH,tr,isOpt}){
     ['Rated Speed','Up 20m/min · Down 30m/min',''],
   ]);
 
+  const travelMmHe = row.max_travel!=null ? Math.round(row.max_travel*1000) : null;
+
   tbl('he-r-elev',[
     ['(A) Car Ceiling Height',ceiling, isOpt?'mm (Optional)':'mm (Standard)'],
     ['(B) Entrance Height',entH,'mm'],
     ['(C) Min. Overhead',oh,'mm'],
-    ['(D) Max. Travel',row.max_travel?.toLocaleString(),'mm'],
+    ['(D) Max. Travel',travelMmHe?.toLocaleString(),'mm'],
     ['(E) Min. Pit (Standard)',pit,'mm'],
     pitOpt?['(E) Min. Pit (With Isolation Unit)',pitOpt,'mm']:null,
   ].filter(Boolean));
 
   loadHeShaftPlan(row);
-  const totalHeight = (Number(pit)||0) + (Number(oh)||0) + (Number(row.max_travel)||0);
+  const totalHeight = (Number(pit)||0) + (Number(oh)||0) + (Number(travelMmHe)||0);
   loadHeElevationPlan(row, {
     'val-oh': oh,
-    'val-travel': row.max_travel?.toLocaleString(),
+    'val-travel': travelMmHe?.toLocaleString(),
     'val-pit': pit,
     'val-total': totalHeight.toLocaleString(),
   });
