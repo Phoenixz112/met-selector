@@ -1216,6 +1216,19 @@ function normalizePH(rows){
     g2_ah_fp:n(r.g2_ah_fp)??n(r.ah),     g2_bh_fp:n(r.g2_bh_fp)??n(r.bh),
   }));
 }
+function normalizeHE(rows){
+  return rows.map(r=>({...r,
+    persons:+r.persons, capacity:+r.capacity,
+    gate:+r.gate, entrance:+r.entrance,
+    car_aa:+r.car_aa, car_bb:+r.car_bb,
+    ah:+r.ah, bh:+r.bh,
+    ceiling_std:n(r.ceiling_std), ceiling_opt:n(r.ceiling_opt),
+    oh_std:n(r.oh_std), oh_opt:n(r.oh_opt),
+    pit_std:n(r.pit_std), pit_opt:n(r.pit_opt),
+    ent_h_std:n(r.ent_h_std), ent_h_opt:n(r.ent_h_opt),
+    max_travel:n(r.max_travel),
+  }));
+}
 async function loadAll(){
   try {
     var [phRaw,pvRaw,frRaw,escRaw,heRaw,escSetsRaw,escRangesRaw] = await Promise.all([
@@ -1251,17 +1264,7 @@ async function loadAll(){
       W1:+r.W1, W2:+r.W2, W3:+r.W3,
       upper_ext:+r.upper_ext, lower_ext:+r.lower_ext, speed:+r.speed,
     }));
-    HE = HE.map(r=>({...r,
-      persons:+r.persons, capacity:+r.capacity,
-      gate:+r.gate, entrance:+r.entrance,
-      car_aa:+r.car_aa, car_bb:+r.car_bb,
-      ah:+r.ah, bh:+r.bh,
-      ceiling_std:n(r.ceiling_std), ceiling_opt:n(r.ceiling_opt),
-      oh_std:n(r.oh_std), oh_opt:n(r.oh_opt),
-      pit_std:n(r.pit_std), pit_opt:n(r.pit_opt),
-      ent_h_std:n(r.ent_h_std), ent_h_opt:n(r.ent_h_opt),
-      max_travel:n(r.max_travel),
-    }));
+    HE = normalizeHE(HE);
     initApp();
   } catch(e) {
     ['pass-loading','fr-loading','esc-loading','he-loading'].forEach(id=>{
@@ -2491,6 +2494,18 @@ function searchHeShaft(){
 
   const body=document.getElementById('he-shaft-body');
   if(!matches.length){
+    if(HE.length===0){
+      body.innerHTML=`<div class="no-result"><div style="font-size:36px;margin-bottom:12px">⏳</div><div style="font-size:15px;font-weight:700;margin-bottom:6px">Still loading catalog data…</div><div style="font-size:13px">This can take a few seconds on first load. Retrying automatically.</div></div>`;
+      if(!window._heShaftRetryPending){
+        window._heShaftRetryPending=true;
+        safeSheet('HOME_ELEVATOR').then(rows=>{
+          window._heShaftRetryPending=false;
+          if(rows && rows.length){ HE=normalizeHE(rows); }
+          searchHeShaft();
+        }).catch(()=>{ window._heShaftRetryPending=false; });
+      }
+      return;
+    }
     body.innerHTML=`<div class="no-result"><div style="font-size:36px;margin-bottom:12px">🔍</div><div style="font-size:15px;font-weight:700;margin-bottom:6px">No matching models</div><div style="font-size:13px">AH ${ah} × BH ${bh} mm with TR ${tr}m — try relaxing filters or a smaller travel height.</div></div>`;
   } else {
     const best=matches[0];
