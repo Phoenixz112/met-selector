@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" version="1.1" width="842" height="1191" viewBox="0 0 842 1191">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" version="1.1" width="663.3" height="663.7" viewBox="102.0 269.3 663.3 663.7">
 <defs>
 <clipPath id="clip_1">
 <path transform="matrix(.03,0,0,-.03,14,1143)" d="M0 6103H27118V30370H0V6103"/>
@@ -1166,4 +1166,4 @@
   <text id="val-car-bb" x="670" y="495" text-anchor="middle" font-size="14" transform="rotate(-90 670 495)">0</text>
   <text id="val-bh" x="732" y="455" text-anchor="middle" font-size="14" transform="rotate(-90 732 455)">0</text>
 </g>
-<text x="827.0" y="35" text-anchor="end" font-family="monospace" font-size="16" font-weight="700" fill="#1a1a1a">UNIT: mm</text></svg>
+<text x="750.3" y="299.3" text-anchor="end" font-family="monospace" font-size="16" font-weight="700" fill="#1a1a1a">UNIT: mm</text></svg>
