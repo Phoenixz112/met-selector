@@ -1864,47 +1864,93 @@ function showModelResult(){
 // tall portrait diagrams (elevation views) — the browser lets them overflow
 // across multiple print pages, splitting the CAD linework away from the text
 // labels instead of keeping the whole diagram on one page.
-function prepareSvgsForPrint(){
-  const maxW = 650, maxH = 750; // px — safe content area for one printed page, leaving room for the footer line below
-  document.querySelectorAll('.svg-wrap svg').forEach(svg=>{
-    const vb=svg.getAttribute('viewBox');
-    if(!vb) return;
-    const parts=vb.trim().split(/\s+/).map(Number);
-    if(parts.length!==4) return;
-    const [,,vw,vh]=parts;
-    if(!vw||!vh) return;
-    const scale=Math.min(maxW/vw, maxH/vh);
-    svg.style.width=(vw*scale)+'px';
-    svg.style.height=(vh*scale)+'px';
-    svg.style.maxWidth='none';
-    svg.style.display='block';
-    svg.style.margin='0 auto';
+// Convert one <svg> element to a PNG data URL at the given pixel size, by
+// serializing it, loading it into an <img>, then drawing that into a canvas.
+// Rendering to a flat bitmap avoids relying on the browser re-laying-out a
+// huge/complex live SVG (thousands of CAD path segments) at print time —
+// which was unreliable and sometimes dropped the linework, leaving only text.
+function svgToPngDataUrl(svgEl, wpx, hpx){
+  return new Promise((resolve,reject)=>{
+    try{
+      const clone=svgEl.cloneNode(true);
+      clone.setAttribute('width',wpx);
+      clone.setAttribute('height',hpx);
+      const svgData=new XMLSerializer().serializeToString(clone);
+      const svgBlob=new Blob([svgData],{type:'image/svg+xml;charset=utf-8'});
+      const url=URL.createObjectURL(svgBlob);
+      const img=new Image();
+      img.onload=()=>{
+        const dpr=2; // render at 2x for print sharpness
+        const canvas=document.createElement('canvas');
+        canvas.width=Math.round(wpx*dpr);
+        canvas.height=Math.round(hpx*dpr);
+        const ctx=canvas.getContext('2d');
+        ctx.fillStyle='#fff';
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.drawImage(img,0,0,canvas.width,canvas.height);
+        URL.revokeObjectURL(url);
+        resolve(canvas.toDataURL('image/png'));
+      };
+      img.onerror=(e)=>{ URL.revokeObjectURL(url); reject(e); };
+      img.src=url;
+    }catch(e){ reject(e); }
   });
 }
-// Some diagrams (especially tall elevation views) are very large/complex SVGs.
-// Resizing them and immediately calling window.print() can capture the print
-// snapshot before the browser finishes repainting the resized content, which
-// is why the vector linework sometimes goes missing while text still shows.
-// Waiting two animation frames + a short timeout lets the repaint complete first.
-function printAfterRepaint(cb){
-  prepareSvgsForPrint();
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    setTimeout(()=>{
-      window.print();
-      restoreSvgsAfterPrint();
-      if(cb) cb();
-    }, 200);
-  }));
+// Before printing, replace every visible diagram SVG with a PNG rasterized at
+// a size that fits within one printable page (preserving aspect ratio). The
+// original SVG is hidden (not removed) so it can be restored after printing.
+async function prepareSvgsForPrint(){
+  const maxW = 650, maxH = 750; // px — safe content area for one printed page, leaving room for the footer line below
+  const svgs=[...document.querySelectorAll('.svg-wrap svg')];
+  for(const svg of svgs){
+    const vb=svg.getAttribute('viewBox');
+    if(!vb) continue;
+    const parts=vb.trim().split(/\s+/).map(Number);
+    if(parts.length!==4) continue;
+    const [,,vw,vh]=parts;
+    if(!vw||!vh) continue;
+    const scale=Math.min(maxW/vw, maxH/vh);
+    const wpx=vw*scale, hpx=vh*scale;
+    try{
+      const dataUrl=await svgToPngDataUrl(svg,wpx,hpx);
+      const img=document.createElement('img');
+      img.src=dataUrl;
+      img.className='print-diagram-img';
+      img.style.width=wpx+'px';
+      img.style.height=hpx+'px';
+      img.style.display='block';
+      img.style.margin='0 auto';
+      svg.style.display='none';
+      svg.insertAdjacentElement('afterend',img);
+    }catch(e){
+      console.warn('SVG->PNG conversion failed, printing live SVG instead',e);
+      svg.style.width=wpx+'px';
+      svg.style.height=hpx+'px';
+      svg.style.display='block';
+      svg.style.margin='0 auto';
+    }
+  }
+}
+async function printAfterRepaint(cb){
+  await prepareSvgsForPrint();
+  // One extra frame so the freshly-inserted <img> elements are painted before
+  // the print snapshot is taken.
+  await new Promise(res=>requestAnimationFrame(()=>requestAnimationFrame(res)));
+  window.print();
+  restoreSvgsAfterPrint();
+  if(cb) cb();
 }
 function doPrint(){
   printAfterRepaint();
 }
 function restoreSvgsAfterPrint(){
+  document.querySelectorAll('.print-diagram-img').forEach(img=>img.remove());
   document.querySelectorAll('.svg-wrap svg').forEach(svg=>{
     svg.style.width='100%';
     svg.style.height='';
     svg.style.maxWidth='';
     svg.style.margin='';
+    svg.style.display='';
   });
 }
 function printMetaText(title){
