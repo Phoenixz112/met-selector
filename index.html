@@ -1024,7 +1024,7 @@ body{
       <div class="step-pill">2 · Results</div>
     </div>
     <div class="result-header" style="margin-bottom:12px">
-      <div class="result-model">Smart K-II</div>
+      <div class="result-model" id="esc-r-title">Smart K-II</div>
       <div class="result-sub">SMEC · Escalator · Beam to Beam Calculator</div>
       <div class="result-badge">Escalator</div>
     </div>
@@ -1866,7 +1866,21 @@ function showModelResult(){
 // activation window with async work). Keeping this call synchronous and immediate
 // is what makes the print dialog reliably appear.
 function doPrint(){
+  const titleIds=['r-title','fr-r-title','he-r-title','esc-r-title'];
+  let modelText='';
+  for(const id of titleIds){
+    const el=document.getElementById(id);
+    if(el && el.offsetParent!==null && el.textContent.trim() && el.textContent.trim()!=='—'){
+      modelText=el.textContent.trim();
+      break;
+    }
+  }
+  const originalTitle=document.title;
+  if(modelText){
+    document.title=modelText.replace(/[\\/:*?"<>|]/g,'').replace(/\s*·\s*/g,'_').replace(/\s+/g,'_');
+  }
   window.print();
+  document.title=originalTitle;
 }
 function printMetaText(title){
   const d=new Date();
