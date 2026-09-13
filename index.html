@@ -422,6 +422,7 @@ body{
 
 /* ── PRINT ───────────────────────────────────────────────── */
 @media print{
+  body{min-height:auto!important}
   .app-header,.btn-primary,.btn-secondary,.btn-export,.btn-reset,.no-print{display:none!important}
   body{background:#fff}
   /* Only the currently active category page prints — prevents
@@ -1093,7 +1094,7 @@ body{
     </div>
     <!-- Results -->
     <div id="esc-results-wrap">
-      <div class="result-sub" id="esc-r-summary" style="margin-bottom:10px">—</div>
+      <div id="esc-r-summary" style="margin-bottom:10px;font-size:15px;font-weight:700;color:var(--navy)">—</div>
       <div class="section-title">Results</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:12px">
         <div class="card" style="padding:14px;text-align:center">
@@ -3700,7 +3701,7 @@ function resetHeForm(){
     document.getElementById('esc-b2b').textContent=nf(b2b);
     document.getElementById('esc-tg').textContent=nf(tg);
     const summaryEl=document.getElementById('esc-r-summary');
-    if(summaryEl) summaryEl.textContent=`Model: ${mVal} · Speed: ${sVal} m/s · Rise: ${nf(rVal)} mm · Flat Step: ${escFlat} · ${dVal}° · ${envVal}`;
+    if(summaryEl) summaryEl.textContent=`Model: K-II ${mVal} · Speed: ${sVal} m/s · Rise: ${nf(rVal)} mm · Flat Step: ${escFlat} · ${dVal}° · ${envVal}`;
     document.getElementById('esc-pit').textContent=nf(pitDepth);
 
     // Intermediate support
