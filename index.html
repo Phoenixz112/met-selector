@@ -2016,7 +2016,7 @@ function searchShaft(){
         Door: <span>${best.door}</span> &nbsp;·&nbsp;
         Gate: <span>${best.gate}</span> &nbsp;·&nbsp;
         ${best.cwt?`CWT: <span>${best.cwt}</span> &nbsp;·&nbsp;`:''} 
-        FP: <span>${best.fireproof==='yes'?'Yes':'No'}</span><br>
+        Fireproof Door: <span>${best.fireproof==='yes'?'Yes':'No'}</span><br>
         Car: <span>${best.car_aa}×${best.car_bb}</span> mm &nbsp;·&nbsp;
         Entrance: <span>${best.entrance}</span> mm (${best.entrance_type})<br>
         Min. Shaft: <span>${best._ah}×${best._bh}</span> mm
@@ -2041,7 +2041,7 @@ function searchShaft(){
         <div class="accordion-body">
           <div class="match-dims">
             Speed: <span>${fmtSpd(r,spd)} m/s</span> &nbsp;·&nbsp;
-            Car: <span>${r.car_aa}×${r.car_bb}</span> mm &nbsp;·&nbsp; Entrance: <span>${r.entrance}</span> mm (${r.entrance_type}) &nbsp;·&nbsp; FP: <span>${r.fireproof==='yes'?'Yes':'No'}</span><br>
+            Car: <span>${r.car_aa}×${r.car_bb}</span> mm &nbsp;·&nbsp; Entrance: <span>${r.entrance}</span> mm (${r.entrance_type}) &nbsp;·&nbsp; Fireproof Door: <span>${r.fireproof==='yes'?'Yes':'No'}</span><br>
             Min. Shaft: <span>${r._ah}×${r._bh}</span> mm${r.am?` &nbsp;·&nbsp; M/R: <span>${r.am}×${r.bm}</span> mm`:''}<br>
             ${getOHDisplay(r)}
           </div>
