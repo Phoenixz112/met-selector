@@ -440,11 +440,7 @@ body{
   .drawing-container{padding:6px;max-width:none}
   .dview{display:block!important;margin-bottom:0;break-inside:avoid}
   .svg-wrap{border:none;background:none}
-  .svg-wrap svg{width:auto!important;height:auto!important;max-width:100%;max-height:820px;display:block;margin:0 auto}
-  /* Elevation views are tall/portrait — constrain by WIDTH (not height) so the
-     whole diagram (including the bottom Pit Depth section) always fits without
-     being cropped. A fixed max-height + overflow:hidden was cutting content off. */
-  #svg-side svg,#he-svg-side svg{max-width:320px}
+  .svg-wrap svg{width:var(--print-w,100%)!important;height:var(--print-h,auto)!important;max-width:100%;display:block;margin:0 auto}
   /* Expand any collapsed "Other matches" so their spec details print too */
   .accordion-body{display:block!important}
   .accordion-header span:last-child{display:none!important}
@@ -2462,6 +2458,24 @@ function resetEsc(){
 // ============================================================
 // TABLES
 // ============================================================
+// Compute exact print-safe pixel dimensions for a diagram SVG from its viewBox,
+// fitting within (maxW x maxH) while preserving aspect ratio — done once, right
+// when the diagram loads (not at print time), and stored as CSS custom
+// properties consumed by the print stylesheet. This replaced several earlier
+// attempts at pure-CSS auto/max-width/max-height scaling, which proved
+// unreliable across different SVG aspect ratios (sometimes clipping content).
+function setPrintSize(svgEl, maxW, maxH){
+  if(!svgEl) return;
+  const vb=svgEl.getAttribute('viewBox');
+  if(!vb) return;
+  const parts=vb.trim().split(/\s+/).map(Number);
+  if(parts.length!==4) return;
+  const [,,vw,vh]=parts;
+  if(!vw||!vh) return;
+  const scale=Math.min(maxW/vw, maxH/vh);
+  svgEl.style.setProperty('--print-w',(vw*scale).toFixed(1)+'px');
+  svgEl.style.setProperty('--print-h',(vh*scale).toFixed(1)+'px');
+}
 function fmt(n){
   const num = typeof n==='number' ? n : (n!=null && n!=='' && !isNaN(+n) ? +n : NaN);
   return isFinite(num) ? num.toLocaleString() : n;
@@ -3003,6 +3017,7 @@ async function loadHeShaftPlan(row){
     host.innerHTML=svgText;
     const svgEl=host.querySelector('svg');
     if(svgEl) svgEl.style.width='100%';
+    if(svgEl) setPrintSize(svgEl,650,700);
     const values=heTemplateValueMap(row);
     Object.entries(values).forEach(([id,val])=>{
       const el=host.querySelector('#'+CSS.escape(id));
@@ -3039,6 +3054,7 @@ async function loadHeElevationPlan(row, evalues){
     host.innerHTML=svgText;
     const svgEl=host.querySelector('svg');
     if(svgEl) svgEl.style.width='100%';
+    if(svgEl) setPrintSize(svgEl,300,780);
     Object.entries(evalues).forEach(([id,val])=>{
       const el=host.querySelector('#'+CSS.escape(id));
       if(el && val!=null) el.textContent=val;
@@ -3089,6 +3105,7 @@ async function loadPassShaftPlan(row,ah,bh,gate,door,cwt){
     host.innerHTML=svgText;
     const svgEl=host.querySelector('svg');
     if(svgEl) svgEl.style.width='100%';
+    if(svgEl) setPrintSize(svgEl,650,700);
     const values={
       'val-ah': fmt(ah),
       'val-bh': fmt(bh),
@@ -3132,6 +3149,7 @@ async function loadPassElevationPlan(row,vt,tr){
     host.innerHTML=svgText;
     const svgEl=host.querySelector('svg');
     if(svgEl) svgEl.style.width='100%';
+    if(svgEl) setPrintSize(svgEl,300,780);
     const travelMm = tr?Math.round(tr*1000):0;
     const ohVal = vt?Number(vt.oh)||0:0;
     const pitVal = vt?Number(vt.pit)||0:0;
@@ -3182,6 +3200,7 @@ async function loadPassBedShaftPlan(row,ah,bh,gate,door,cwt){
     host.innerHTML=svgText;
     const svgEl=host.querySelector('svg');
     if(svgEl) svgEl.style.width='100%';
+    if(svgEl) setPrintSize(svgEl,650,700);
     const values={
       'val-ah': fmt(ah),
       'val-bh': fmt(bh),
@@ -3223,6 +3242,7 @@ async function loadPassBedElevationPlan(row,vt,tr){
     host.innerHTML=svgText;
     const svgEl=host.querySelector('svg');
     if(svgEl) svgEl.style.width='100%';
+    if(svgEl) setPrintSize(svgEl,300,780);
     const travelMm = tr?Math.round(tr*1000):0;
     const ohVal = vt?Number(vt.oh)||0:0;
     const pitVal = vt?Number(vt.pit)||0:0;
@@ -3278,6 +3298,7 @@ async function loadPassMrShaftPlan(row,ah,bh,gate,door,cwt){
     host.innerHTML=svgText;
     const svgEl=host.querySelector('svg');
     if(svgEl) svgEl.style.width='100%';
+    if(svgEl) setPrintSize(svgEl,650,700);
     const values={
       'val-ah': fmt(ah),
       'val-bh': fmt(bh),
@@ -3319,6 +3340,7 @@ async function loadPassMrElevationPlan(row,vt,tr){
     host.innerHTML=svgText;
     const svgEl=host.querySelector('svg');
     if(svgEl) svgEl.style.width='100%';
+    if(svgEl) setPrintSize(svgEl,300,780);
     const travelMm = tr?Math.round(tr*1000):0;
     const ohVal = vt?Number(vt.oh)||0:0;
     const pitVal = vt?Number(vt.pit)||0:0;
@@ -3614,6 +3636,7 @@ function resetHeForm(){
       host.innerHTML=svgText;
       const svgEl=host.querySelector('svg');
       if(svgEl) svgEl.style.width='100%';
+      if(svgEl) setPrintSize(svgEl,680,500);
       const val=host.querySelector('#val-b2b');
       if(val) val.textContent=nf(b2b);
       const valTg=host.querySelector('#val-tg');
