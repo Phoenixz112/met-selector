@@ -1196,6 +1196,26 @@ async function safeSheet(name){
   catch(e){ console.warn('Sheet not found or error:', name, e.message); return []; }
 }
 
+function normalizePH(rows){
+  return rows.map(r=>({...r,
+    persons:n(r.persons)||0, capacity:n(r.capacity)||0,
+    gate:n(r.gate)||1, entrance:n(r.entrance)||0,
+    car_aa:n(r.car_aa), car_bb:n(r.car_bb),
+    // New MASTER format (handle both uppercase from Sheets and lowercase)
+    ah:n(r.ah||r.AH), bh:n(r.bh||r.BH),
+    oh:n(r.oh||r.OH), oh_sets:n(r.oh_sets||r.OH_sets),
+    pd:n(r.pd||r.PD), pd_sets:n(r.pd_sets||r.PD_sets),
+    hm:n(r.hm||r.HM),
+    tr_min:n(r.tr_min), tr_max:n(r.tr_max),
+    spd_min:n(r.spd_min)??n(r.speed_ms), spd_max:n(r.spd_max)??n(r.speed_ms),
+    am:n(r.am), bm:n(r.bm),
+    // Legacy format
+    ah_nofp:n(r.ah_nofp)??n(r.ah), bh_nofp:n(r.bh_nofp)??n(r.bh),
+    ah_fp:n(r.ah_fp)??n(r.ah),     bh_fp:n(r.bh_fp)??n(r.bh),
+    g2_ah_nofp:n(r.g2_ah_nofp)??n(r.ah), g2_bh_nofp:n(r.g2_bh_nofp)??n(r.bh),
+    g2_ah_fp:n(r.g2_ah_fp)??n(r.ah),     g2_bh_fp:n(r.g2_bh_fp)??n(r.bh),
+  }));
+}
 async function loadAll(){
   try {
     var [phRaw,pvRaw,frRaw,escRaw,heRaw,escSetsRaw,escRangesRaw] = await Promise.all([
@@ -1215,24 +1235,7 @@ async function loadAll(){
       }
     }
     // Normalize numbers
-    PH = PH.map(r=>({...r,
-      persons:n(r.persons)||0, capacity:n(r.capacity)||0,
-      gate:n(r.gate)||1, entrance:n(r.entrance)||0,
-      car_aa:n(r.car_aa), car_bb:n(r.car_bb),
-      // New MASTER format (handle both uppercase from Sheets and lowercase)
-      ah:n(r.ah||r.AH), bh:n(r.bh||r.BH),
-      oh:n(r.oh||r.OH), oh_sets:n(r.oh_sets||r.OH_sets),
-      pd:n(r.pd||r.PD), pd_sets:n(r.pd_sets||r.PD_sets),
-      hm:n(r.hm||r.HM),
-      tr_min:n(r.tr_min), tr_max:n(r.tr_max),
-      spd_min:n(r.spd_min)??n(r.speed_ms), spd_max:n(r.spd_max)??n(r.speed_ms),
-      am:n(r.am), bm:n(r.bm),
-      // Legacy format
-      ah_nofp:n(r.ah_nofp)??n(r.ah), bh_nofp:n(r.bh_nofp)??n(r.bh),
-      ah_fp:n(r.ah_fp)??n(r.ah),     bh_fp:n(r.bh_fp)??n(r.bh),
-      g2_ah_nofp:n(r.g2_ah_nofp)??n(r.ah), g2_bh_nofp:n(r.g2_bh_nofp)??n(r.bh),
-      g2_ah_fp:n(r.g2_ah_fp)??n(r.ah),     g2_bh_fp:n(r.g2_bh_fp)??n(r.bh),
-    }));
+    PH = normalizePH(PH);
     // PASSENGER_VERTICAL removed - data now in PASSENGER sheet
     FR = FR.map(r=>({...r,
       capacity:+r.capacity, speed:+r.speed,
@@ -1979,6 +1982,26 @@ function searchShaft(){
 
   const body=document.getElementById('shaft-body');
   if(!matches.length){
+    if(PH.length===0){
+      body.innerHTML=`<div class="no-result"><div style="font-size:36px;margin-bottom:12px">⏳</div><div style="font-size:15px;font-weight:700;margin-bottom:6px">Still loading catalog data…</div><div style="font-size:13px">This can take a few seconds on first load. Retrying automatically.</div></div>`;
+      if(!window._shaftRetryPending){
+        window._shaftRetryPending=true;
+        safeSheet('PASSENGER').then(rows=>{
+          window._shaftRetryPending=false;
+          if(rows && rows.length){
+            PH=normalizePH(rows);
+            const oSel=document.getElementById('sh-origin');
+            if(oSel && oSel.options.length<=1){
+              [...new Set(PH.map(r=>r.origin))].sort().forEach(o=>{
+                const el=document.createElement('option');el.value=o;el.textContent=o;oSel.appendChild(el);
+              });
+            }
+          }
+          searchShaft();
+        }).catch(()=>{ window._shaftRetryPending=false; });
+      }
+      return;
+    }
     body.innerHTML=`<div class="no-result"><div style="font-size:36px;margin-bottom:12px">🔍</div><div style="font-size:15px;font-weight:700;margin-bottom:6px">No matching models</div><div style="font-size:13px">AH ${ah} × BH ${bh} mm with TR ${tr}m, Speed ${spd.toFixed(2)} m/s — try relaxing filters.</div></div>`;
   } else {
     const best=matches[0];
