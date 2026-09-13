@@ -423,6 +423,14 @@ body{
 /* ── PRINT ───────────────────────────────────────────────── */
 @media print{
   body{min-height:auto!important}
+  * {-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
+  /* The "Beam to Beam" card uses white text on a red background — if the
+     browser/print settings skip printing background colors (common default),
+     that white text becomes invisible against white paper. Force dark,
+     readable text here regardless of whether the background prints. */
+  #esc-b2b-card{border:2px solid #C8102E!important}
+  #esc-b2b-label,#esc-b2b-unit{color:#9e0c23!important}
+  #esc-b2b{color:#C8102E!important}
   .app-header,.btn-primary,.btn-secondary,.btn-export,.btn-reset,.no-print{display:none!important}
   body{background:#fff}
   /* Only the currently active category page prints — prevents
@@ -1098,10 +1106,10 @@ body{
           <div style="font-size:22px;font-weight:700;color:var(--navy);font-family:'Roboto Mono',monospace" id="esc-sw">—</div>
           <div style="font-size:10px;color:var(--text-soft)">mm</div>
         </div>
-        <div class="card" style="padding:14px;text-align:center;border-color:#9e0c23;background:#C8102E">
-          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Beam to Beam</div>
+        <div class="card" id="esc-b2b-card" style="padding:14px;text-align:center;border-color:#9e0c23;background:#C8102E">
+          <div id="esc-b2b-label" style="font-size:10px;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Beam to Beam</div>
           <div style="font-size:22px;font-weight:700;color:#fff;font-family:'Roboto Mono',monospace" id="esc-b2b">—</div>
-          <div style="font-size:10px;color:rgba(255,255,255,.5)">mm</div>
+          <div id="esc-b2b-unit" style="font-size:10px;color:rgba(255,255,255,.5)">mm</div>
         </div>
         <div class="card" style="padding:14px;text-align:center">
           <div style="font-size:10px;font-weight:700;color:var(--text-soft);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">TG</div>
