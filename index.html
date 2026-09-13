@@ -2118,13 +2118,14 @@ async function exportShaftMatch(i){
   if(!r){ doPrint(); return; }
   // Show the same result page used by "By Model" (with title/tables/drawings),
   // hide the shaft-search views, then print — restoring the shaft view after.
+  document.getElementById('main-passenger').classList.add('active');
   document.getElementById('shaft-input').style.display='none';
   document.getElementById('shaft-results').style.display='none';
   document.getElementById('em3').style.display='';
   window.scrollTo({top:0,behavior:'smooth'});
   try{
     await renderModelResultFromRow(r,{
-      ah:ctx.ah, bh:ctx.bh, tr:ctx.tr, spd:ctx.spd,
+      ah:ctx.ah??r._ah, bh:ctx.bh??r._bh, tr:ctx.tr, spd:ctx.spd,
       gate:r.gate, door:r.door, cwt:r.cwt, std:r.standard, fp:r.fireproof,
       vt:r._vt,
     });
@@ -2647,6 +2648,7 @@ async function exportHeShaftMatch(i){
   const r=(window._heShaftMatches||[])[i];
   const ctx=window._heShaftSearchCtx||{};
   if(!r){ doPrint(); return; }
+  document.getElementById('main-home-elev').classList.add('active');
   document.getElementById('he-shaft-input').style.display='none';
   document.getElementById('he-shaft-results').style.display='none';
   document.getElementById('he-result').style.display='';
