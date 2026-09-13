@@ -2118,9 +2118,17 @@ async function exportShaftMatch(i){
   if(!r){ doPrint(); return; }
   // Show the same result page used by "By Model" (with title/tables/drawings),
   // hide the shaft-search views, then print — restoring the shaft view after.
+  // em3 lives inside #pass-model, a sibling wrapper of #pass-mode (which holds
+  // the shaft-search UI) — both wrappers must be toggled, not just em3 itself,
+  // or em3 stays invisible (display:none on its parent) even with its own
+  // display set, which is what was causing the blank print output.
   document.getElementById('main-passenger').classList.add('active');
+  document.getElementById('pass-mode').style.display='none';
+  document.getElementById('pass-model').style.display='';
   document.getElementById('shaft-input').style.display='none';
   document.getElementById('shaft-results').style.display='none';
+  document.getElementById('em1').style.display='none';
+  document.getElementById('em2').style.display='none';
   document.getElementById('em3').style.display='';
   window.scrollTo({top:0,behavior:'smooth'});
   try{
@@ -2135,6 +2143,8 @@ async function exportShaftMatch(i){
     window.print();
   }
   document.getElementById('em3').style.display='none';
+  document.getElementById('pass-model').style.display='none';
+  document.getElementById('pass-mode').style.display='';
   document.getElementById('shaft-results').style.display='';
 }
 
@@ -2648,7 +2658,12 @@ async function exportHeShaftMatch(i){
   const r=(window._heShaftMatches||[])[i];
   const ctx=window._heShaftSearchCtx||{};
   if(!r){ doPrint(); return; }
+  // he-result lives inside #he-form, a sibling wrapper of #he-shaft (which holds
+  // the shaft-search UI) — both wrappers must be toggled, not just he-result
+  // itself, or it stays invisible (display:none on its parent).
   document.getElementById('main-home-elev').classList.add('active');
+  document.getElementById('he-shaft').style.display='none';
+  document.getElementById('he-form').style.display='';
   document.getElementById('he-shaft-input').style.display='none';
   document.getElementById('he-shaft-results').style.display='none';
   document.getElementById('he-result').style.display='';
@@ -2665,6 +2680,8 @@ async function exportHeShaftMatch(i){
     window.print();
   }
   document.getElementById('he-result').style.display='none';
+  document.getElementById('he-form').style.display='none';
+  document.getElementById('he-shaft').style.display='';
   document.getElementById('he-shaft-results').style.display='';
 }
 
