@@ -426,14 +426,19 @@ body{
   /* Only the currently active category page prints — prevents
      Elevator and Escalator content from mixing on the same printout */
   .page{display:none!important}
-  .page.active{display:block!important;padding:0}
+  .page.active{display:block!important;padding:0;max-width:none!important}
   .card,.result-header,.drawing-container,.tol-box{box-shadow:none;break-inside:avoid}
   /* Show only Spec + Layout: hide step navigation pills */
   .steps-bar{display:none!important}
   /* Print both drawing views (Top/Side or Shaft/Elevation) instead of
      only whichever tab happens to be active on screen */
   .drawing-tabs{display:none!important}
-  .dview{display:block!important;margin-bottom:16px;break-inside:avoid}
+  /* Each diagram gets its own full page at maximum size, instead of being
+     squeezed alongside other content and auto-scaled down small */
+  .drawing-container{padding:6px;max-width:none}
+  .dview{display:block!important;margin-bottom:0;break-inside:avoid;page-break-before:always}
+  .svg-wrap{border:none;background:none}
+  .svg-wrap svg{width:100%!important;height:auto!important}
   /* Expand any collapsed "Other matches" so their spec details print too */
   .accordion-body{display:block!important}
   .accordion-header span:last-child{display:none!important}
@@ -464,6 +469,7 @@ body{
   .input-row{grid-template-columns:1fr}
   .result-model{font-size:17px}
   .profile-hero-title{font-size:22px}
+  .drawing-container{padding:8px}
 }
 @media(max-width:360px){
   .type-grid{grid-template-columns:1fr}
@@ -1832,7 +1838,18 @@ function showModelResult(){
 
   const vt=lookupVT(ST.series,row.capacity,spd,tr,std,row);
 
-  document.getElementById('r-title').textContent=`${seriesDisplayName(ST.series)} · ${code}`;
+  renderModelResultFromRow(row,{ah,bh,tr,spd,gate,door,cwt,std,fp,vt});
+
+  sendLog({mode:'By Model',factory:row.origin,series:ST.series,code,capacity:row.capacity,door,gate,entrance_type:row.entrance_type,speed:spd,travel_m:tr,ah_std:ah,bh_std:bh,tolerance_mm:getTolerance(tr,gate).side});
+  goMS(3);
+}
+
+// Shared renderer: fills the By-Model result view (title, spec tables, tolerance box,
+// shaft/elevation drawings) from a PH row + the resolved display values. Used by both
+// "By Model" search and the per-match Export from "By Shaft Size".
+function renderModelResultFromRow(row,{ah,bh,tr,spd,gate,door,cwt,std,fp,vt}){
+  const code=row.code;
+  document.getElementById('r-title').textContent=`${seriesDisplayName(row.series)} · ${code}`;
   document.getElementById('r-sub').textContent=
     `${row.origin} · ${door} Door · Gate ${gate} · ${fp==='yes'?'Fireproof · ':''}${cwt?`CWT ${cwt} · `:''}${spd} m/s · TR ${tr}m`;
 
@@ -1885,9 +1902,6 @@ function showModelResult(){
     document.getElementById('svg-top').innerHTML=diagramComingSoonHTML;
     document.getElementById('svg-side').innerHTML=diagramComingSoonHTML;
   }
-
-  sendLog({mode:'By Model',factory:row.origin,series:ST.series,code,capacity:row.capacity,door,gate,entrance_type:row.entrance_type,speed:spd,travel_m:tr,ah_std:ah,bh_std:bh,tolerance_mm:getTolerance(tr,gate).side});
-  goMS(3);
 }
 
 // ============================================================
@@ -2002,6 +2016,7 @@ function searchShaft(){
     const best=matches[0];
     const{ahTol,bhTol,side}=getTolerance(tr,best.gate);
     window._shaftMatches=matches;
+    window._shaftSearchCtx={tr,spd};
 
     // Best match card
     let html=`<div class="alert-info no-print">Found <strong>${matches.length}</strong> configuration${matches.length>1?'s':''} · Shaft ${ah}×${bh} mm · TR ${tr}m · Speed ${spd.toFixed(2)} m/s</div>`;
@@ -2067,9 +2082,25 @@ function goShaftEdit(){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function exportShaftMatch(i){
-  // TODO: per-match export behavior — placeholder uses print for now.
   const r=(window._shaftMatches||[])[i];
-  window.print();
+  const ctx=window._shaftSearchCtx||{};
+  if(!r){ window.print(); return; }
+  renderModelResultFromRow(r,{
+    ah:r._ah, bh:r._bh, tr:ctx.tr, spd:ctx.spd,
+    gate:r.gate, door:r.door, cwt:r.cwt, std:r.standard, fp:r.fireproof,
+    vt:r._vt,
+  });
+  // Show the same result page used by "By Model" (with title/tables/drawings),
+  // hide the shaft-search views, then print — restoring the shaft view after.
+  document.getElementById('shaft-input').style.display='none';
+  document.getElementById('shaft-results').style.display='none';
+  document.getElementById('em3').style.display='';
+  window.scrollTo({top:0,behavior:'smooth'});
+  setTimeout(()=>{
+    window.print();
+    document.getElementById('em3').style.display='none';
+    document.getElementById('shaft-results').style.display='';
+  }, 150);
 }
 
 function toggleAcc(el){
@@ -2516,6 +2547,7 @@ function searchHeShaft(){
   } else {
     const best=matches[0];
     window._heShaftMatches=matches;
+    window._heShaftSearchCtx={tr};
     let html2=`<div class="alert-info no-print">Found <strong>${matches.length}</strong> model${matches.length>1?'s':''} fitting AH ${ah} × BH ${bh} mm · TR ${tr}m</div>`;
     html2+=`<div class="match-best">
       <div class="match-header">
@@ -2574,9 +2606,22 @@ function goHeShaftEdit(){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function exportHeShaftMatch(i){
-  // TODO: per-match export behavior — placeholder uses print for now.
   const r=(window._heShaftMatches||[])[i];
-  window.print();
+  const ctx=window._heShaftSearchCtx||{};
+  if(!r){ window.print(); return; }
+  renderHeResultFromRow(r,{
+    ceiling:r.ceiling_std, oh:r.oh_std, pit:r.pit_std, pitOpt:r.pit_opt,
+    entH:r.ent_h_std, tr:ctx.tr, isOpt:false,
+  });
+  document.getElementById('he-shaft-input').style.display='none';
+  document.getElementById('he-shaft-results').style.display='none';
+  document.getElementById('he-result').style.display='';
+  window.scrollTo({top:0,behavior:'smooth'});
+  setTimeout(()=>{
+    window.print();
+    document.getElementById('he-result').style.display='none';
+    document.getElementById('he-shaft-results').style.display='';
+  }, 150);
 }
 
 function buildHeSeriesList(){
@@ -2769,10 +2814,21 @@ function showHeResult(){
   const pitOpt  = row.pit_opt;
   const entH    = isOpt&&row.ent_h_opt  ? row.ent_h_opt  : row.ent_h_std;
 
-  document.getElementById('he-r-title').textContent=`${HE_series} · ${code}`;
-  document.getElementById('he-r-sub').textContent=`MHE · ${door} Door · ${gate} Gate · ${ceiling}mm Ceiling · ${row.capacity} kg (${row.persons}P)${tr?` · TR ${tr}m`:''}`;
+  renderHeResultFromRow(row,{ceiling,oh,pit,pitOpt,entH,tr,isOpt});
 
-  // Shaft plan
+  document.getElementById('he-input').style.display='none';
+  document.getElementById('he-result').style.display='';
+  window.scrollTo({top:0,behavior:'smooth'});
+  sendLog({mode:'Home Elevator',series:HE_series,code,capacity:row.capacity,door,gate});
+}
+
+// Shared renderer: fills the By-Model HE result view (title, tables, drawings) from
+// an HE row + resolved display values. Used by both "By Model" and the per-match
+// Export from "By Shaft Size".
+function renderHeResultFromRow(row,{ceiling,oh,pit,pitOpt,entH,tr,isOpt}){
+  document.getElementById('he-r-title').textContent=`${row.series} · ${row.code}`;
+  document.getElementById('he-r-sub').textContent=`MHE · ${row.door} Door · ${row.gate} Gate · ${ceiling}mm Ceiling · ${row.capacity} kg (${row.persons}P)${tr?` · TR ${tr}m`:''}`;
+
   tbl('he-r-shaft',[
     ['Min. Hoistway Width (AH)',row.ah,'mm'],
     ['Min. Hoistway Depth (BH)',row.bh,'mm'],
@@ -2782,7 +2838,6 @@ function showHeResult(){
     ['Rated Speed','Up 20m/min · Down 30m/min',''],
   ]);
 
-  // Elevation
   tbl('he-r-elev',[
     ['(A) Car Ceiling Height',ceiling, isOpt?'mm (Optional)':'mm (Standard)'],
     ['(B) Entrance Height',entH,'mm'],
@@ -2792,9 +2847,6 @@ function showHeResult(){
     pitOpt?['(E) Min. Pit (With Isolation Unit)',pitOpt,'mm']:null,
   ].filter(Boolean));
 
-  // Drawings — prefer hand-made templates (keyed by Door+Gate for Shaft, Gate for Elevation)
-  // if one exists for this configuration, filling in the real calculated values by element ID.
-  // Falls back to a placeholder if no matching template has been made yet.
   loadHeShaftPlan(row);
   const totalHeight = (Number(pit)||0) + (Number(oh)||0) + (Number(row.max_travel)||0);
   loadHeElevationPlan(row, {
@@ -2810,11 +2862,6 @@ function showHeResult(){
   } else {
     document.getElementById('he-note').style.display='none';
   }
-
-  document.getElementById('he-input').style.display='none';
-  document.getElementById('he-result').style.display='';
-  window.scrollTo({top:0,behavior:'smooth'});
-  sendLog({mode:'Home Elevator',series:HE_series,code,capacity:row.capacity,door,gate});
 }
 function goHeEdit(){
   document.getElementById('he-result').style.display='none';
