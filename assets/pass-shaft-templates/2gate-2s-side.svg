@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" version="1.1" width="1191.0" height="887.0" viewBox="0.0 -45.0 1191.0 887.0">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" version="1.1" width="702.3" height="799.0" viewBox="245.0 3.7 702.3 799.0">
 <defs>
 <clipPath id="clip_1">
 <path transform="matrix(0,-.03,-.03,-0,1143,828)" d="M0 3383H27118V33090H0V3383"/>
@@ -1387,10 +1387,10 @@
 </g>
 
 <g id="value-overlays" font-family="monospace" font-weight="700" fill="#1a1a1a">
-  <text id="val-jj" x="550" y="630" text-anchor="middle" font-size="16">0</text>
-  <text id="val-car-aa" x="505" y="700" text-anchor="middle" font-size="16">0</text>
-  <text id="val-ah" x="535" y="770" text-anchor="middle" font-size="16">0</text>
-  <text id="val-car-bb" x="845" y="355" text-anchor="middle" font-size="16" transform="rotate(-90 845 355)">0</text>
-  <text id="val-bh" x="910" y="302" text-anchor="middle" font-size="16" transform="rotate(-90 910 302)">0</text>
+  <text id="val-jj" x="550" y="630" text-anchor="middle" font-size="14">0</text>
+  <text id="val-car-aa" x="505" y="700" text-anchor="middle" font-size="14">0</text>
+  <text id="val-ah" x="535" y="770" text-anchor="middle" font-size="14">0</text>
+  <text id="val-car-bb" x="845" y="355" text-anchor="middle" font-size="14" transform="rotate(-90 845 355)">0</text>
+  <text id="val-bh" x="910" y="302" text-anchor="middle" font-size="14" transform="rotate(-90 910 302)">0</text>
 </g>
-<text x="1176.0" y="-23.0" text-anchor="end" font-family="monospace" font-size="16" font-weight="700" fill="#1a1a1a">UNIT: mm</text></svg>
+<text x="932.3" y="23.7" text-anchor="end" font-family="monospace" font-size="14" font-weight="700" fill="#1a1a1a">UNIT: mm</text></svg>
