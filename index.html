@@ -799,6 +799,7 @@ body{
         <div class="section-title">Machine Room</div>
         <div class="card"><table class="dim-table" id="r-mr"></table></div>
       </div>
+      <div class="print-only-meta print-page-header" id="r-print-meta-page2"></div>
       <div class="section-title">Car & Vertical</div>
       <div class="card"><table class="dim-table" id="r-car"></table></div>
       <div class="section-title">Shaft Tolerance</div>
@@ -990,6 +991,7 @@ body{
       <div class="print-only-meta" id="he-print-meta"></div>
       <div class="section-title">Shaft Plan</div>
       <div class="card"><table class="dim-table" id="he-r-shaft"></table></div>
+      <div class="print-only-meta print-page-header" id="he-print-meta-page2"></div>
       <div class="section-title">Elevation Plan</div>
       <div class="card"><table class="dim-table" id="he-r-elev"></table></div>
       <div class="alert-warn" id="he-note" style="display:none"></div>
@@ -1869,7 +1871,7 @@ function renderModelResultFromRow(row,{ah,bh,tr,spd,gate,door,cwt,std,fp,vt}){
   document.getElementById('r-sub').textContent=
     `${row.origin} · ${door} Door · Gate ${gate} · ${fp==='yes'?'Fireproof · ':''}${cwt?`CWT ${cwt} · `:''}${spd} m/s · TR ${tr}m`;
   const metaTxt=printMetaText(modelTitle);
-  ['r-print-meta','r-print-footer','r-print-meta-shaft','r-print-meta-elev'].forEach(id=>{
+  ['r-print-meta','r-print-meta-page2','r-print-footer','r-print-meta-shaft','r-print-meta-elev'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.textContent=metaTxt;
   });
 
@@ -2854,7 +2856,7 @@ function renderHeResultFromRow(row,{ceiling,oh,pit,pitOpt,entH,tr,isOpt}){
   document.getElementById('he-r-title').textContent=modelTitle;
   document.getElementById('he-r-sub').textContent=`MHE · ${row.door} Door · ${row.gate} Gate · ${ceiling}mm Ceiling · ${row.capacity} kg (${row.persons}P)${tr?` · TR ${tr}m`:''}`;
   const metaTxt=printMetaText(modelTitle);
-  ['he-print-meta','he-print-footer','he-print-meta-shaft','he-print-meta-elev'].forEach(id=>{
+  ['he-print-meta','he-print-meta-page2','he-print-footer','he-print-meta-shaft','he-print-meta-elev'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.textContent=metaTxt;
   });
 
