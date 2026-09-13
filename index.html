@@ -804,13 +804,13 @@ body{
       <div class="card"><table class="dim-table" id="r-car"></table></div>
       <div class="section-title">Shaft Tolerance</div>
       <div id="r-tol"></div>
-      <div class="section-title">Layout Drawing</div>
+      <div class="section-title print-page-header">Layout Drawing</div>
       <div class="drawing-container">
         <div class="drawing-tabs">
           <button class="drawing-tab active" onclick="switchDraw('top')">Top View</button>
           <button class="drawing-tab" onclick="switchDraw('side')">Side View</button>
         </div>
-        <div class="dview active print-page-header" id="draw-top"><div class="print-only-meta" id="r-print-meta-shaft"></div><div class="svg-wrap" id="svg-top"></div></div>
+        <div class="dview active" id="draw-top"><div class="print-only-meta" id="r-print-meta-shaft"></div><div class="svg-wrap" id="svg-top"></div></div>
         <div class="dview print-page-header" id="draw-side"><div class="print-only-meta" id="r-print-meta-elev"></div><div class="svg-wrap" id="svg-side"></div></div>
       </div>
       <div class="alert-info">All dimensions in mm · Source: Mitsubishi Electric Catalog</div>
@@ -995,13 +995,13 @@ body{
       <div class="section-title">Elevation Plan</div>
       <div class="card"><table class="dim-table" id="he-r-elev"></table></div>
       <div class="alert-warn" id="he-note" style="display:none"></div>
-      <div class="section-title">Layout Drawing</div>
+      <div class="section-title print-page-header">Layout Drawing</div>
       <div class="drawing-container">
         <div class="drawing-tabs">
           <button class="drawing-tab active" onclick="switchHeDraw('top')">Shaft Plan</button>
           <button class="drawing-tab" onclick="switchHeDraw('side')">Elevation Plan</button>
         </div>
-        <div class="dview active print-page-header" id="he-draw-top"><div class="print-only-meta" id="he-print-meta-shaft"></div><div class="svg-wrap" id="he-svg-top"></div></div>
+        <div class="dview active" id="he-draw-top"><div class="print-only-meta" id="he-print-meta-shaft"></div><div class="svg-wrap" id="he-svg-top"></div></div>
         <div class="dview print-page-header" id="he-draw-side"><div class="print-only-meta" id="he-print-meta-elev"></div><div class="svg-wrap" id="he-svg-side"></div></div>
       </div>
       <div class="alert-info">All dimensions in mm · Source: Mitsubishi Electric Catalog (MHE)<br>*¹ When 100mm Higher Car Ceiling Height & Entrance Height (Optional) is applied<br>*² When Double Isolation Unit for Absorbing Vibration and Sound (Optional) is applied</div>
@@ -1865,7 +1865,7 @@ function showModelResult(){
 // across multiple print pages, splitting the CAD linework away from the text
 // labels instead of keeping the whole diagram on one page.
 function prepareSvgsForPrint(){
-  const maxW = 720, maxH = 930; // px — safe content area for one printed page
+  const maxW = 650, maxH = 850; // px — safe content area for one printed page, with margin
   document.querySelectorAll('.svg-wrap svg').forEach(svg=>{
     const vb=svg.getAttribute('viewBox');
     if(!vb) return;
@@ -1881,10 +1881,23 @@ function prepareSvgsForPrint(){
     svg.style.margin='0 auto';
   });
 }
-function doPrint(){
+// Some diagrams (especially tall elevation views) are very large/complex SVGs.
+// Resizing them and immediately calling window.print() can capture the print
+// snapshot before the browser finishes repainting the resized content, which
+// is why the vector linework sometimes goes missing while text still shows.
+// Waiting two animation frames + a short timeout lets the repaint complete first.
+function printAfterRepaint(cb){
   prepareSvgsForPrint();
-  window.print();
-  restoreSvgsAfterPrint();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    setTimeout(()=>{
+      window.print();
+      restoreSvgsAfterPrint();
+      if(cb) cb();
+    }, 200);
+  }));
+}
+function doPrint(){
+  printAfterRepaint();
 }
 function restoreSvgsAfterPrint(){
   document.querySelectorAll('.svg-wrap svg').forEach(svg=>{
@@ -2154,11 +2167,10 @@ function exportShaftMatch(i){
   document.getElementById('em3').style.display='';
   window.scrollTo({top:0,behavior:'smooth'});
   setTimeout(()=>{
-    prepareSvgsForPrint();
-    window.print();
-    restoreSvgsAfterPrint();
-    document.getElementById('em3').style.display='none';
-    document.getElementById('shaft-results').style.display='';
+    printAfterRepaint(()=>{
+      document.getElementById('em3').style.display='none';
+      document.getElementById('shaft-results').style.display='';
+    });
   }, 150);
 }
 
@@ -2681,11 +2693,10 @@ function exportHeShaftMatch(i){
   document.getElementById('he-result').style.display='';
   window.scrollTo({top:0,behavior:'smooth'});
   setTimeout(()=>{
-    prepareSvgsForPrint();
-    window.print();
-    restoreSvgsAfterPrint();
-    document.getElementById('he-result').style.display='none';
-    document.getElementById('he-shaft-results').style.display='';
+    printAfterRepaint(()=>{
+      document.getElementById('he-result').style.display='none';
+      document.getElementById('he-shaft-results').style.display='';
+    });
   }, 150);
 }
 
@@ -3119,7 +3130,7 @@ async function loadPassElevationPlan(row,vt,tr){
     const values={
       'val-oh': vt?fmt(vt.oh):null,
       'val-pit': vt?fmt(vt.pit):null,
-      'val-travel': tr?travelMm:null,
+      'val-travel': tr?travelMm.toLocaleString():null,
       'val-total': (vt&&tr)?totalHeight.toLocaleString():null,
     };
     Object.entries(values).forEach(([id,val])=>{
@@ -3210,7 +3221,7 @@ async function loadPassBedElevationPlan(row,vt,tr){
     const values={
       'val-oh': vt?fmt(vt.oh):null,
       'val-pit': vt?fmt(vt.pit):null,
-      'val-travel': tr?travelMm:null,
+      'val-travel': tr?travelMm.toLocaleString():null,
       'val-total': (vt&&tr)?totalHeight.toLocaleString():null,
       'val-hm': vt?vt.hm:null,
     };
@@ -3306,7 +3317,7 @@ async function loadPassMrElevationPlan(row,vt,tr){
     const values={
       'val-oh': vt?fmt(vt.oh):null,
       'val-pit': vt?fmt(vt.pit):null,
-      'val-travel': tr?travelMm:null,
+      'val-travel': tr?travelMm.toLocaleString():null,
       'val-total': (vt&&tr)?totalHeight.toLocaleString():null,
       'val-hm': vt?vt.hm:null,
     };
