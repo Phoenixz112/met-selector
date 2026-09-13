@@ -263,6 +263,7 @@ body{
 }
 .result-model{font-size:20px;font-weight:800;letter-spacing:-.3px;font-family:'Roboto Mono',monospace;position:relative}
 .result-sub{font-size:12px;color:rgba(255,255,255,.7);margin-top:4px;position:relative}
+.print-only-meta{display:none}
 .result-badge{
   display:inline-block;background:rgba(255,255,255,.2);
   color:#fff;font-size:10px;font-weight:700;
@@ -436,12 +437,17 @@ body{
   /* Each diagram gets its own full page at maximum size, instead of being
      squeezed alongside other content and auto-scaled down small */
   .drawing-container{padding:6px;max-width:none}
-  .dview{display:block!important;margin-bottom:0;break-inside:avoid;page-break-before:always}
+  .dview{display:block!important;margin-bottom:0;break-inside:avoid}
   .svg-wrap{border:none;background:none}
   .svg-wrap svg{width:100%!important;height:auto!important}
   /* Expand any collapsed "Other matches" so their spec details print too */
   .accordion-body{display:block!important}
   .accordion-header span:last-child{display:none!important}
+  /* Simple header/footer: model name + export date, shown at the top of the
+     Spec page and again at the top of the Shaft/Elevation pages (each of
+     which starts on its own new page), plus once more as a footer line */
+  .print-only-meta{display:block!important;font-size:10px;color:#666;font-family:'Roboto Mono',monospace;margin:0 0 8px;padding-bottom:6px;border-bottom:1px solid #ddd}
+  .print-page-header{page-break-before:always}
 }
 
 /* ── RESPONSIVE ──────────────────────────────────────────── */
@@ -786,6 +792,7 @@ body{
         <div class="result-sub" id="r-sub">—</div>
         <div class="result-badge" id="r-badge">Passenger Elevator</div>
       </div>
+      <div class="print-only-meta" id="r-print-meta"></div>
       <div class="section-title">Hoistway Dimensions</div>
       <div class="card"><table class="dim-table" id="r-shaft"></table></div>
       <div id="r-mr-wrap">
@@ -802,10 +809,11 @@ body{
           <button class="drawing-tab active" onclick="switchDraw('top')">Top View</button>
           <button class="drawing-tab" onclick="switchDraw('side')">Side View</button>
         </div>
-        <div class="dview active" id="draw-top"><div class="svg-wrap" id="svg-top"></div></div>
-        <div class="dview" id="draw-side"><div class="svg-wrap" id="svg-side"></div></div>
+        <div class="dview active print-page-header" id="draw-top"><div class="print-only-meta" id="r-print-meta-shaft"></div><div class="svg-wrap" id="svg-top"></div></div>
+        <div class="dview print-page-header" id="draw-side"><div class="print-only-meta" id="r-print-meta-elev"></div><div class="svg-wrap" id="svg-side"></div></div>
       </div>
       <div class="alert-info">All dimensions in mm · Source: Mitsubishi Electric Catalog</div>
+      <div class="print-only-meta" id="r-print-footer"></div>
       <button class="btn-export no-print" onclick="window.print()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
         Print / Export PDF
@@ -979,6 +987,7 @@ body{
         <div class="result-sub" id="he-r-sub">—</div>
         <div class="result-badge">Home Elevator</div>
       </div>
+      <div class="print-only-meta" id="he-print-meta"></div>
       <div class="section-title">Shaft Plan</div>
       <div class="card"><table class="dim-table" id="he-r-shaft"></table></div>
       <div class="section-title">Elevation Plan</div>
@@ -990,10 +999,11 @@ body{
           <button class="drawing-tab active" onclick="switchHeDraw('top')">Shaft Plan</button>
           <button class="drawing-tab" onclick="switchHeDraw('side')">Elevation Plan</button>
         </div>
-        <div class="dview active" id="he-draw-top"><div class="svg-wrap" id="he-svg-top"></div></div>
-        <div class="dview" id="he-draw-side"><div class="svg-wrap" id="he-svg-side"></div></div>
+        <div class="dview active print-page-header" id="he-draw-top"><div class="print-only-meta" id="he-print-meta-shaft"></div><div class="svg-wrap" id="he-svg-top"></div></div>
+        <div class="dview print-page-header" id="he-draw-side"><div class="print-only-meta" id="he-print-meta-elev"></div><div class="svg-wrap" id="he-svg-side"></div></div>
       </div>
       <div class="alert-info">All dimensions in mm · Source: Mitsubishi Electric Catalog (MHE)<br>*¹ When 100mm Higher Car Ceiling Height & Entrance Height (Optional) is applied<br>*² When Double Isolation Unit for Absorbing Vibration and Sound (Optional) is applied</div>
+      <div class="print-only-meta" id="he-print-footer"></div>
       <button class="btn-export no-print" onclick="window.print()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
         Print / Export PDF
@@ -1847,11 +1857,21 @@ function showModelResult(){
 // Shared renderer: fills the By-Model result view (title, spec tables, tolerance box,
 // shaft/elevation drawings) from a PH row + the resolved display values. Used by both
 // "By Model" search and the per-match Export from "By Shaft Size".
+function printMetaText(title){
+  const d=new Date();
+  const dateStr=d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  return `${title} · Exported ${dateStr}`;
+}
 function renderModelResultFromRow(row,{ah,bh,tr,spd,gate,door,cwt,std,fp,vt}){
   const code=row.code;
-  document.getElementById('r-title').textContent=`${seriesDisplayName(row.series)} · ${code}`;
+  const modelTitle=`${seriesDisplayName(row.series)} · ${code}`;
+  document.getElementById('r-title').textContent=modelTitle;
   document.getElementById('r-sub').textContent=
     `${row.origin} · ${door} Door · Gate ${gate} · ${fp==='yes'?'Fireproof · ':''}${cwt?`CWT ${cwt} · `:''}${spd} m/s · TR ${tr}m`;
+  const metaTxt=printMetaText(modelTitle);
+  ['r-print-meta','r-print-footer','r-print-meta-shaft','r-print-meta-elev'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.textContent=metaTxt;
+  });
 
   const hasMR=row.am&&row.bm;
   document.getElementById('r-mr-wrap').style.display=hasMR?'':'none';
@@ -2830,8 +2850,13 @@ function showHeResult(){
 // an HE row + resolved display values. Used by both "By Model" and the per-match
 // Export from "By Shaft Size".
 function renderHeResultFromRow(row,{ceiling,oh,pit,pitOpt,entH,tr,isOpt}){
-  document.getElementById('he-r-title').textContent=`${row.series} · ${row.code}`;
+  const modelTitle=`${row.series} · ${row.code}`;
+  document.getElementById('he-r-title').textContent=modelTitle;
   document.getElementById('he-r-sub').textContent=`MHE · ${row.door} Door · ${row.gate} Gate · ${ceiling}mm Ceiling · ${row.capacity} kg (${row.persons}P)${tr?` · TR ${tr}m`:''}`;
+  const metaTxt=printMetaText(modelTitle);
+  ['he-print-meta','he-print-footer','he-print-meta-shaft','he-print-meta-elev'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.textContent=metaTxt;
+  });
 
   tbl('he-r-shaft',[
     ['Min. Hoistway Width (AH)',row.ah,'mm'],
