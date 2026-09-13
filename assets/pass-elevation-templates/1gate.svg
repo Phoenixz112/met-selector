@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" version="1.1" width="842" height="1191" viewBox="0 0 842 1191">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" version="1.1" width="486.0" height="1042.0" viewBox="123.3 58.3 486.0 1042.0">
 <defs>
 <clipPath id="clip_1">
 <path transform="matrix(.03,0,0,-.03,14,1143)" d="M2553 0H24565V36472H2553V0"/>
@@ -1875,4 +1875,4 @@
   <text id="val-travel" x="210" y="717" text-anchor="middle" font-size="14" transform="rotate(-90 210 717)">0</text>
   <text id="val-pit" x="210" y="1020" text-anchor="middle" font-size="14" transform="rotate(-90 210 1020)">0</text>
 </g>
-<text x="827.0" y="35" text-anchor="end" font-family="monospace" font-size="16" font-weight="700" fill="#1a1a1a">UNIT: mm</text></svg>
+<text x="594.3" y="108.3" text-anchor="end" font-family="monospace" font-size="16" font-weight="700" fill="#1a1a1a">UNIT: mm</text></svg>
