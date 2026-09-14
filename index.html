@@ -2467,46 +2467,13 @@ function resetEsc(){
 // TABLES
 // ============================================================
 // Compute exact print-safe pixel dimensions for a diagram SVG from its viewBox,
-// fitting within (maxW x maxH) while preserving aspect ratio — done once, right
-// when the diagram loads (not at print time), and stored as CSS custom
-// properties consumed by the print stylesheet. This replaced several earlier
-// attempts at pure-CSS auto/max-width/max-height scaling, which proved
-// unreliable across different SVG aspect ratios (sometimes clipping content).
-function setPrintSize(svgEl, maxW, maxH){
-  if(!svgEl) return;
-  const vb=svgEl.getAttribute('viewBox');
-  if(!vb) return;
-  const parts=vb.trim().split(/\s+/).map(Number);
-  if(parts.length!==4) return;
-  const [,,vw,vh]=parts;
-  if(!vw||!vh) return;
-  const scale=Math.min(maxW/vw, maxH/vh);
-  const pw=(vw*scale).toFixed(1), ph=(vh*scale).toFixed(1);
-  svgEl.style.setProperty('--print-w',pw+'px');
-  svgEl.style.setProperty('--print-h',ph+'px');
-  svgEl.dataset.printW=pw;
-  svgEl.dataset.printH=ph;
-}
-// Belt-and-suspenders: some print engines don't reliably read CSS custom
-// properties (var(--print-w)) inside a @media print block. beforeprint fires
-// synchronously as part of the browser's own print sequence (whether
-// triggered by our button or the user's own Ctrl+P), so applying the
-// precomputed size as a direct inline pixel style here is guaranteed to work
-// regardless of var() support, with zero gesture-timing risk.
-window.addEventListener('beforeprint',()=>{
-  document.querySelectorAll('.svg-wrap svg').forEach(svg=>{
-    if(svg.dataset.printW && svg.dataset.printH){
-      svg.style.width=svg.dataset.printW+'px';
-      svg.style.height=svg.dataset.printH+'px';
-    }
-  });
-});
-window.addEventListener('afterprint',()=>{
-  document.querySelectorAll('.svg-wrap svg').forEach(svg=>{
-    svg.style.width='100%';
-    svg.style.height='';
-  });
-});
+// Print-safe diagram sizing is baked directly into each template SVG file's
+// width/height attributes (see assets/*-templates/*.svg) — computed once when
+// building each template, not at runtime. This replaced several earlier
+// JS/CSS-based approaches (custom properties, beforeprint listeners, live
+// resizing) that proved unreliable in some browsers' print pipelines. The
+// print stylesheet intentionally does NOT override width/height, so it falls
+// back to these baked-in intrinsic values automatically and unconditionally.
 function fmt(n){
   const num = typeof n==='number' ? n : (n!=null && n!=='' && !isNaN(+n) ? +n : NaN);
   return isFinite(num) ? num.toLocaleString() : n;
@@ -3048,7 +3015,6 @@ async function loadHeShaftPlan(row){
     host.innerHTML=svgText;
     const svgEl=host.querySelector('svg');
     if(svgEl) svgEl.style.width='100%';
-    if(svgEl) setPrintSize(svgEl,650,700);
     const values=heTemplateValueMap(row);
     Object.entries(values).forEach(([id,val])=>{
       const el=host.querySelector('#'+CSS.escape(id));
@@ -3084,7 +3050,6 @@ async function loadHeElevationPlan(row, evalues){
     host.innerHTML=svgText;
     const svgEl=host.querySelector('svg');
     if(svgEl) svgEl.style.width='100%';
-    if(svgEl) setPrintSize(svgEl,300,780);
     Object.entries(evalues).forEach(([id,val])=>{
       const el=host.querySelector('#'+CSS.escape(id));
       if(el && val!=null) el.textContent=val;
@@ -3134,7 +3099,6 @@ async function loadPassShaftPlan(row,ah,bh,gate,door,cwt){
     host.innerHTML=svgText;
     const svgEl=host.querySelector('svg');
     if(svgEl) svgEl.style.width='100%';
-    if(svgEl) setPrintSize(svgEl,650,700);
     const values={
       'val-ah': fmt(ah),
       'val-bh': fmt(bh),
@@ -3177,7 +3141,6 @@ async function loadPassElevationPlan(row,vt,tr){
     host.innerHTML=svgText;
     const svgEl=host.querySelector('svg');
     if(svgEl) svgEl.style.width='100%';
-    if(svgEl) setPrintSize(svgEl,300,780);
     const travelMm = tr?Math.round(tr*1000):0;
     const ohVal = vt?Number(vt.oh)||0:0;
     const pitVal = vt?Number(vt.pit)||0:0;
@@ -3227,7 +3190,6 @@ async function loadPassBedShaftPlan(row,ah,bh,gate,door,cwt){
     host.innerHTML=svgText;
     const svgEl=host.querySelector('svg');
     if(svgEl) svgEl.style.width='100%';
-    if(svgEl) setPrintSize(svgEl,650,700);
     const values={
       'val-ah': fmt(ah),
       'val-bh': fmt(bh),
@@ -3268,7 +3230,6 @@ async function loadPassBedElevationPlan(row,vt,tr){
     host.innerHTML=svgText;
     const svgEl=host.querySelector('svg');
     if(svgEl) svgEl.style.width='100%';
-    if(svgEl) setPrintSize(svgEl,300,780);
     const travelMm = tr?Math.round(tr*1000):0;
     const ohVal = vt?Number(vt.oh)||0:0;
     const pitVal = vt?Number(vt.pit)||0:0;
@@ -3323,7 +3284,6 @@ async function loadPassMrShaftPlan(row,ah,bh,gate,door,cwt){
     host.innerHTML=svgText;
     const svgEl=host.querySelector('svg');
     if(svgEl) svgEl.style.width='100%';
-    if(svgEl) setPrintSize(svgEl,650,700);
     const values={
       'val-ah': fmt(ah),
       'val-bh': fmt(bh),
@@ -3364,7 +3324,6 @@ async function loadPassMrElevationPlan(row,vt,tr){
     host.innerHTML=svgText;
     const svgEl=host.querySelector('svg');
     if(svgEl) svgEl.style.width='100%';
-    if(svgEl) setPrintSize(svgEl,300,780);
     const travelMm = tr?Math.round(tr*1000):0;
     const ohVal = vt?Number(vt.oh)||0:0;
     const pitVal = vt?Number(vt.pit)||0:0;
@@ -3659,7 +3618,6 @@ function resetHeForm(){
       host.innerHTML=svgText;
       const svgEl=host.querySelector('svg');
       if(svgEl) svgEl.style.width='100%';
-      if(svgEl) setPrintSize(svgEl,680,500);
       const val=host.querySelector('#val-b2b');
       if(val) val.textContent=nf(b2b);
       const valTg=host.querySelector('#val-tg');
