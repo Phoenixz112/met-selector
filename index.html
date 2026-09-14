@@ -3038,11 +3038,10 @@ async function loadHeShaftPlan(row){
   const key=heShaftTemplateKey(row);
   if(!key){ host.innerHTML=diagramComingSoonHTML; return; }
   try{
-    let svgText=heShaftTemplateCache[key];
-    if(svgText===undefined){
-      const res=await fetch(`assets/he-shaft-templates/${key}.svg`);
+    let svgText;
+    {
+      const res=await fetch(`assets/he-shaft-templates/${key}.svg`, {cache: 'no-store'});
       svgText = res.ok ? await res.text() : null;
-      heShaftTemplateCache[key]=svgText;
     }
     if(svgText===null){ host.innerHTML=diagramComingSoonHTML; return; }
 
@@ -3075,11 +3074,10 @@ async function loadHeElevationPlan(row, evalues){
   const key=heElevationTemplateKey(row);
   if(!key){ host.innerHTML=diagramComingSoonHTML; return; }
   try{
-    let svgText=heElevationTemplateCache[key];
-    if(svgText===undefined){
-      const res=await fetch(`assets/he-elevation-templates/${key}.svg`);
+    let svgText;
+    {
+      const res=await fetch(`assets/he-elevation-templates/${key}.svg`, {cache: 'no-store'});
       svgText = res.ok ? await res.text() : null;
-      heElevationTemplateCache[key]=svgText;
     }
     if(svgText===null){ host.innerHTML=diagramComingSoonHTML; return; }
 
@@ -3126,11 +3124,10 @@ async function loadPassShaftPlan(row,ah,bh,gate,door,cwt){
   const key=passShaftTemplateKey(gate,door,cwt);
   if(!key){ host.innerHTML=diagramComingSoonHTML; return; }
   try{
-    let svgText=passShaftTemplateCache[key];
-    if(svgText===undefined){
-      const res=await fetch(`assets/pass-shaft-templates/${key}.svg`);
+    let svgText;
+    {
+      const res=await fetch(`assets/pass-shaft-templates/${key}.svg`, {cache: 'no-store'});
       svgText = res.ok ? await res.text() : null;
-      passShaftTemplateCache[key]=svgText;
     }
     if(svgText===null){ host.innerHTML=diagramComingSoonHTML; return; }
 
@@ -3170,11 +3167,10 @@ async function loadPassElevationPlan(row,vt,tr){
   const key=passElevationTemplateKey(gate);
   if(!key){ host.innerHTML=diagramComingSoonHTML; return; }
   try{
-    let svgText=passElevationTemplateCache[key];
-    if(svgText===undefined){
-      const res=await fetch(`assets/pass-elevation-templates/${key}.svg`);
+    let svgText;
+    {
+      const res=await fetch(`assets/pass-elevation-templates/${key}.svg`, {cache: 'no-store'});
       svgText = res.ok ? await res.text() : null;
-      passElevationTemplateCache[key]=svgText;
     }
     if(svgText===null){ host.innerHTML=diagramComingSoonHTML; return; }
 
@@ -3221,11 +3217,10 @@ async function loadPassBedShaftPlan(row,ah,bh,gate,door,cwt){
   const key=passBedShaftTemplateKey(gate,door,cwt);
   if(!key){ host.innerHTML=diagramComingSoonHTML; return; }
   try{
-    let svgText=passBedShaftTemplateCache[key];
-    if(svgText===undefined){
-      const res=await fetch(`assets/passbed-shaft-templates/${key}.svg`);
+    let svgText;
+    {
+      const res=await fetch(`assets/passbed-shaft-templates/${key}.svg`, {cache: 'no-store'});
       svgText = res.ok ? await res.text() : null;
-      passBedShaftTemplateCache[key]=svgText;
     }
     if(svgText===null){ host.innerHTML=diagramComingSoonHTML; return; }
 
@@ -3263,11 +3258,10 @@ async function loadPassBedElevationPlan(row,vt,tr){
   const key=passBedElevationTemplateKey(gate);
   if(!key){ host.innerHTML=diagramComingSoonHTML; return; }
   try{
-    let svgText=passBedElevationTemplateCache[key];
-    if(svgText===undefined){
-      const res=await fetch(`assets/passbed-elevation-templates/${key}.svg`);
+    let svgText;
+    {
+      const res=await fetch(`assets/passbed-elevation-templates/${key}.svg`, {cache: 'no-store'});
       svgText = res.ok ? await res.text() : null;
-      passBedElevationTemplateCache[key]=svgText;
     }
     if(svgText===null){ host.innerHTML=diagramComingSoonHTML; return; }
 
@@ -3319,11 +3313,10 @@ async function loadPassMrShaftPlan(row,ah,bh,gate,door,cwt){
   const key=passMrShaftTemplateKey(gate,door,cwt);
   if(!key){ host.innerHTML=diagramComingSoonHTML; return; }
   try{
-    let svgText=passMrShaftTemplateCache[key];
-    if(svgText===undefined){
-      const res=await fetch(`assets/passmr-shaft-templates/${key}.svg`);
+    let svgText;
+    {
+      const res=await fetch(`assets/passmr-shaft-templates/${key}.svg`, {cache: 'no-store'});
       svgText = res.ok ? await res.text() : null;
-      passMrShaftTemplateCache[key]=svgText;
     }
     if(svgText===null){ host.innerHTML=diagramComingSoonHTML; return; }
 
@@ -3361,11 +3354,10 @@ async function loadPassMrElevationPlan(row,vt,tr){
   const key=passMrElevationTemplateKey(gate);
   if(!key){ host.innerHTML=diagramComingSoonHTML; return; }
   try{
-    let svgText=passMrElevationTemplateCache[key];
-    if(svgText===undefined){
-      const res=await fetch(`assets/passmr-elevation-templates/${key}.svg`);
+    let svgText;
+    {
+      const res=await fetch(`assets/passmr-elevation-templates/${key}.svg`, {cache: 'no-store'});
       svgText = res.ok ? await res.text() : null;
-      passMrElevationTemplateCache[key]=svgText;
     }
     if(svgText===null){ host.innerHTML=diagramComingSoonHTML; return; }
 
@@ -3655,11 +3647,10 @@ function resetHeForm(){
     const host=document.getElementById('esc-svg-host');
     const key=escTemplateKey(degree,req);
     try{
-      let svgText=escTemplateCache[key];
-      if(svgText===undefined){
-        const res=await fetch(`assets/esc-templates/${key}.svg`);
+      let svgText;
+      {
+        const res=await fetch(`assets/esc-templates/${key}.svg`, {cache: 'no-store'});
         svgText = res.ok ? await res.text() : null;
-        escTemplateCache[key]=svgText;
       }
       if(svgText===null){
         host.innerHTML=`<div style="padding:24px;text-align:center;color:var(--text-soft);font-size:12px">Diagram under development — coming soon (${key})</div>`;
