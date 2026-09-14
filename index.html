@@ -448,7 +448,7 @@ body{
   .drawing-container{padding:6px;max-width:none}
   .dview{display:block!important;margin-bottom:0;break-inside:avoid}
   .svg-wrap{border:none;background:none}
-  .svg-wrap svg{width:var(--print-w,100%)!important;height:var(--print-h,auto)!important;max-width:100%;display:block;margin:0 auto}
+  .svg-wrap svg{max-width:100%;display:block;margin:0 auto}
   /* Expand any collapsed "Other matches" so their spec details print too */
   .accordion-body{display:block!important}
   .accordion-header span:last-child{display:none!important}
@@ -2481,9 +2481,32 @@ function setPrintSize(svgEl, maxW, maxH){
   const [,,vw,vh]=parts;
   if(!vw||!vh) return;
   const scale=Math.min(maxW/vw, maxH/vh);
-  svgEl.style.setProperty('--print-w',(vw*scale).toFixed(1)+'px');
-  svgEl.style.setProperty('--print-h',(vh*scale).toFixed(1)+'px');
+  const pw=(vw*scale).toFixed(1), ph=(vh*scale).toFixed(1);
+  svgEl.style.setProperty('--print-w',pw+'px');
+  svgEl.style.setProperty('--print-h',ph+'px');
+  svgEl.dataset.printW=pw;
+  svgEl.dataset.printH=ph;
 }
+// Belt-and-suspenders: some print engines don't reliably read CSS custom
+// properties (var(--print-w)) inside a @media print block. beforeprint fires
+// synchronously as part of the browser's own print sequence (whether
+// triggered by our button or the user's own Ctrl+P), so applying the
+// precomputed size as a direct inline pixel style here is guaranteed to work
+// regardless of var() support, with zero gesture-timing risk.
+window.addEventListener('beforeprint',()=>{
+  document.querySelectorAll('.svg-wrap svg').forEach(svg=>{
+    if(svg.dataset.printW && svg.dataset.printH){
+      svg.style.width=svg.dataset.printW+'px';
+      svg.style.height=svg.dataset.printH+'px';
+    }
+  });
+});
+window.addEventListener('afterprint',()=>{
+  document.querySelectorAll('.svg-wrap svg').forEach(svg=>{
+    svg.style.width='100%';
+    svg.style.height='';
+  });
+});
 function fmt(n){
   const num = typeof n==='number' ? n : (n!=null && n!=='' && !isNaN(+n) ? +n : NaN);
   return isFinite(num) ? num.toLocaleString() : n;
